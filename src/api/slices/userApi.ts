@@ -1,20 +1,8 @@
 import { type User, type Role, Domains } from '@/models';
-import { baseApi } from '../baseApi';
+import { baseApi } from 'api/baseApi';
+import type { PaginationParams, PaginationResult } from '@/models/pagination';
 
-interface GetUsersResponse {
-  data: User<Role>[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-interface GetUsersRequest {
-  page?: number;
-  limit?: number;
-  search?: string;
-  sort?: string;
-  order?: 'ascend' | 'descend';
-}
+interface GetUsersResponse extends PaginationResult<User<Role>> {}
 
 interface ChangePasswordRequest {
   currentPassword: string;
@@ -23,7 +11,7 @@ interface ChangePasswordRequest {
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<GetUsersResponse, GetUsersRequest>({
+    getUsers: builder.query<GetUsersResponse, PaginationParams>({
       query: (params) => ({
         url: '/users',
         method: 'GET',

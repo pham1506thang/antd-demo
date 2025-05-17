@@ -1,5 +1,5 @@
 import { Domains, type Role, type User } from '@/models';
-import { baseApi } from '../baseApi';
+import { baseApi } from 'api/baseApi';
 import { tokenService } from '@/services/tokenService';
 
 interface LoginRequest {

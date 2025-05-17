@@ -1,9 +1,9 @@
 import React from 'react';
 import { Form, Input, Button, Space } from 'antd';
 import { SaveOutlined, CloseOutlined } from '@ant-design/icons';
-import { userApi } from '../../../api/slices/userApi';
-import type { User } from '../../../models/user';
-import type { Role } from '../../../models/role';
+import { userApi } from 'api/slices/userApi';
+import type { User } from 'models/user';
+import type { Role } from 'models/role';
 
 interface ProfileFormProps {
   initialValues?: User<Role>;

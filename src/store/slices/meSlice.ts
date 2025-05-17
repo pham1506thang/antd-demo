@@ -1,8 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { User } from '../../models/user';
-import type { Role } from '../../models/role';
-import { authApi } from '../../api/slices/authApi';
+import type { User } from 'models/user';
+import type { Role } from 'models/role';
+import { authApi } from 'api/slices/authApi';
 import { userApi } from '@/api/slices/userApi';
 
 interface MeState {

@@ -1,52 +1,30 @@
-import React, { useState } from 'react';
-import { Table, Tag, Space, Button, message } from 'antd';
+import React from 'react';
+import { Table, Tag, Space, Button, message, Input } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import type { TablePaginationConfig } from 'antd/es/table';
-import type { FilterValue, SorterResult, TableCurrentDataSource } from 'antd/es/table/interface';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { User } from '../../../models/user';
-import type { Role } from '../../../models/role';
-import { userApi } from '../../../api/slices/userApi';
+import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import type { User } from 'models/user';
+import type { Role } from 'models/role';
+import { userApi } from 'api/slices/userApi';
+import { usePagination } from '@/hooks/usePagination';
+import type { FilterValue } from 'antd/es/table/interface';
+import debounce from 'lodash/debounce';
 
-interface TableParams {
-  pagination?: TablePaginationConfig;
-  sortField?: string;
-  sortOrder?: 'ascend' | 'descend' | null;
-  filters?: Record<string, FilterValue | null>;
-}
+const { Search } = Input;
 
 const UsersList: React.FC = () => {
-  const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-    },
+  const {
+    tableParams,
+    paginationParams,
+    handleTableChange,
+    setSearch,
+  } = usePagination<User<Role>>({
+    defaultSorts: [{ field: 'createdAt', order: 'descend' }],
+    defaultFilters: [],
   });
 
-  const { data: usersData, isLoading, isFetching } = userApi.useGetUsersQuery({
-    page: tableParams.pagination?.current,
-    limit: tableParams.pagination?.pageSize,
-    sort: tableParams.sortField,
-    order: tableParams.sortOrder as 'ascend' | 'descend',
-  });
+  const { data: usersData, isLoading, isFetching } = userApi.useGetUsersQuery(paginationParams, { skip: true });
 
   const [deleteUser] = userApi.useDeleteUserMutation();
-
-  const handleTableChange = (
-    pagination: TablePaginationConfig,
-    filters: Record<string, FilterValue | null>,
-    sorter: SorterResult<User<Role>> | SorterResult<User<Role>>[],
-    _: TableCurrentDataSource<User<Role>>
-  ) => {
-    setTableParams({
-      pagination,
-      filters,
-      ...(!Array.isArray(sorter) && {
-        sortField: sorter.field as string,
-        sortOrder: sorter.order,
-      }),
-    });
-  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -57,12 +35,45 @@ const UsersList: React.FC = () => {
     }
   };
 
+  const handleSearch = debounce((value: string) => {
+    setSearch(value);
+  }, 500);
+
   const columns: ColumnsType<User<Role>> = [
     {
       title: 'Username',
       dataIndex: 'username',
       key: 'username',
       sorter: true,
+      filterIcon: <SearchOutlined />,
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Search
+            placeholder="Search username"
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onSearch={() => confirm()}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Filter
+            </Button>
+            <Button
+              onClick={() => clearFilters?.()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Reset
+            </Button>
+          </Space>
+        </div>
+      ),
     },
     {
       title: 'Name',
@@ -74,11 +85,19 @@ const UsersList: React.FC = () => {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      sorter: true,
     },
     {
       title: 'Roles',
       dataIndex: 'roles',
       key: 'roles',
+      filters: [
+        { text: 'Admin', value: 'admin' },
+        { text: 'User', value: 'user' },
+        { text: 'Manager', value: 'manager' },
+      ],
+      filterMode: 'tree',
+      filterSearch: true,
       render: (roles: Role[]) => (
         <>
           {roles.map((role) => (
@@ -93,6 +112,7 @@ const UsersList: React.FC = () => {
       title: 'Last Login',
       dataIndex: 'lastLogin',
       key: 'lastLogin',
+      sorter: true,
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
@@ -117,19 +137,31 @@ const UsersList: React.FC = () => {
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={usersData?.data}
-      rowKey="_id"
-      loading={isLoading || isFetching}
-      pagination={{
-        ...tableParams.pagination,
-        total: usersData?.total,
-        showSizeChanger: true,
-        showTotal: (total) => `Total ${total} users`,
-      }}
-      onChange={handleTableChange}
-    />
+    <div>
+      <div style={{ marginBottom: 16 }}>
+        <Search
+          placeholder="Search users"
+          allowClear
+          onChange={e => handleSearch(e.target.value)}
+          style={{ width: 200 }}
+        />
+      </div>
+      <Table
+        columns={columns}
+        dataSource={usersData?.data}
+        rowKey="_id"
+        loading={isLoading || isFetching}
+        pagination={{
+          ...tableParams.pagination,
+          total: usersData?.meta.total,
+          current: usersData?.meta.page,
+          pageSize: usersData?.meta.limit,
+          showSizeChanger: true,
+          showTotal: (total) => `Total ${total} users`,
+        }}
+        onChange={handleTableChange}
+      />
+    </div>
   );
 };
 

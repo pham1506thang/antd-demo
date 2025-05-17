@@ -18,11 +18,11 @@ import {
   SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
-import { selectMe } from '../../store/slices/meSlice';
+import { selectMe } from 'store/slices/meSlice';
 import ProfileForm from './components/ProfileForm';
 import ChangePasswordForm from './components/ChangePasswordForm';
 import AvatarUpload from './components/AvatarUpload';
-import type { Role } from '../../models/role';
+import type { Role } from 'models/role';
 
 const { Title } = Typography;
 
