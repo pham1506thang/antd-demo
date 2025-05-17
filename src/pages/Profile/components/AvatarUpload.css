@@ -1,0 +1,36 @@
+.avatar-uploader .ant-upload {
+  width: auto !important;
+  height: auto !important;
+  background: none !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+.avatar-uploader .ant-upload:hover {
+  background: none !important;
+}
+
+.avatar-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.avatar-container .overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-container:hover .overlay {
+  opacity: 1;
+} 
