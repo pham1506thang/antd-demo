@@ -1,6 +1,6 @@
-import React from 'react';
-import { Form, Input, Select, Button, Space } from 'antd';
-import { SearchOutlined, UndoOutlined } from '@ant-design/icons';
+import React from "react";
+import { Form, Input, Select, Button, Space } from "antd";
+import { SearchOutlined, UndoOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -12,29 +12,28 @@ export interface FilterValues {
 
 interface UserFiltersProps {
   values: FilterValues;
-  onChange: (changedValues: any, allValues: FilterValues) => void;
-  onSearch: (values: FilterValues) => void;
+  onChange: (allValues: FilterValues) => void;
 }
 
-const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange, onSearch }) => {
+const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
   const [form] = Form.useForm();
+
+  const onValuesChange = (_changedValues: any, allValues: FilterValues) => {
+    // Call the onChange prop with the changed values and all values
+    onChange(allValues);
+  };
 
   const handleReset = () => {
     form.resetFields();
-    onSearch({});
-  };
-
-  const handleFinish = (values: FilterValues) => {
-    onSearch(values);
+    onChange({});
   };
 
   return (
-    <Form 
-      form={form} 
+    <Form
+      form={form}
       layout="vertical"
       initialValues={values}
-      onValuesChange={onChange}
-      onFinish={handleFinish}
+      onValuesChange={onValuesChange}
     >
       <Space>
         <Form.Item name="search" label="Search">
@@ -44,9 +43,9 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange, onSearch })
           />
         </Form.Item>
         <Form.Item name="status" label="Status">
-          <Select 
+          <Select
             mode="multiple"
-            placeholder="Select status" 
+            placeholder="Select status"
             allowClear
             style={{ minWidth: 200 }}
           >
@@ -56,9 +55,9 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange, onSearch })
           </Select>
         </Form.Item>
         <Form.Item name="role" label="Role">
-          <Select 
+          <Select
             mode="multiple"
-            placeholder="Select role" 
+            placeholder="Select role"
             allowClear
             style={{ minWidth: 200 }}
           >
@@ -68,14 +67,13 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange, onSearch })
           </Select>
         </Form.Item>
         <Form.Item label=" ">
-          <Space>
-            <Button type="primary" icon={<SearchOutlined />} htmlType="submit">
-              Search
-            </Button>
-            <Button icon={<UndoOutlined />} onClick={handleReset}>
-              Reset
-            </Button>
-          </Space>
+          <Button
+            htmlType="reset"
+            icon={<UndoOutlined />}
+            onClick={handleReset}
+          >
+            Reset
+          </Button>
         </Form.Item>
       </Space>
     </Form>

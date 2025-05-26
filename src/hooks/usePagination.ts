@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import _ from 'lodash';
 import type { TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import type { PaginationParams, TableParams, SortField, FilterField } from '@/models/pagination';
@@ -39,6 +40,27 @@ export function usePagination<T>({
     search: defaultSearch,
   });
 
+  // Debounced setSearch using useCallback and lodash.debounce
+  const setSearch = useCallback(
+    _.debounce((search: string) => {
+      setTableParams(prev => ({
+        ...prev,
+        search,
+        pagination: {
+          ...prev.pagination,
+          current: 1,
+        },
+      }));
+    }, 400),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      setSearch.cancel && setSearch.cancel();
+    };
+  }, [setSearch]);
+
   // Convert table params to API pagination params
   const paginationParams: PaginationParams = useMemo(() => ({
     page: tableParams.pagination?.current || defaultCurrent,
@@ -68,11 +90,14 @@ export function usePagination<T>({
           : [];
 
       // Handle multiple filters
-      const filterFields: FilterField[] = Object.entries(filters)
-        .filter(([_, value]) => value !== null && value.length > 0)
+      const filterFields: FilterField[] = (Object.entries(filters)
+        .filter(([_, value]) => value !== null && value.length > 0) as [string, FilterValue][])
+        // Convert filter values to appropriate format
         .map(([field, value]) => ({
           field,
-          value: value!,
+          value: Array.isArray(value)
+            ? value.filter(v => typeof v === 'string' || typeof v === 'number')
+            : value,
         }));
 
       setTableParams({
@@ -85,22 +110,10 @@ export function usePagination<T>({
     [tableParams.search]
   );
 
-  const setSearch = useCallback((search: string) => {
-    setTableParams(prev => ({
-      ...prev,
-      search,
-      // Reset to first page when searching
-      pagination: {
-        ...prev.pagination,
-        current: 1,
-      },
-    }));
-  }, []);
-
   return {
     tableParams,
     paginationParams,
     handleTableChange,
     setSearch,
   };
-} 
+}
