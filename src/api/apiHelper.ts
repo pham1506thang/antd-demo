@@ -24,7 +24,11 @@ export const buildQueryString = (params: Record<string, any>): string => {
 
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === null || value === '') return;
-    if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+    if (Array.isArray(value)) {
+      if (value.length === 0) return;
+      searchParams.set(key, JSON.stringify(value));
+    } else if (typeof value === 'object' && value !== null) {
+      if (Object.keys(value).length === 0) return;
       searchParams.set(key, JSON.stringify(value));
     } else {
       searchParams.set(key, String(value));
