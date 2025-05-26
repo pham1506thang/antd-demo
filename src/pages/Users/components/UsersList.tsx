@@ -1,17 +1,20 @@
-import React from 'react';
-import { Table, Tag, Space, Button, message, Input } from 'antd';
+import React, { useEffect } from 'react';
+import { Table, Tag, Space, Button, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { User } from 'models/user';
 import type { Role } from 'models/role';
 import { userApi } from 'api/slices/userApi';
 import { usePagination } from '@/hooks/usePagination';
-import type { FilterValue } from 'antd/es/table/interface';
-import debounce from 'lodash/debounce';
+import type { PaginationParams } from 'models/pagination';
+import { convertFiltersToParams } from '@/api/apiHelper';
+import type { FilterValues } from './UserFilters';
 
-const { Search } = Input;
+interface UsersListProps {
+  filters: FilterValues;
+}
 
-const UsersList: React.FC = () => {
+const UsersList: React.FC<UsersListProps> = ({ filters }) => {
   const {
     tableParams,
     paginationParams,
@@ -22,22 +25,35 @@ const UsersList: React.FC = () => {
     defaultFilters: [],
   });
 
-  const { data: usersData, isLoading, isFetching } = userApi.useGetUsersQuery(paginationParams, { skip: true });
+  useEffect(() => {
+    if (filters.search) {
+      setSearch(filters.search);
+    }
+  }, [filters.search, setSearch]);
+
+  // Convert filter values to API params
+  const apiFilters = convertFiltersToParams({
+    status: filters.status,
+    role: filters.role,
+  });
+
+  const queryParams: PaginationParams = {
+    ...paginationParams,
+    filters: apiFilters,
+  };
+
+  const { data: usersData, isLoading, isFetching } = userApi.useGetUsersQuery(queryParams);
 
   const [deleteUser] = userApi.useDeleteUserMutation();
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteUser(id);
+      await deleteUser(id).unwrap();
       message.success('User deleted successfully');
     } catch (error) {
       message.error('Failed to delete user');
     }
   };
-
-  const handleSearch = debounce((value: string) => {
-    setSearch(value);
-  }, 500);
 
   const columns: ColumnsType<User<Role>> = [
     {
@@ -45,35 +61,6 @@ const UsersList: React.FC = () => {
       dataIndex: 'username',
       key: 'username',
       sorter: true,
-      filterIcon: <SearchOutlined />,
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Search
-            placeholder="Search username"
-            value={selectedKeys[0]}
-            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onSearch={() => confirm()}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Filter
-            </Button>
-            <Button
-              onClick={() => clearFilters?.()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Reset
-            </Button>
-          </Space>
-        </div>
-      ),
     },
     {
       title: 'Name',
@@ -91,13 +78,6 @@ const UsersList: React.FC = () => {
       title: 'Roles',
       dataIndex: 'roles',
       key: 'roles',
-      filters: [
-        { text: 'Admin', value: 'admin' },
-        { text: 'User', value: 'user' },
-        { text: 'Manager', value: 'manager' },
-      ],
-      filterMode: 'tree',
-      filterSearch: true,
       render: (roles: Role[]) => (
         <>
           {roles.map((role) => (
@@ -118,7 +98,7 @@ const UsersList: React.FC = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (_, record) => (
+      render: (_, record: User<Role>) => (
         <Space size="middle">
           <Button
             type="text"
@@ -129,7 +109,7 @@ const UsersList: React.FC = () => {
             type="text"
             danger
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record._id!)}
+            onClick={() => record._id && handleDelete(record._id)}
           />
         </Space>
       ),
@@ -137,32 +117,22 @@ const UsersList: React.FC = () => {
   ];
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Search
-          placeholder="Search users"
-          allowClear
-          onChange={e => handleSearch(e.target.value)}
-          style={{ width: 200 }}
-        />
-      </div>
-      <Table
-        columns={columns}
-        dataSource={usersData?.data}
-        rowKey="_id"
-        loading={isLoading || isFetching}
-        pagination={{
-          ...tableParams.pagination,
-          total: usersData?.meta.total,
-          current: usersData?.meta.page,
-          pageSize: usersData?.meta.limit,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} users`,
-        }}
-        onChange={handleTableChange}
-      />
-    </div>
+    <Table
+      columns={columns}
+      dataSource={usersData?.data}
+      rowKey="_id"
+      loading={isLoading || isFetching}
+      pagination={{
+        ...tableParams.pagination,
+        total: usersData?.meta.total,
+        current: usersData?.meta.page,
+        pageSize: usersData?.meta.limit,
+        showSizeChanger: true,
+        showTotal: (total) => `Total ${total} users`,
+      }}
+      onChange={handleTableChange}
+    />
   );
 };
 
-export default UsersList; 
+export default UsersList;
