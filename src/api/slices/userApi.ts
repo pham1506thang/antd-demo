@@ -1,6 +1,7 @@
 import { type User, type Role, Domains } from '@/models';
 import { baseApi } from 'api/baseApi';
 import type { PaginationParams, PaginationResult } from '@/models/pagination';
+import { buildQueryString } from '@/api/apiHelper';
 
 interface GetUsersResponse extends PaginationResult<User<Role>> {}
 
@@ -12,11 +13,13 @@ interface ChangePasswordRequest {
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getUsers: builder.query<GetUsersResponse, PaginationParams>({
-      query: (params) => ({
-        url: '/users',
-        method: 'GET',
-        params,
-      }),
+      query: (params) => {
+        const queryString = buildQueryString(params);
+        return {
+          url: `/users${queryString}`,
+          method: 'GET',
+        };
+      },
       providesTags: [Domains.Users],
     }),
     getUser: builder.query<User<Role>, string>({
@@ -65,4 +68,4 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: [Domains.Users],
     }),
   }),
-}); 
+});

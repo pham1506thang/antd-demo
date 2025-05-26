@@ -1,4 +1,4 @@
-import type { FilterField, PaginationParams } from '../models/pagination';
+import type { FilterField } from '../models/pagination';
 
 export const convertFiltersToParams = (filters: Record<string, any>): FilterField[] => {
   return Object.entries(filters)
@@ -19,34 +19,17 @@ export const convertFiltersToParams = (filters: Record<string, any>): FilterFiel
     });
 };
 
-export const buildQueryString = (params: PaginationParams): string => {
-  const queryParts: string[] = [];
+export const buildQueryString = (params: Record<string, any>): string => {
+  const searchParams = new URLSearchParams();
 
-  if (params.page) {
-    queryParts.push(`page=${params.page}`);
-  }
-  if (params.limit) {
-    queryParts.push(`limit=${params.limit}`);
-  }
-  if (params.search) {
-    queryParts.push(`search=${encodeURIComponent(params.search)}`);
-  }
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return;
+    if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+      searchParams.set(key, JSON.stringify(value));
+    } else {
+      searchParams.set(key, String(value));
+    }
+  });
 
-  if (params.sorts?.length) {
-    const sortString = params.sorts
-      .map(sort => `${sort.field}:${sort.order}`)
-      .join(',');
-    queryParts.push(`sort=${sortString}`);
-  }
-
-  if (params.filters?.length) {
-    params.filters.forEach(filter => {
-      const value = Array.isArray(filter.value) 
-        ? filter.value.join(',')
-        : filter.value;
-      queryParts.push(`${filter.field}${filter.operator ? `:${filter.operator}` : ''}=${value}`);
-    });
-  }
-
-  return queryParts.length ? `?${queryParts.join('&')}` : '';
+  return searchParams.toString() ? `?${searchParams.toString()}` : '';
 };
