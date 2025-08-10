@@ -40,7 +40,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
     role: filters.role,
   });
 
-  const queryParams: PaginationParams = {
+  const queryParams: PaginationParams<User<Role>> = {
     ...paginationParams,
     filters: apiFilters,
   };
@@ -106,13 +106,13 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
           <Button
             type="text"
             icon={<EditOutlined />}
-            onClick={() => console.log('Edit user:', record._id)}
+            onClick={() => console.log('Edit user:', record.id)}
           />
           <Button
             type="text"
             danger
             icon={<DeleteOutlined />}
-            onClick={() => record._id && handleDelete(record._id)}
+            onClick={() => record.id && handleDelete(record.id)}
           />
         </Space>
       ),

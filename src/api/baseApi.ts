@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn } from '@reduxjs/toolkit/query';
 import type { AxiosRequestConfig, AxiosError } from 'axios';
 import axiosInstance from './axiosConfig';
-import { DomainValues } from '@/models/permission';
+import { DOMAINS } from '@/models/permission';
 
 // Define custom axios base query
 const axiosBaseQuery =
@@ -41,5 +41,5 @@ export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery(),
   endpoints: () => ({}),
-  tagTypes: [...DomainValues],
+  tagTypes: Object.values(DOMAINS).map(domainValue => domainValue.value),
 }); 

@@ -7,14 +7,14 @@ import type { PaginationParams, TableParams, SortField, FilterField } from '@/mo
 interface UsePaginationProps<T> {
   defaultPageSize?: number;
   defaultCurrent?: number;
-  defaultSorts?: SortField[];
+  defaultSorts?: SortField<T>[];
   defaultFilters?: FilterField[];
   defaultSearch?: string;
 }
 
 interface UsePaginationResult<T> {
-  tableParams: TableParams;
-  paginationParams: PaginationParams;
+  tableParams: TableParams<T>;
+  paginationParams: PaginationParams<T>;
   handleTableChange: (
     pagination: TablePaginationConfig,
     filters: Record<string, FilterValue | null>,
@@ -30,7 +30,7 @@ export function usePagination<T>({
   defaultFilters = [],
   defaultSearch = '',
 }: UsePaginationProps<T> = {}): UsePaginationResult<T> {
-  const [tableParams, setTableParams] = useState<TableParams>({
+  const [tableParams, setTableParams] = useState<TableParams<T>>({
     pagination: {
       current: defaultCurrent,
       pageSize: defaultPageSize,
@@ -62,7 +62,7 @@ export function usePagination<T>({
   }, [setSearch]);
 
   // Convert table params to API pagination params
-  const paginationParams: PaginationParams = useMemo(() => ({
+  const paginationParams: PaginationParams<T> = useMemo(() => ({
     page: tableParams.pagination?.current || defaultCurrent,
     limit: tableParams.pagination?.pageSize || defaultPageSize,
     sorts: tableParams.sortFields,
@@ -77,14 +77,14 @@ export function usePagination<T>({
       sorter: SorterResult<T> | SorterResult<T>[],
     ) => {
       // Handle multiple sorters
-      const sortFields: SortField[] = Array.isArray(sorter)
+      const sortFields: SortField<T>[] = Array.isArray(sorter)
         ? sorter.map(s => ({
-            field: s.field as string,
+            field: s.field as keyof T,
             order: s.order || 'ascend',
           }))
         : sorter.field
           ? [{
-              field: sorter.field as string,
+              field: sorter.field as keyof T,
               order: sorter.order || 'ascend',
             }]
           : [];

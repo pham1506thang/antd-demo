@@ -3,7 +3,6 @@ import { Form, Input, Button, Card } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authApi } from '@/api/slices/authApi';
-import { tokenService } from '@/services/tokenService';
 
 interface LoginForm {
   username: string;
@@ -17,10 +16,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (values: LoginForm) => {
     try {
-      const result = await login(values).unwrap();
-      // Store the token
-      tokenService.setToken(result.accessToken);
-      
+      await login(values).unwrap();
       // Navigate to the original route or home
       // AppInit will handle fetching the user data
       const from = (location.state as any)?.from?.pathname || '/';

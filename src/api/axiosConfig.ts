@@ -2,7 +2,6 @@ import axios from 'axios';
 import type { AxiosError, AxiosInstance, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios';
 import { message } from 'antd';
 import { tokenService } from '@/services/tokenService';
-import { Domains } from '@/models';
 
 // Extend AxiosRequestConfig to include _retry flag
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -101,7 +100,7 @@ axiosInstance.interceptors.response.use(
         await delay(500);
         
         // Attempt to refresh token
-        const response = await rawAxios.post(`/${Domains.Auths}/refresh`);
+        const response = await rawAxios.post(`/auths/refresh`);
         const { accessToken } = response.data;
         
         tokenService.setToken(accessToken);

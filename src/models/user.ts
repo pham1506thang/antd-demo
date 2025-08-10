@@ -1,7 +1,7 @@
 import type { Role } from "./role";
 
-export type User<TRole extends Role | string> = {
-  _id?: string;
+export type User<TRole extends Role | string = string> = {
+  id?: string;
   username: string;
   name?: string;
   email?: string;

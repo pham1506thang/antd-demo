@@ -1,16 +1,35 @@
 import type { TablePaginationConfig } from "antd/es/table";
 
-export type FilterOperator = 'eq' | 'neq' | 'contains' | 'in' | 'nin' | 'gt' | 'gte' | 'lt' | 'lte';
+export type FilterOperator = 
+  | 'eq' 
+  | 'neq' 
+  | 'contains' 
+  | 'not_contains'
+  | 'starts_with'
+  | 'ends_with'
+  | 'in' 
+  | 'nin' 
+  | 'gt' 
+  | 'gte' 
+  | 'lt' 
+  | 'lte'
+  | 'is_null'
+  | 'is_not_null'
+  | 'between';
+
+type FilterValue = string | number | boolean | Date | Array<string | number | Date> | null;
 
 export interface FilterField {
   field: string;
   operator?: FilterOperator;
-  value: string | number | boolean | Array<string | number>;
+  value: FilterValue;
 }
 
-export interface SortField {
-  field: string;
-  order: 'ascend' | 'descend';
+type SortOrder = 'ascend' | 'descend';
+
+export interface SortField<T> {
+  field: keyof T;
+  order: SortOrder;
 }
 
 export interface PaginationResult<T> {
@@ -23,17 +42,17 @@ export interface PaginationResult<T> {
   };
 }
 
-export interface PaginationParams {
+export interface PaginationParams<T> {
   page: number;
   limit: number;
-  sorts?: SortField[];
+  sorts?: SortField<T>[];
   filters?: FilterField[];
   search?: string;
 }
 
-export interface TableParams {
+export interface TableParams<T> {
   pagination?: TablePaginationConfig;
-  sortFields?: SortField[];
+  sortFields?: SortField<T>[];
   filterFields?: FilterField[];
   search?: string;
 }

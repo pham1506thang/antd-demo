@@ -20,11 +20,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   const [updateUser] = userApi.useUpdateUserMutation();
 
   const handleSubmit = async (values: Pick<User<Role>, 'name' | 'email'>) => {
-    if (!initialValues?._id) return;
+    if (!initialValues?.id) return;
 
     try {
       await updateUser({
-        id: initialValues._id,
+        id: initialValues.id,
         user: {
           name: values.name,
           email: values.email,

@@ -1,4 +1,4 @@
-import { Domains, type Role, type User } from '@/models';
+import { type Role, type User } from '@/models';
 import { baseApi } from 'api/baseApi';
 import { tokenService } from '@/services/tokenService';
 
@@ -16,7 +16,7 @@ export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: `/${Domains.Auths}/login`,
+        url: `/auths/login`,
         method: 'POST',
         data: credentials,
       }),
@@ -28,18 +28,16 @@ export const authApi = baseApi.injectEndpoints({
           // Handle error if needed
         }
       },
-      invalidatesTags: [Domains.Auths],
     }),
     getMe: builder.query<User<Role>, void>({
       query: () => ({
-        url: `/${Domains.Auths}/me`,
+        url: `/auths/me`,
         method: 'GET',
       }),
-      providesTags: [Domains.Auths],
     }),
     logout: builder.mutation<void, void>({
       query: () => ({
-        url: `/${Domains.Auths}/logout`,
+        url: `/atuhs/logout`,
         method: 'POST',
       }),
       onQueryStarted: async (_, { queryFulfilled }) => {
@@ -50,7 +48,6 @@ export const authApi = baseApi.injectEndpoints({
           // Handle error if needed
         }
       },
-      invalidatesTags: [Domains.Auths],
     })
   }),
 }); 

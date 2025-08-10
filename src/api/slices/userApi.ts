@@ -1,4 +1,4 @@
-import { type User, type Role, Domains } from '@/models';
+import { type User, type Role, DOMAINS } from '@/models';
 import { baseApi } from 'api/baseApi';
 import type { PaginationParams, PaginationResult } from '@/models/pagination';
 import { buildQueryString } from '@/api/apiHelper';
@@ -12,22 +12,22 @@ interface ChangePasswordRequest {
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<GetUsersResponse, PaginationParams>({
+    getUsers: builder.query<GetUsersResponse, PaginationParams<User<Role>>>({
       query: (params) => {
         const queryString = buildQueryString(params);
         return {
-          url: `/users${queryString}`,
+          url: `/${DOMAINS.USERS.value}/${queryString}`,
           method: 'GET',
         };
       },
-      providesTags: [Domains.Users],
+      providesTags: [DOMAINS.USERS.value],
     }),
     getUser: builder.query<User<Role>, string>({
       query: (id) => ({
-        url: `/users/${id}`,
+        url: `/${DOMAINS.USERS.value}/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: Domains.Users, id }],
+      providesTags: (_, __, id) => [{ type: DOMAINS.USERS.value, id }],
     }),
     createUser: builder.mutation<User<Role>, Partial<User<string>>>({
       query: (user) => ({
@@ -35,7 +35,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'POST',
         data: user,
       }),
-      invalidatesTags: [Domains.Users],
+      invalidatesTags: [DOMAINS.USERS.value],
     }),
     updateUser: builder.mutation<User<Role>, { id: string; user: Partial<User<string>> }>({
       query: ({ id, user }) => ({
@@ -43,11 +43,11 @@ export const userApi = baseApi.injectEndpoints({
         method: 'PUT',
         data: user,
       }),
-      invalidatesTags: (result, error, { id }) => [{ type: Domains.Users, id }],
+      invalidatesTags: (_, __, { id }) => [{ type: DOMAINS.USERS.value, id }],
     }),
     changePassword: builder.mutation<void, ChangePasswordRequest>({
       query: (passwords) => ({
-        url: `/${Domains.Users}/change-password`,
+        url: `/${DOMAINS.USERS.value}/change-password`,
         method: 'PATCH',
         data: passwords,
       }),
@@ -58,14 +58,14 @@ export const userApi = baseApi.injectEndpoints({
         method: 'PUT',
         data: { avatarUrl },
       }),
-      invalidatesTags: [Domains.Users, Domains.Auths],
+      invalidatesTags: [DOMAINS.USERS.value],
     }),
     deleteUser: builder.mutation<void, string>({
       query: (id) => ({
         url: `/users/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: [Domains.Users],
+      invalidatesTags: [DOMAINS.USERS.value],
     }),
   }),
 });
