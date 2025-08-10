@@ -9,6 +9,7 @@ import { usePagination } from '@/hooks/usePagination';
 import type { PaginationParams } from 'models/pagination';
 import { convertFiltersToParams } from '@/api/apiHelper';
 import type { FilterValues } from './UserFilters';
+import { format } from 'date-fns';
 
 interface UsersListProps {
   filters: FilterValues;
@@ -96,7 +97,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       dataIndex: 'lastLogin',
       key: 'lastLogin',
       sorter: true,
-      render: (date: string) => new Date(date).toLocaleDateString(),
+      render: (date: string) => date ? format(new Date(date), 'yyyy/MM/dd-HH:mm:ss') : 'Never',
     },
     {
       title: 'Actions',

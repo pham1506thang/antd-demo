@@ -43,7 +43,7 @@ export const userApi = baseApi.injectEndpoints({
         method: 'PUT',
         data: user,
       }),
-      invalidatesTags: (_, __, { id }) => [{ type: DOMAINS.USERS.value, id }],
+      invalidatesTags: [DOMAINS.USERS.value],
     }),
     changePassword: builder.mutation<void, ChangePasswordRequest>({
       query: (passwords) => ({
