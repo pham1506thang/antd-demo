@@ -9,48 +9,21 @@ import {
   Space,
   Divider,
   message,
-  Tag,
   Tooltip,
 } from 'antd';
 import {
   EditOutlined,
   LockOutlined,
-  SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { selectMe } from 'store/slices/meSlice';
 import ProfileForm from './components/ProfileForm';
 import ChangePasswordForm from './components/ChangePasswordForm';
 import AvatarUpload from './components/AvatarUpload';
-import type { Role } from 'models/role';
+import { RoleTag } from 'components/index';
+import StatusTag from 'components/StatusTag';
 
 const { Title } = Typography;
-
-const RoleTag: React.FC<{ role: Role }> = ({ role }) => {
-  if (role.isAdmin) {
-    return (
-      <Tag color="blue">
-        <Space size={4}>
-          <SafetyCertificateOutlined />
-          {role.label}
-        </Space>
-      </Tag>
-    );
-  }
-  
-  if (role.isProtected) {
-    return (
-      <Tag color="blue">
-        <Space size={4}>
-          <LockOutlined />
-          {role.label}
-        </Space>
-      </Tag>
-    );
-  }
-
-  return <Tag>{role.label}</Tag>;
-};
 
 const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -98,6 +71,7 @@ const ProfilePage: React.FC = () => {
                       <RoleTag key={role._id} role={role} />
                     ))}
                   </Space>
+                  <StatusTag status={me.status} />
                 </Space>
               </Col>
               <Col>
@@ -129,6 +103,9 @@ const ProfilePage: React.FC = () => {
                 </Descriptions.Item>
                 <Descriptions.Item label="Email">{me.email}</Descriptions.Item>
                 <Descriptions.Item label="Name">{me.name}</Descriptions.Item>
+                <Descriptions.Item label="Status">
+                  <StatusTag status={me.status} />
+                </Descriptions.Item>
                 <Descriptions.Item label="Last Login">
                   {me.lastLogin
                     ? new Date(me.lastLogin).toLocaleString()

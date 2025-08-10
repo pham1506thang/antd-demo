@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Table, Tag, Space, Button, message } from 'antd';
+import { Table, Space, Button, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { User } from 'models/user';
+import type { User, UserStatus } from 'models/user';
 import type { Role } from 'models/role';
 import { userApi } from 'api/slices/userApi';
 import { usePagination } from '@/hooks/usePagination';
@@ -10,6 +10,9 @@ import type { PaginationParams } from 'models/pagination';
 import { convertFiltersToParams } from '@/api/apiHelper';
 import type { FilterValues } from './UserFilters';
 import { format } from 'date-fns';
+import { TIME_FORMAT } from '@/models';
+import { RoleTag } from '@/components/RoleTag';
+import StatusTag from '@/components/StatusTag';
 
 interface UsersListProps {
   filters: FilterValues;
@@ -85,11 +88,18 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       render: (roles: Role[]) => (
         <>
           {roles.map((role) => (
-            <Tag color="blue" key={role._id}>
-              {role.label}
-            </Tag>
+            <RoleTag key={role._id} role={role} />
           ))}
         </>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      sorter: true,
+      render: (status: UserStatus) => (
+        <StatusTag status={status} />
       ),
     },
     {
@@ -97,7 +107,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       dataIndex: 'lastLogin',
       key: 'lastLogin',
       sorter: true,
-      render: (date: string) => date ? format(new Date(date), 'yyyy/MM/dd-HH:mm:ss') : 'Never',
+      render: (date: string) => date ? format(date, TIME_FORMAT) : 'Never',
     },
     {
       title: 'Actions',

@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Input, Select, Button, Space } from "antd";
 import { SearchOutlined, UndoOutlined } from "@ant-design/icons";
+import { USER_STATUS } from "models/user";
 
 const { Option } = Select;
 
@@ -49,9 +50,10 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
             allowClear
             style={{ minWidth: 200 }}
           >
-            <Option value="active">Active</Option>
-            <Option value="inactive">Inactive</Option>
-            <Option value="blocked">Blocked</Option>
+            <Option value={USER_STATUS.ACTIVE}>Active</Option>
+            <Option value={USER_STATUS.INACTIVE}>Inactive</Option>
+            <Option value={USER_STATUS.PENDING}>Pending</Option>
+            <Option value={USER_STATUS.SUSPENDED}>Suspended</Option>
           </Select>
         </Form.Item>
         <Form.Item name="role" label="Role">
