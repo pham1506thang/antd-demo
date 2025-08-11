@@ -1,4 +1,4 @@
-import type { Role } from "./role";
+import type { SummaryRole } from "./role";
 
 export const USER_STATUS = {
   ACTIVE: 'active',
@@ -9,7 +9,7 @@ export const USER_STATUS = {
 
 export type UserStatus = typeof USER_STATUS[keyof typeof USER_STATUS];
 
-export type User<TRole extends Role | string = string> = {
+export type User = {
   id?: string;
   username: string;
   name?: string;
@@ -17,7 +17,7 @@ export type User<TRole extends Role | string = string> = {
   avatarUrl?: string;
   lastLogin?: string;
   status: UserStatus;
-  roles: TRole[];
+  roles: SummaryRole[];
   createdAt?: string;
   updatedAt?: string;
 }

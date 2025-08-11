@@ -3,7 +3,7 @@ import { baseApi } from 'api/baseApi';
 import type { PaginationParams, PaginationResult } from '@/models/pagination';
 import { buildQueryString } from '@/api/apiHelper';
 
-interface GetUsersResponse extends PaginationResult<User<Role>> {}
+interface GetUsersResponse extends PaginationResult<User> {}
 
 interface ChangePasswordRequest {
   currentPassword: string;
@@ -12,7 +12,7 @@ interface ChangePasswordRequest {
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<GetUsersResponse, PaginationParams<User<Role>>>({
+    getUsers: builder.query<GetUsersResponse, PaginationParams<User>>({
       query: (params) => {
         const queryString = buildQueryString(params);
         return {
@@ -22,14 +22,14 @@ export const userApi = baseApi.injectEndpoints({
       },
       providesTags: [DOMAINS.USERS.value],
     }),
-    getUser: builder.query<User<Role>, string>({
+    getUser: builder.query<User, string>({
       query: (id) => ({
         url: `/${DOMAINS.USERS.value}/${id}`,
         method: 'GET',
       }),
       providesTags: (_, __, id) => [{ type: DOMAINS.USERS.value, id }],
     }),
-    createUser: builder.mutation<User<Role>, Partial<User<string>>>({
+    createUser: builder.mutation<User, Partial<User>>({
       query: (user) => ({
         url: '/users',
         method: 'POST',
@@ -37,7 +37,7 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [DOMAINS.USERS.value],
     }),
-    updateUser: builder.mutation<User<Role>, { id: string; user: Partial<User<string>> }>({
+    updateUser: builder.mutation<User, { id: string; user: Partial<User> }>({
       query: ({ id, user }) => ({
         url: `/users/${id}`,
         method: 'PUT',
@@ -52,7 +52,7 @@ export const userApi = baseApi.injectEndpoints({
         data: passwords,
       }),
     }),
-    updateAvatar: builder.mutation<User<Role>, string>({
+    updateAvatar: builder.mutation<User, string>({
       query: (avatarUrl) => ({
         url: '/users/avatar',
         method: 'PUT',

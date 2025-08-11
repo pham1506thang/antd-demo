@@ -1,15 +1,19 @@
-import { type Role, type User } from '@/models';
 import { baseApi } from 'api/baseApi';
 import { tokenService } from '@/services/tokenService';
+import type { Permission, User } from '@/models';
 
 interface LoginRequest {
   username: string;
   password: string;
 }
 
+export interface GetAuthResponse {
+  me: User;
+  permissions: Permission[];
+}
+
 interface LoginResponse {
   accessToken: string;
-  user: User<Role>;
 }
 
 export const authApi = baseApi.injectEndpoints({
@@ -29,15 +33,15 @@ export const authApi = baseApi.injectEndpoints({
         }
       },
     }),
-    getMe: builder.query<User<Role>, void>({
+    getAuth: builder.query<GetAuthResponse, void>({
       query: () => ({
-        url: `/auths/me`,
+        url: `/auths/auth`,
         method: 'GET',
       }),
     }),
     logout: builder.mutation<void, void>({
       query: () => ({
-        url: `/atuhs/logout`,
+        url: `/auths/logout`,
         method: 'POST',
       }),
       onQueryStarted: async (_, { queryFulfilled }) => {

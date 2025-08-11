@@ -1,10 +1,10 @@
 import React from 'react';
 import { Tag, Space } from 'antd';
 import { LockOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
-import type { Role } from 'models/role';
+import type { SummaryRole } from 'models/role';
 
 interface RoleTagProps {
-  role: Role;
+  role: SummaryRole;
 }
 
 export const RoleTag: React.FC<RoleTagProps> = ({ role }) => {

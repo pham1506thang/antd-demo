@@ -88,7 +88,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       render: (roles: Role[]) => (
         <>
           {roles.map((role) => (
-            <RoleTag key={role._id} role={role} />
+            <RoleTag key={role.id} role={role} />
           ))}
         </>
       ),

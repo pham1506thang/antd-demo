@@ -4,7 +4,7 @@ import { Spin } from 'antd';
 import { tokenService } from '@/services/tokenService';
 import { authApi } from '@/api/slices/authApi';
 import { useAppDispatch } from '@/store/hooks';
-import { setMe } from '@/store/slices/meSlice';
+import { setAuth } from '@/store/slices/authSlice';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -14,13 +14,13 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   
-  const { isLoading, data, error } = authApi.useGetMeQuery(undefined, {
+  const { isLoading, data, error } = authApi.useGetAuthQuery(undefined, {
     skip: !tokenService.hasToken(),
   });
 
   useEffect(() => {
     if (data) {
-      dispatch(setMe(data));
+      dispatch(setAuth(data));
     }
   }, [data, dispatch]);
 

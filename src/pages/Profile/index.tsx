@@ -16,12 +16,12 @@ import {
   LockOutlined,
 } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
-import { selectMe } from 'store/slices/meSlice';
 import ProfileForm from './components/ProfileForm';
 import ChangePasswordForm from './components/ChangePasswordForm';
 import AvatarUpload from './components/AvatarUpload';
 import { RoleTag } from 'components/index';
 import StatusTag from 'components/StatusTag';
+import { meSelector } from '@/store/slices/authSlice';
 
 const { Title } = Typography;
 
@@ -29,7 +29,7 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-  const me = useSelector(selectMe);
+  const me = useSelector(meSelector);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -68,7 +68,7 @@ const ProfilePage: React.FC = () => {
                   </Title>
                   <Space size={[0, 8]} wrap>
                     {me.roles.map((role) => (
-                      <RoleTag key={role._id} role={role} />
+                      <RoleTag key={role.id} role={role} />
                     ))}
                   </Space>
                   <StatusTag status={me.status} />
@@ -114,8 +114,8 @@ const ProfilePage: React.FC = () => {
                 <Descriptions.Item label="Roles" span={2}>
                   <Space size={[8, 8]} wrap>
                     {me.roles.map((role) => (
-                      <Tooltip 
-                        key={role._id} 
+                      <Tooltip
+                        key={role.id}
                         title={
                           <>
                             {role.isAdmin && "Administrator role with full access"}

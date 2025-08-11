@@ -1,7 +1,12 @@
-// Đổi sang string thay vì phụ thuộc vào const
 export type DomainType = string;
 
 export type ActionType = string;
+
+export type Permission = {
+  id: string;
+  domain: DomainType;
+  action: ActionType;
+}
 
 export const DOMAINS = {
   ARTICLES: {
