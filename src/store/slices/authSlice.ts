@@ -21,6 +21,15 @@ const initialState: AuthState = {
 
 const sliceName = "auth";
 
+export const buildAuthState = (state: {
+  me: User;
+  permissions: Permission[];
+}): AuthState => ({
+  ...state,
+  isAdmin: state.me.roles.some((role) => role.isAdmin),
+  isSuperAdmin: state.me.roles.some((role) => role.isSuperAdmin),
+});
+
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -68,7 +77,9 @@ export const authSlice = createSlice({
 
 export const { clearAuth, setAuth } = authSlice.actions;
 
-export const meSelector = (state: { [sliceName]: AuthState }) => state[sliceName].me;
-export const permissionsSelector = (state: { [sliceName]: AuthState }) => state[sliceName].permissions;
+export const meSelector = (state: { [sliceName]: AuthState }) =>
+  state[sliceName].me;
+export const permissionsSelector = (state: { [sliceName]: AuthState }) =>
+  state[sliceName].permissions;
 
 export default authSlice.reducer;

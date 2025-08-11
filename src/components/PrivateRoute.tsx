@@ -4,7 +4,7 @@ import { Spin } from 'antd';
 import { tokenService } from '@/services/tokenService';
 import { authApi } from '@/api/slices/authApi';
 import { useAppDispatch } from '@/store/hooks';
-import { setAuth } from '@/store/slices/authSlice';
+import { buildAuthState, setAuth, type AuthState } from '@/store/slices/authSlice';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -13,14 +13,15 @@ interface PrivateRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
-  
+
   const { isLoading, data, error } = authApi.useGetAuthQuery(undefined, {
     skip: !tokenService.hasToken(),
   });
 
   useEffect(() => {
     if (data) {
-      dispatch(setAuth(data));
+      const authState: AuthState = buildAuthState(data);
+      dispatch(setAuth(authState));
     }
   }, [data, dispatch]);
 
@@ -31,11 +32,11 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div style={{ 
-        height: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center' 
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}>
         <Spin size="large" />
       </div>

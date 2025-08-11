@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { tokenService } from '@/services/tokenService';
 import { authApi } from '@/api/slices/authApi';
 import { useAppDispatch } from '@/store/hooks';
-import { setAuth, type AuthState } from '@/store/slices/authSlice';
+import { buildAuthState, setAuth, type AuthState } from '@/store/slices/authSlice';
 
 interface AppInitProps {
   children: React.ReactNode;
@@ -24,12 +24,7 @@ const AppInit: React.FC<AppInitProps> = ({ children }) => {
     if (tokenService.hasToken()) {
       getAuth().unwrap()
         .then((data) => {
-          const authState: AuthState = {
-            me: data.me,
-            permissions: data.permissions,
-            isAdmin: data.me.roles.some((role) => role.isAdmin),
-            isSuperAdmin: data.me.roles.some((role) => role.isSuperAdmin),
-          }
+          const authState: AuthState = buildAuthState(data);
           dispatch(setAuth(authState));
           setIsLoading(false);
         })
