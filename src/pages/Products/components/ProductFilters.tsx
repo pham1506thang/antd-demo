@@ -1,5 +1,14 @@
 import React from 'react';
-import { Form, Row, Col, Input, Select, Button, Space, InputNumber } from 'antd';
+import {
+  Form,
+  Row,
+  Col,
+  Input,
+  Select,
+  Button,
+  Space,
+  InputNumber,
+} from 'antd';
 import { SearchOutlined, UndoOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -76,4 +85,4 @@ const ProductFilters: React.FC = () => {
   );
 };
 
-export default ProductFilters; 
+export default ProductFilters;

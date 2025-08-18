@@ -1,6 +1,11 @@
 import React from 'react';
 import { Row, Col, Card, Statistic } from 'antd';
-import { UserOutlined, TeamOutlined, UserAddOutlined, UserSwitchOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+  UserSwitchOutlined,
+} from '@ant-design/icons';
 
 const UserStats: React.FC = () => {
   return (
@@ -48,4 +53,4 @@ const UserStats: React.FC = () => {
   );
 };
 
-export default UserStats; 
+export default UserStats;

@@ -4,7 +4,11 @@ import { Spin } from 'antd';
 import { tokenService } from '@/services/tokenService';
 import { authApi } from '@/api/slices/authApi';
 import { useAppDispatch } from '@/store/hooks';
-import { buildAuthState, setAuth, type AuthState } from '@/store/slices/authSlice';
+import {
+  buildAuthState,
+  setAuth,
+  type AuthState,
+} from '@/store/slices/authSlice';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -32,12 +36,14 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div style={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
+      <div
+        style={{
+          height: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <Spin size="large" />
       </div>
     );
@@ -52,4 +58,4 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-export default PrivateRoute; 
+export default PrivateRoute;

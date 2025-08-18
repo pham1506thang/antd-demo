@@ -1,9 +1,15 @@
-import { type User, type Role, DOMAINS } from '@/models';
+import {
+  type AssignRoleDTO,
+  type CreateUserDTO,
+  type UpdateUserDTO,
+  type User,
+  DOMAINS,
+} from '@/models';
 import { baseApi } from 'api/baseApi';
 import type { PaginationParams, PaginationResult } from '@/models/pagination';
 import { buildQueryString } from '@/api/apiHelper';
 
-interface GetUsersResponse extends PaginationResult<User> {}
+type GetUsersResponse = PaginationResult<User>;
 
 interface ChangePasswordRequest {
   currentPassword: string;
@@ -20,7 +26,16 @@ export const userApi = baseApi.injectEndpoints({
           method: 'GET',
         };
       },
-      providesTags: [DOMAINS.USERS.value],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.data.map(({ id }) => ({
+                type: DOMAINS.USERS.value,
+                id,
+              })),
+              { type: DOMAINS.USERS.value, id: 'LIST' },
+            ]
+          : [{ type: DOMAINS.USERS.value, id: 'LIST' }],
     }),
     getUser: builder.query<User, string>({
       query: (id) => ({
@@ -29,28 +44,38 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: (_, __, id) => [{ type: DOMAINS.USERS.value, id }],
     }),
-    createUser: builder.mutation<User, Partial<User>>({
+    createUser: builder.mutation<User, CreateUserDTO>({
       query: (user) => ({
-        url: '/users',
+        url: `/${DOMAINS.USERS.value}`,
         method: 'POST',
         data: user,
       }),
-      invalidatesTags: [DOMAINS.USERS.value],
+      invalidatesTags: [{ type: DOMAINS.USERS.value, id: 'LIST' }],
     }),
-    updateUser: builder.mutation<User, { id: string; user: Partial<User> }>({
-      query: ({ id, user }) => ({
-        url: `/users/${id}`,
+    updateUser: builder.mutation<User, { id: string } & UpdateUserDTO>({
+      query: ({ id, ...user }) => ({
+        url: `/${DOMAINS.USERS.value}/${id}`,
         method: 'PUT',
         data: user,
       }),
-      invalidatesTags: [DOMAINS.USERS.value],
+      invalidatesTags: (_, __, { id }) => [
+        { type: DOMAINS.USERS.value, id },
+        { type: DOMAINS.USERS.value, id: 'LIST' },
+      ],
     }),
-    changePassword: builder.mutation<void, ChangePasswordRequest>({
-      query: (passwords) => ({
-        url: `/${DOMAINS.USERS.value}/change-password`,
+    changePassword: builder.mutation<
+      void,
+      { id: string } & ChangePasswordRequest
+    >({
+      query: ({ id, ...passwords }) => ({
+        url: `/${DOMAINS.USERS.value}/${id}/change-password`,
         method: 'PATCH',
         data: passwords,
       }),
+      invalidatesTags: (_, __, { id }) => [
+        { type: DOMAINS.USERS.value, id },
+        { type: DOMAINS.USERS.value, id: 'LIST' },
+      ],
     }),
     updateAvatar: builder.mutation<User, string>({
       query: (avatarUrl) => ({
@@ -58,14 +83,22 @@ export const userApi = baseApi.injectEndpoints({
         method: 'PUT',
         data: { avatarUrl },
       }),
-      invalidatesTags: [DOMAINS.USERS.value],
+      invalidatesTags: [{ type: DOMAINS.USERS.value, id: 'LIST' }],
     }),
     deleteUser: builder.mutation<void, string>({
       query: (id) => ({
         url: `/users/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: [DOMAINS.USERS.value],
+      invalidatesTags: [{ type: DOMAINS.USERS.value, id: 'LIST' }],
+    }),
+    assignUserRole: builder.mutation<User, { id: string } & AssignRoleDTO>({
+      query: ({ id, roles }) => ({
+        url: `/users/${id}/assign-roles`,
+        method: 'PATCH',
+        data: { roles },
+      }),
+      invalidatesTags: [{ type: DOMAINS.USERS.value, id: 'LIST' }],
     }),
   }),
 });

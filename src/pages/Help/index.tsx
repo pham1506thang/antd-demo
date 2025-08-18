@@ -16,17 +16,20 @@ const HelpPage: React.FC = () => {
         <Collapse defaultActiveKey={['1']}>
           <Panel header="How do I reset my password?" key="1">
             <Paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </Paragraph>
           </Panel>
           <Panel header="How can I update my profile?" key="2">
             <Paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </Paragraph>
           </Panel>
           <Panel header="Where can I find my order history?" key="3">
             <Paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </Paragraph>
           </Panel>
         </Collapse>
@@ -35,7 +38,8 @@ const HelpPage: React.FC = () => {
       <Card title="Need More Help?">
         <Space direction="vertical" size="middle">
           <Paragraph>
-            If you can't find the answer to your question in our FAQ, please contact our support team.
+            If you can&apos;t find the answer to your question in our FAQ,
+            please contact our support team.
           </Paragraph>
           <Button type="primary" icon={<MessageOutlined />}>
             Contact Support
@@ -46,4 +50,4 @@ const HelpPage: React.FC = () => {
   );
 };
 
-export default HelpPage; 
+export default HelpPage;

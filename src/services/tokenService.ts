@@ -16,4 +16,4 @@ export const tokenService = {
   hasToken: () => {
     return !!localStorage.getItem(TOKEN_KEY);
   },
-}; 
+};

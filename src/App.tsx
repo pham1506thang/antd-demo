@@ -1,7 +1,13 @@
-import { useState } from 'react'
-import { Layout, Menu, theme, Dropdown, Modal } from 'antd'
-import type { MenuProps } from 'antd'
-import { BrowserRouter, Route, Routes, useNavigate, useLocation } from 'react-router-dom'
+import React, { useState } from 'react';
+import { Layout, Menu, theme, Dropdown, Modal } from 'antd';
+import type { MenuProps } from 'antd';
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+} from 'react-router-dom';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -13,32 +19,34 @@ import {
   QuestionCircleOutlined,
   BarChartOutlined,
   FileTextOutlined,
-} from '@ant-design/icons'
-import Dashboard from './pages/Dashboard'
-import Users from './pages/Users'
-import Orders from './pages/Orders'
-import Analytics from './pages/Analytics'
-import Reports from './pages/Reports'
-import Profile from './pages/Profile'
-import Settings from './pages/Settings'
-import Help from './pages/Help'
-import Login from './pages/Login'
-import { tokenService } from '@/services/tokenService'
-import { UserMenuTrigger } from './components/UserMenuTrigger'
-import AppInit from '@/components/AppInit'
+} from '@ant-design/icons';
+import Dashboard from './pages/Dashboard';
+import Users from './pages/Users';
+import Orders from './pages/Orders';
+import Analytics from './pages/Analytics';
+import Reports from './pages/Reports';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Help from './pages/Help';
+import Login from './pages/Login';
+import CreateUserPage from './pages/Users/CreateUser';
+import UpdateUserPage from './pages/Users/UpdateUser';
+import { tokenService } from '@/services/tokenService';
+import { UserMenuTrigger } from './components/UserMenuTrigger';
+import AppInit from '@/components/AppInit';
 
-const { Header, Sider, Content } = Layout
+const { Header, Sider, Content } = Layout;
 
 // Wrapper component to handle navigation
-const MenuWrapper: React.FC<{ collapsed: boolean; setCollapsed: (collapsed: boolean) => void }> = ({
-  collapsed,
-  setCollapsed,
-}) => {
-  const navigate = useNavigate()
-  const location = useLocation()
+const MenuWrapper: React.FC<{
+  collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+}> = ({ collapsed, setCollapsed }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken()
+  } = theme.useToken();
 
   const handleLogout = () => {
     Modal.confirm({
@@ -94,7 +102,7 @@ const MenuWrapper: React.FC<{ collapsed: boolean; setCollapsed: (collapsed: bool
       icon: <QuestionCircleOutlined />,
       label: 'Help',
     },
-  ]
+  ];
 
   const userMenuItems: MenuProps['items'] = [
     {
@@ -116,7 +124,7 @@ const MenuWrapper: React.FC<{ collapsed: boolean; setCollapsed: (collapsed: bool
       label: 'Logout',
       danger: true,
     },
-  ]
+  ];
 
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
     switch (key) {
@@ -146,7 +154,7 @@ const MenuWrapper: React.FC<{ collapsed: boolean; setCollapsed: (collapsed: bool
         }}
         onBreakpoint={(broken) => {
           if (broken) {
-            setCollapsed(true)
+            setCollapsed(true);
           }
         }}
       >
@@ -214,6 +222,8 @@ const MenuWrapper: React.FC<{ collapsed: boolean; setCollapsed: (collapsed: bool
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/users" element={<Users />} />
+            <Route path="/users/create" element={<CreateUserPage />} />
+            <Route path="/users/update/:userId" element={<UpdateUserPage />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/reports" element={<Reports />} />
@@ -224,15 +234,17 @@ const MenuWrapper: React.FC<{ collapsed: boolean; setCollapsed: (collapsed: bool
         </Content>
       </Layout>
     </Layout>
-  )
-}
+  );
+};
 
 // Main App component
 const App: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <BrowserRouter
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
@@ -245,7 +257,7 @@ const App: React.FC = () => {
         />
       </Routes>
     </BrowserRouter>
-  )
-}
+  );
+};
 
-export default App
+export default App;

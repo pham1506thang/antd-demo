@@ -1,5 +1,10 @@
 import axios from 'axios';
-import type { AxiosError, AxiosInstance, CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios';
+import type {
+  AxiosError,
+  AxiosInstance,
+  CreateAxiosDefaults,
+  InternalAxiosRequestConfig,
+} from 'axios';
 import { message } from 'antd';
 import { tokenService } from '@/services/tokenService';
 
@@ -14,8 +19,8 @@ const AXIOS_CONFIG: CreateAxiosDefaults = {
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true
-}
+  withCredentials: true,
+};
 // Create axios instance
 const axiosInstance: AxiosInstance = axios.create(AXIOS_CONFIG);
 
@@ -40,7 +45,7 @@ let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
 // Helper to simulate delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Helper to add callbacks to the subscriber queue
 const addRefreshSubscriber = (callback: (token: string) => void) => {
@@ -66,7 +71,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as ExtendedAxiosRequestConfig;
-    
+
     if (!originalRequest) {
       return Promise.reject(error);
     }
@@ -98,29 +103,29 @@ axiosInstance.interceptors.response.use(
       try {
         // Simulate delay in refresh token
         await delay(500);
-        
+
         // Attempt to refresh token
-        const response = await rawAxios.post(`/auths/refresh`);
+        const response = await rawAxios.post('/auths/refresh');
         const { accessToken } = response.data;
-        
+
         tokenService.setToken(accessToken);
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        
+
         // Process any queued requests
         processQueue(null, accessToken);
-        
+
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         // If refresh fails, clear token and process queue with error
         tokenService.removeToken();
         processQueue(new Error('Refresh failed'));
-        
+
         // Just show error message, let components handle navigation
         message.error('Session expired. Please login again.');
 
         await delay(1000);
         window.location.href = '/login';
-        
+
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -129,7 +134,9 @@ axiosInstance.interceptors.response.use(
 
     // Handle other errors
     if (error.response) {
-      const messageFromApi: string | string[] | undefined = (error.response.data as any).message;
+      const messageFromApi: string | string[] | undefined = (
+        error.response.data as any
+      ).message;
       if (!messageFromApi) {
         message.error('An error occurred. Please try again.');
       } else if (Array.isArray(messageFromApi)) {
@@ -138,13 +145,15 @@ axiosInstance.interceptors.response.use(
         message.error(messageFromApi);
       }
     } else if (error.request) {
-      message.error('No response from server. Please check your internet connection.');
+      message.error(
+        'No response from server. Please check your internet connection.'
+      );
     } else {
       message.error('Request failed. Please try again.');
     }
-    
+
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance; 
+export default axiosInstance;

@@ -11,14 +11,11 @@ import {
   message,
   Tooltip,
 } from 'antd';
-import {
-  EditOutlined,
-  LockOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, LockOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import ProfileForm from './components/ProfileForm';
 import ChangePasswordForm from './components/ChangePasswordForm';
-import AvatarUpload from './components/AvatarUpload';
+import AvatarUpload from 'components/AvatarUpload';
 import { RoleTag } from 'components/index';
 import StatusTag from 'components/StatusTag';
 import { meSelector } from '@/store/slices/authSlice';
@@ -62,7 +59,11 @@ const ProfilePage: React.FC = () => {
                 <AvatarUpload avatarUrl={me.avatarUrl} />
               </Col>
               <Col flex="auto">
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <Space
+                  direction="vertical"
+                  size="small"
+                  style={{ width: '100%' }}
+                >
                   <Title level={4} style={{ margin: 0 }}>
                     {me.name || me.username}
                   </Title>
@@ -118,9 +119,13 @@ const ProfilePage: React.FC = () => {
                         key={role.id}
                         title={
                           <>
-                            {role.isAdmin && "Administrator role with full access"}
-                            {role.isProtected && "Protected role with restricted access"}
-                            {!role.isAdmin && !role.isProtected && "Standard role"}
+                            {role.isAdmin &&
+                              'Administrator role with full access'}
+                            {role.isProtected &&
+                              'Protected role with restricted access'}
+                            {!role.isAdmin &&
+                              !role.isProtected &&
+                              'Standard role'}
                           </>
                         }
                       >
@@ -161,4 +166,4 @@ const ProfilePage: React.FC = () => {
   );
 };
 
-export default ProfilePage; 
+export default ProfilePage;

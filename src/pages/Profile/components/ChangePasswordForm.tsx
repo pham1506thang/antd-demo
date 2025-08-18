@@ -29,15 +29,12 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
       }).unwrap();
       onSuccess();
     } catch (error) {
+      // Handle error silently or add proper error handling
     }
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleSubmit}
-    >
+    <Form form={form} layout="vertical" onFinish={handleSubmit}>
       <Form.Item
         name="currentPassword"
         label="Current Password"
@@ -82,17 +79,10 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
 
       <Form.Item>
         <Space>
-          <Button
-            type="primary"
-            htmlType="submit"
-            icon={<SaveOutlined />}
-          >
+          <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
             Change Password
           </Button>
-          <Button
-            onClick={onCancel}
-            icon={<CloseOutlined />}
-          >
+          <Button onClick={onCancel} icon={<CloseOutlined />}>
             Cancel
           </Button>
         </Space>
@@ -101,4 +91,4 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
   );
 };
 
-export default ChangePasswordForm; 
+export default ChangePasswordForm;

@@ -10,8 +10,8 @@ export const UserMenuTrigger = styled.div`
   justify-content: center;
   transition: all 0.3s;
   background-color: transparent;
-  
+
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
   }
-`; 
+`;

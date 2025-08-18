@@ -18,7 +18,7 @@ const mockData: Order[] = [
     key: '1',
     orderNumber: 'ORD-001',
     customer: 'John Doe',
-    amount: 150.00,
+    amount: 150.0,
     status: 'completed',
     date: '2024-03-20',
   },
@@ -73,10 +73,14 @@ const OrdersPage: React.FC = () => {
         <ShoppingCartOutlined /> Orders
       </Title>
       <Card>
-        <Table columns={columns} dataSource={mockData} />
+        <Table
+          columns={columns}
+          dataSource={mockData}
+          scroll={{ x: 'max-content' }}
+        />
       </Card>
     </Space>
   );
 };
 
-export default OrdersPage; 
+export default OrdersPage;

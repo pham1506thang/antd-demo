@@ -2,13 +2,56 @@ import React, { useState } from 'react';
 import { Upload, message } from 'antd';
 import type { UploadChangeParam } from 'antd/es/upload';
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
-import { LoadingOutlined, UserOutlined, CameraOutlined } from '@ant-design/icons';
+import {
+  LoadingOutlined,
+  UserOutlined,
+  CameraOutlined,
+} from '@ant-design/icons';
 import { userApi } from 'api/slices/userApi';
-import './AvatarUpload.css';
+import styled from 'styled-components';
 
 interface AvatarUploadProps {
   avatarUrl?: string;
 }
+
+const StyledUpload = styled(Upload)`
+  &.avatar-uploader .ant-upload {
+    width: auto !important;
+    height: auto !important;
+    background: none !important;
+    border: none !important;
+    margin: 0 !important;
+  }
+
+  &.avatar-uploader .ant-upload:hover {
+    background: none !important;
+  }
+`;
+
+const AvatarContainer = styled.div`
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+
+  &:hover .overlay {
+    opacity: 1;
+  }
+`;
+
+const Overlay = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+`;
 
 const styles = {
   placeholder: {
@@ -59,7 +102,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl }) => {
       setLoading(true);
       return;
     }
-    
+
     if (info.file.status === 'done') {
       try {
         await updateAvatar(info.file.response.url);
@@ -73,7 +116,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl }) => {
   };
 
   return (
-    <Upload
+    <StyledUpload
       name="avatar"
       listType="picture-card"
       className="avatar-uploader"
@@ -83,19 +126,15 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl }) => {
       onChange={handleChange}
     >
       {avatarUrl ? (
-        <div className="avatar-container">
-          <img
-            src={avatarUrl}
-            alt="avatar"
-            style={styles.image}
-          />
-          <div className="overlay">
+        <AvatarContainer>
+          <img src={avatarUrl} alt="avatar" style={styles.image} />
+          <Overlay className="overlay">
             <CameraOutlined style={{ color: 'white', fontSize: 24 }} />
             <div style={{ color: 'white', marginTop: 4, fontSize: 12 }}>
               Change Photo
             </div>
-          </div>
-        </div>
+          </Overlay>
+        </AvatarContainer>
       ) : (
         <div style={styles.placeholder}>
           {loading ? (
@@ -108,8 +147,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl }) => {
           )}
         </div>
       )}
-    </Upload>
+    </StyledUpload>
   );
 };
 
-export default AvatarUpload; 
+export default AvatarUpload;

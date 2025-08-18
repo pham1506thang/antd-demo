@@ -46,14 +46,29 @@ const TopPages: React.FC = () => {
         renderItem={(item) => (
           <List.Item>
             <div style={{ width: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginBottom: 4,
+                }}
+              >
                 <LinkOutlined style={{ marginRight: 8 }} />
                 <Text strong>{item.url}</Text>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text type="secondary">{item.views.toLocaleString()} views</Text>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Text type="secondary">
+                  {item.views.toLocaleString()} views
+                </Text>
                 <Tag color={item.change >= 0 ? 'success' : 'error'}>
-                  {item.change >= 0 ? '+' : ''}{item.change}%
+                  {item.change >= 0 ? '+' : ''}
+                  {item.change}%
                 </Tag>
               </div>
             </div>
@@ -64,4 +79,4 @@ const TopPages: React.FC = () => {
   );
 };
 
-export default TopPages; 
+export default TopPages;

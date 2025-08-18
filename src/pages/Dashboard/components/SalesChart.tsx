@@ -41,4 +41,4 @@ const SalesChart: React.FC = () => {
   );
 };
 
-export default SalesChart; 
+export default SalesChart;

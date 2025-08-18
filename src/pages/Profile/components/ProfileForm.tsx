@@ -43,36 +43,24 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       initialValues={initialValues}
       onFinish={handleSubmit}
     >
-      <Form.Item
-        name="name"
-        label="Name"
-      >
+      <Form.Item name="name" label="Name">
         <Input />
       </Form.Item>
 
       <Form.Item
         name="email"
         label="Email"
-        rules={[
-          { type: 'email', message: 'Please enter a valid email!' },
-        ]}
+        rules={[{ type: 'email', message: 'Please enter a valid email!' }]}
       >
         <Input />
       </Form.Item>
 
       <Form.Item>
         <Space>
-          <Button
-            type="primary"
-            htmlType="submit"
-            icon={<SaveOutlined />}
-          >
+          <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
             Save Changes
           </Button>
-          <Button
-            onClick={onCancel}
-            icon={<CloseOutlined />}
-          >
+          <Button onClick={onCancel} icon={<CloseOutlined />}>
             Cancel
           </Button>
         </Space>
@@ -81,4 +69,4 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   );
 };
 
-export default ProfileForm; 
+export default ProfileForm;

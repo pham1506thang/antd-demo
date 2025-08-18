@@ -1,4 +1,4 @@
-import { USER_STATUS } from "@/models";
+import { USER_STATUS } from '@/models';
 
 // Status color mapping
 export const getUserStatusColor = (status: string) => {

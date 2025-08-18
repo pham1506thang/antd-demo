@@ -4,7 +4,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { tokenService } from '@/services/tokenService';
 import { authApi } from '@/api/slices/authApi';
 import { useAppDispatch } from '@/store/hooks';
-import { buildAuthState, setAuth, type AuthState } from '@/store/slices/authSlice';
+import {
+  buildAuthState,
+  setAuth,
+  type AuthState,
+} from '@/store/slices/authSlice';
 
 interface AppInitProps {
   children: React.ReactNode;
@@ -22,7 +26,8 @@ const AppInit: React.FC<AppInitProps> = ({ children }) => {
   useEffect(() => {
     // If we have a token, try to fetch the user data
     if (tokenService.hasToken()) {
-      getAuth().unwrap()
+      getAuth()
+        .unwrap()
         .then((data) => {
           const authState: AuthState = buildAuthState(data);
           dispatch(setAuth(authState));
@@ -34,7 +39,7 @@ const AppInit: React.FC<AppInitProps> = ({ children }) => {
     } else {
       navigate('/login', {
         replace: true,
-        state: { from: location }
+        state: { from: location },
       });
     }
   }, []);
@@ -42,14 +47,16 @@ const AppInit: React.FC<AppInitProps> = ({ children }) => {
   // Show loading while fetching profile
   if (isLoading) {
     return (
-      <div style={{
-        height: '100vh',
-        width: '100vw',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f0f2f5'
-      }}>
+      <div
+        style={{
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f0f2f5',
+        }}
+      >
         <Spin size="large" tip="Initializing..." fullscreen />
       </div>
     );
@@ -58,4 +65,4 @@ const AppInit: React.FC<AppInitProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-export default AppInit; 
+export default AppInit;

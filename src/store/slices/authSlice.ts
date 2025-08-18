@@ -1,9 +1,9 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
-import type { User } from "models/user";
-import { authApi } from "api/slices/authApi";
-import { userApi } from "@/api/slices/userApi";
-import type { Permission } from "@/models";
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { User } from 'models/user';
+import { authApi } from 'api/slices/authApi';
+import { userApi } from '@/api/slices/userApi';
+import type { Permission } from '@/models';
 
 export interface AuthState {
   me: User | null;
@@ -19,7 +19,7 @@ const initialState: AuthState = {
   isSuperAdmin: false,
 };
 
-const sliceName = "auth";
+const sliceName = 'auth';
 
 export const buildAuthState = (state: {
   me: User;
@@ -31,7 +31,7 @@ export const buildAuthState = (state: {
 });
 
 export const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
     clearAuth: () => {

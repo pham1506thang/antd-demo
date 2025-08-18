@@ -27,13 +27,15 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div style={{
-      height: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#f0f2f5'
-    }}>
+    <div
+      style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f0f2f5',
+      }}
+    >
       <Card style={{ width: 400, padding: '24px 24px 0' }}>
         <h2 style={{ textAlign: 'center', marginBottom: 32 }}>Login</h2>
         <Form
@@ -46,9 +48,9 @@ const Login: React.FC = () => {
             name="username"
             rules={[{ required: true, message: 'Please input your username!' }]}
           >
-            <Input 
-              prefix={<UserOutlined />} 
-              placeholder="Username" 
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="Username"
               size="large"
             />
           </Form.Item>
@@ -65,9 +67,9 @@ const Login: React.FC = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
+            <Button
+              type="primary"
+              htmlType="submit"
               loading={isLoading}
               block
               size="large"
@@ -81,4 +83,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

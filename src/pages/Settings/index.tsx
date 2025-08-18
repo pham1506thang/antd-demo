@@ -1,5 +1,14 @@
 import React from 'react';
-import { Typography, Card, Form, Input, Switch, Select, Button, Space } from 'antd';
+import {
+  Typography,
+  Card,
+  Form,
+  Input,
+  Switch,
+  Select,
+  Button,
+  Space,
+} from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
@@ -13,7 +22,7 @@ const SettingsPage: React.FC = () => {
       <Title level={2}>
         <SettingOutlined /> Settings
       </Title>
-      
+
       <Card title="General Settings">
         <Form
           form={form}
@@ -22,7 +31,7 @@ const SettingsPage: React.FC = () => {
             siteName: 'My Admin Dashboard',
             language: 'en',
             darkMode: false,
-            emailNotifications: true
+            emailNotifications: true,
           }}
         >
           <Form.Item label="Site Name" name="siteName">
@@ -41,7 +50,11 @@ const SettingsPage: React.FC = () => {
             <Switch />
           </Form.Item>
 
-          <Form.Item label="Email Notifications" name="emailNotifications" valuePropName="checked">
+          <Form.Item
+            label="Email Notifications"
+            name="emailNotifications"
+            valuePropName="checked"
+          >
             <Switch />
           </Form.Item>
 
@@ -54,4 +67,4 @@ const SettingsPage: React.FC = () => {
   );
 };
 
-export default SettingsPage; 
+export default SettingsPage;

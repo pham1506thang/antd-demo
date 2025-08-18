@@ -12,6 +12,7 @@ import type { FilterValues } from './UserFilters';
 import { format } from 'date-fns';
 import { TIME_FORMAT } from '@/models';
 import { RoleTag } from '@/components/RoleTag';
+import { useNavigate } from 'react-router-dom';
 import StatusTag from '@/components/StatusTag';
 
 interface UsersListProps {
@@ -19,15 +20,12 @@ interface UsersListProps {
 }
 
 const UsersList: React.FC<UsersListProps> = ({ filters }) => {
-  const {
-    tableParams,
-    paginationParams,
-    handleTableChange,
-    setSearch,
-  } = usePagination<User<Role>>({
-    defaultSorts: [{ field: 'createdAt', order: 'descend' }],
-    defaultFilters: [],
-  });
+  const navigate = useNavigate();
+  const { tableParams, paginationParams, handleTableChange, setSearch } =
+    usePagination<User>({
+      defaultSorts: [{ field: 'createdAt', order: 'descend' }],
+      defaultFilters: [],
+    });
 
   const prevSearchRef = useRef<string | undefined>(undefined);
 
@@ -41,15 +39,19 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
   // Convert filter values to API params
   const apiFilters = convertFiltersToParams({
     status: filters.status,
-    role: filters.role,
+    roles: filters.roles,
   });
 
-  const queryParams: PaginationParams<User<Role>> = {
+  const queryParams: PaginationParams<User> = {
     ...paginationParams,
     filters: apiFilters,
   };
 
-  const { data: usersData, isLoading, isFetching } = userApi.useGetUsersQuery(queryParams);
+  const {
+    data: usersData,
+    isLoading,
+    isFetching,
+  } = userApi.useGetUsersQuery(queryParams);
 
   const [deleteUser] = userApi.useDeleteUserMutation();
 
@@ -62,7 +64,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
     }
   };
 
-  const columns: ColumnsType<User<Role>> = [
+  const columns: ColumnsType<User> = [
     {
       title: 'Username',
       dataIndex: 'username',
@@ -85,12 +87,19 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       title: 'Roles',
       dataIndex: 'roles',
       key: 'roles',
+      width: 200,
       render: (roles: Role[]) => (
-        <>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 4,
+          }}
+        >
           {roles.map((role) => (
             <RoleTag key={role.id} role={role} />
           ))}
-        </>
+        </div>
       ),
     },
     {
@@ -98,26 +107,31 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       dataIndex: 'status',
       key: 'status',
       sorter: true,
-      render: (status: UserStatus) => (
-        <StatusTag status={status} />
-      ),
+      render: (status: UserStatus) => <StatusTag status={status} />,
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      sorter: true,
+      render: (date: string) => (date ? format(date, TIME_FORMAT) : ''),
     },
     {
       title: 'Last Login',
       dataIndex: 'lastLogin',
       key: 'lastLogin',
       sorter: true,
-      render: (date: string) => date ? format(date, TIME_FORMAT) : 'Never',
+      render: (date: string) => (date ? format(date, TIME_FORMAT) : 'Never'),
     },
     {
       title: 'Actions',
       key: 'actions',
-      render: (_, record: User<Role>) => (
+      render: (_, record: User) => (
         <Space size="middle">
           <Button
             type="text"
             icon={<EditOutlined />}
-            onClick={() => console.log('Edit user:', record.id)}
+            onClick={() => navigate(`/users/update/${record.id}`)}
           />
           <Button
             type="text"
@@ -134,7 +148,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
     <Table
       columns={columns}
       dataSource={usersData?.data}
-      rowKey="_id"
+      rowKey="id"
       loading={isLoading || isFetching}
       pagination={{
         ...tableParams.pagination,
@@ -145,6 +159,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
         showTotal: (total) => `Total ${total} users`,
       }}
       onChange={handleTableChange}
+      scroll={{ x: 'max-content' }}
     />
   );
 };

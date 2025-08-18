@@ -9,9 +9,7 @@ interface StatusTagProps {
 
 const StatusTag: React.FC<StatusTagProps> = ({ status }) => {
   return (
-    <Tag color={getUserStatusColor(status)}>
-      {getUserStatusText(status)}
-    </Tag>
+    <Tag color={getUserStatusColor(status)}>{getUserStatusText(status)}</Tag>
   );
 };
 

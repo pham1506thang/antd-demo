@@ -18,7 +18,7 @@ export const RoleTag: React.FC<RoleTagProps> = ({ role }) => {
       </Tag>
     );
   }
-  
+
   if (role.isProtected) {
     return (
       <Tag color="blue">

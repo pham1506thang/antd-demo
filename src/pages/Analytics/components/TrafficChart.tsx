@@ -43,4 +43,4 @@ const TrafficChart: React.FC = () => {
   );
 };
 
-export default TrafficChart; 
+export default TrafficChart;

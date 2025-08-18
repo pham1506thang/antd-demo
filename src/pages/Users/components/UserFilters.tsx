@@ -1,14 +1,22 @@
-import React from "react";
-import { Form, Input, Select, Button, Space } from "antd";
-import { SearchOutlined, UndoOutlined } from "@ant-design/icons";
-import { USER_STATUS } from "models/user";
+import React from 'react';
+import { Form, Input, Select, Button, Space } from 'antd';
+import { SearchOutlined, UndoOutlined } from '@ant-design/icons';
+import { USER_STATUS } from 'models/user';
+import { getUserStatusText } from '@/helpers/user';
+import { useGetSummaryRolesQuery } from '@/api/slices/roleApi';
 
 const { Option } = Select;
+
+// Create array of status options from USER_STATUS
+const statusOptions = Object.values(USER_STATUS).map((status) => ({
+  value: status,
+  label: getUserStatusText(status),
+}));
 
 export interface FilterValues {
   search?: string;
   status?: string[];
-  role?: string[];
+  roles?: string[];
 }
 
 interface UserFiltersProps {
@@ -17,7 +25,9 @@ interface UserFiltersProps {
 }
 
 const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FilterValues>();
+  const { data: rolesData, isLoading: isRolesLoading } =
+    useGetSummaryRolesQuery();
 
   const onValuesChange = (_changedValues: any, allValues: FilterValues) => {
     // Call the onChange prop with the changed values and all values
@@ -49,23 +59,22 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
             placeholder="Select status"
             allowClear
             style={{ minWidth: 200 }}
-          >
-            <Option value={USER_STATUS.ACTIVE}>Active</Option>
-            <Option value={USER_STATUS.INACTIVE}>Inactive</Option>
-            <Option value={USER_STATUS.PENDING}>Pending</Option>
-            <Option value={USER_STATUS.SUSPENDED}>Suspended</Option>
-          </Select>
+            options={statusOptions}
+          />
         </Form.Item>
-        <Form.Item name="role" label="Role">
+        <Form.Item name="roles" label="Role">
           <Select
             mode="multiple"
             placeholder="Select role"
             allowClear
             style={{ minWidth: 200 }}
+            loading={isRolesLoading}
           >
-            <Option value="admin">Admin</Option>
-            <Option value="user">User</Option>
-            <Option value="manager">Manager</Option>
+            {rolesData?.map((role) => (
+              <Option key={role.id} value={role.id}>
+                {role.label}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
         <Form.Item label=" ">

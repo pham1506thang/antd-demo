@@ -3,6 +3,7 @@ import type { BaseQueryFn } from '@reduxjs/toolkit/query';
 import type { AxiosRequestConfig, AxiosError } from 'axios';
 import axiosInstance from './axiosConfig';
 import { DOMAINS } from '@/models/permission';
+import type { ApiError } from '@/models/error';
 
 // Define custom axios base query
 const axiosBaseQuery =
@@ -14,7 +15,7 @@ const axiosBaseQuery =
       params?: AxiosRequestConfig['params'];
     },
     unknown,
-    unknown
+    ApiError
   > =>
   async ({ url, method, data, params }) => {
     try {
@@ -27,12 +28,44 @@ const axiosBaseQuery =
       return { data: result.data };
     } catch (axiosError) {
       const err = axiosError as AxiosError;
-      return {
-        error: {
-          status: err.response?.status,
-          data: err.response?.data || err.message,
-        },
-      };
+
+      if (err.response) {
+        const responseData = err.response.data as ApiError;
+
+        const apiError: ApiError = {
+          statusCode: responseData.statusCode,
+          error: responseData.error,
+          message: responseData.message,
+          details: responseData.details,
+        };
+
+        return {
+          error: apiError,
+        };
+      } else if (err.request) {
+        const networkError: ApiError = {
+          statusCode: 0,
+          error: 'NETWORK_ERROR',
+          message:
+            'No response from server. Please check your internet connection.',
+          details: {},
+        };
+
+        return {
+          error: networkError,
+        };
+      } else {
+        const unknownError: ApiError = {
+          statusCode: 500,
+          error: 'UNKNOWN_ERROR',
+          message: err.message || 'An unknown error occurred',
+          details: {},
+        };
+
+        return {
+          error: unknownError,
+        };
+      }
     }
   };
 
@@ -41,5 +74,5 @@ export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery(),
   endpoints: () => ({}),
-  tagTypes: Object.values(DOMAINS).map(domainValue => domainValue.value),
-}); 
+  tagTypes: Object.values(DOMAINS).map((domainValue) => domainValue.value),
+});

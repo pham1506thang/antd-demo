@@ -20,7 +20,7 @@ export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
-        url: `/auths/login`,
+        url: '/auths/login',
         method: 'POST',
         data: credentials,
       }),
@@ -35,13 +35,13 @@ export const authApi = baseApi.injectEndpoints({
     }),
     getAuth: builder.query<GetAuthResponse, void>({
       query: () => ({
-        url: `/auths/auth`,
+        url: '/auths/auth',
         method: 'GET',
       }),
     }),
     logout: builder.mutation<void, void>({
       query: () => ({
-        url: `/auths/logout`,
+        url: '/auths/logout',
         method: 'POST',
       }),
       onQueryStarted: async (_, { queryFulfilled }) => {
@@ -52,6 +52,6 @@ export const authApi = baseApi.injectEndpoints({
           // Handle error if needed
         }
       },
-    })
+    }),
   }),
-}); 
+});

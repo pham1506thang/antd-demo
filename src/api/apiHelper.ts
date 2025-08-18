@@ -1,8 +1,12 @@
 import type { FilterField } from '../models/pagination';
 
-export const convertFiltersToParams = (filters: Record<string, any>): FilterField[] => {
+export const convertFiltersToParams = (
+  filters: Record<string, any>
+): FilterField[] => {
   return Object.entries(filters)
-    .filter(([_, value]) => value !== undefined && value !== null && value !== '')
+    .filter(
+      ([_, value]) => value !== undefined && value !== null && value !== ''
+    )
     .map(([field, value]) => {
       if (Array.isArray(value)) {
         return {

@@ -1,4 +1,4 @@
-import type { Permission } from "./permission";
+import type { Permission } from './permission';
 
 export type Role = {
   id: string;
@@ -10,6 +10,9 @@ export type Role = {
   permissions: Permission[];
   createdAt?: Date;
   updatedAt?: Date;
-}
+};
 
-export type SummaryRole = Pick<Role, 'id' | 'code' | 'label' | 'isAdmin' | 'isSuperAdmin' | 'isProtected'>
+export type SummaryRole = Pick<
+  Role,
+  'id' | 'code' | 'label' | 'isAdmin' | 'isSuperAdmin' | 'isProtected'
+>;

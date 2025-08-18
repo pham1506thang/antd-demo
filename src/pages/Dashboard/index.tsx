@@ -1,6 +1,10 @@
 import React from 'react';
 import { Card, Row, Col, Statistic } from 'antd';
-import { UserOutlined, ShoppingCartOutlined, DollarOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  ShoppingCartOutlined,
+  DollarOutlined,
+} from '@ant-design/icons';
 import StatisticCard from './components/StatisticCard';
 import RecentActivities from './components/RecentActivities';
 import SalesChart from './components/SalesChart';
@@ -11,21 +15,21 @@ const Dashboard: React.FC = () => {
       <h2>Dashboard</h2>
       <Row gutter={[16, 16]}>
         <Col span={8}>
-          <StatisticCard 
+          <StatisticCard
             title="Active Users"
             value={1128}
             icon={<UserOutlined />}
           />
         </Col>
         <Col span={8}>
-          <StatisticCard 
+          <StatisticCard
             title="Orders"
             value={93}
             icon={<ShoppingCartOutlined />}
           />
         </Col>
         <Col span={8}>
-          <StatisticCard 
+          <StatisticCard
             title="Revenue"
             value={15600}
             prefix="$"
@@ -46,4 +50,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

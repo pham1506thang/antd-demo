@@ -71,7 +71,10 @@ const ReportsList: React.FC = () => {
         renderItem={(item) => (
           <List.Item>
             <div style={{ width: '100%' }}>
-              <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
+              <Space
+                align="start"
+                style={{ width: '100%', justifyContent: 'space-between' }}
+              >
                 <div>
                   <Space>
                     <FileTextOutlined />
@@ -101,4 +104,4 @@ const ReportsList: React.FC = () => {
   );
 };
 
-export default ReportsList; 
+export default ReportsList;

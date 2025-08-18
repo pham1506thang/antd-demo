@@ -1,6 +1,11 @@
 import React from 'react';
 import { Row, Col, Card, Statistic } from 'antd';
-import { FileOutlined, CheckCircleOutlined, ClockCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  FileOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 
 const ReportsSummary: React.FC = () => {
   return (
@@ -48,4 +53,4 @@ const ReportsSummary: React.FC = () => {
   );
 };
 
-export default ReportsSummary; 
+export default ReportsSummary;

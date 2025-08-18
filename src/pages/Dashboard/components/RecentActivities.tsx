@@ -1,6 +1,10 @@
 import React from 'react';
 import { Card, List, Avatar, Tag } from 'antd';
-import { UserOutlined, ShoppingOutlined, MessageOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  ShoppingOutlined,
+  MessageOutlined,
+} from '@ant-design/icons';
 
 const activities = [
   {
@@ -83,4 +87,4 @@ const RecentActivities: React.FC = () => {
   );
 };
 
-export default RecentActivities; 
+export default RecentActivities;

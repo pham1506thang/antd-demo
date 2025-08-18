@@ -28,4 +28,4 @@ const StatisticCard: React.FC<StatisticCardProps> = ({
   );
 };
 
-export default StatisticCard; 
+export default StatisticCard;

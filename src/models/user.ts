@@ -1,4 +1,4 @@
-import type { SummaryRole } from "./role";
+import type { SummaryRole } from './role';
 
 export const USER_STATUS = {
   ACTIVE: 'active',
@@ -7,7 +7,7 @@ export const USER_STATUS = {
   SUSPENDED: 'suspended',
 } as const;
 
-export type UserStatus = typeof USER_STATUS[keyof typeof USER_STATUS];
+export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
 
 export type User = {
   id?: string;
@@ -20,4 +20,4 @@ export type User = {
   roles: SummaryRole[];
   createdAt?: string;
   updatedAt?: string;
-}
+};

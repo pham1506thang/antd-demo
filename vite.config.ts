@@ -1,20 +1,42 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      'api': path.resolve(__dirname, './src/api'),
-      'components': path.resolve(__dirname, './src/components'),
-      'pages': path.resolve(__dirname, './src/pages'),
-      'models': path.resolve(__dirname, './src/models'),
-      'store': path.resolve(__dirname, './src/store'),
-      'utils': path.resolve(__dirname, './src/utils'),
-      'styles': path.resolve(__dirname, './src/styles'),
+      '@': path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src'),
+      api: path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './src/api'
+      ),
+      components: path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './src/components'
+      ),
+      pages: path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './src/pages'
+      ),
+      models: path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './src/models'
+      ),
+      store: path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './src/store'
+      ),
+      utils: path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './src/utils'
+      ),
+      styles: path.resolve(
+        path.dirname(fileURLToPath(import.meta.url)),
+        './src/styles'
+      ),
     },
   },
-})
+});

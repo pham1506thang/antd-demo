@@ -41,4 +41,4 @@ const ReportsChart: React.FC = () => {
   );
 };
 
-export default ReportsChart; 
+export default ReportsChart;
