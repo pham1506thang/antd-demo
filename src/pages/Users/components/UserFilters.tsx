@@ -83,7 +83,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
             icon={<UndoOutlined />}
             onClick={handleReset}
           >
-            Reset
+            Reset filters
           </Button>
         </Form.Item>
       </Space>

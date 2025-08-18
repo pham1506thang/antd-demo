@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Table, Space, Button, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { User, UserStatus } from 'models/user';
 import type { Role } from 'models/role';
 import { userApi } from 'api/slices/userApi';
@@ -51,6 +51,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
     data: usersData,
     isLoading,
     isFetching,
+    refetch,
   } = userApi.useGetUsersQuery(queryParams);
 
   const [deleteUser] = userApi.useDeleteUserMutation();
@@ -145,22 +146,33 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={usersData?.data}
-      rowKey="id"
-      loading={isLoading || isFetching}
-      pagination={{
-        ...tableParams.pagination,
-        total: usersData?.meta.total,
-        current: usersData?.meta.page,
-        pageSize: usersData?.meta.limit,
-        showSizeChanger: true,
-        showTotal: (total) => `Total ${total} users`,
-      }}
-      onChange={handleTableChange}
-      scroll={{ x: 'max-content' }}
-    />
+    <>
+      <Button
+        icon={<ReloadOutlined />}
+        type="primary"
+        onClick={refetch}
+        loading={isFetching}
+        style={{ marginBottom: 24 }}
+      >
+        Refresh list
+      </Button>
+      <Table
+        columns={columns}
+        dataSource={usersData?.data}
+        rowKey="id"
+        loading={isLoading || isFetching}
+        pagination={{
+          ...tableParams.pagination,
+          total: usersData?.meta.total,
+          current: usersData?.meta.page,
+          pageSize: usersData?.meta.limit,
+          showSizeChanger: true,
+          showTotal: (total) => `Total ${total} users`,
+        }}
+        onChange={handleTableChange}
+        scroll={{ x: 'max-content' }}
+      />
+    </>
   );
 };
 
