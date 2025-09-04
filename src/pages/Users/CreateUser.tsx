@@ -4,12 +4,14 @@ import { userApi } from '@/api/slices/userApi';
 import { useApiFormErrorHandler } from '@/hooks/useApiFormErrorHandler';
 import UserForm from './components/UserForm';
 import type { CreateUserDTO } from '@/models';
+import { useNavigate } from 'react-router-dom';
 
 type UserFormProps = React.ComponentProps<typeof UserForm<undefined>>;
 
 const { Title } = Typography;
 
 const CreateUserPage: React.FC = () => {
+  const navigate = useNavigate();
   const [createUser, { isLoading: isCreating }] =
     userApi.useCreateUserMutation();
   const { handleFormApiError } = useApiFormErrorHandler();
@@ -27,6 +29,7 @@ const CreateUserPage: React.FC = () => {
       await createUser(userData).unwrap();
       message.success('User created successfully');
       form.resetFields();
+      navigate('/users');
     } catch (error) {
       handleFormApiError(error, form);
     }

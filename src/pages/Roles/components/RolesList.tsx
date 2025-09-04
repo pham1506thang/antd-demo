@@ -1,0 +1,162 @@
+import React, { useEffect, useRef } from 'react';
+import { Table, Tag, Space, Button, message } from 'antd';
+import { EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import type { TableProps } from 'antd';
+import type { Role } from '@/models/role';
+import type { PaginationParams } from '@/models/pagination';
+import { useDeleteRoleMutation, useGetRolesQuery } from '@/api/slices/roleApi';
+import { usePagination } from '@/hooks/usePagination';
+import { convertFiltersToParams } from '@/api/apiHelper';
+import type { FilterValues } from './RoleFilters';
+
+interface RolesListProps {
+  filters: FilterValues;
+}
+
+const RolesList: React.FC<RolesListProps> = ({ filters }) => {
+  const navigate = useNavigate();
+  const { tableParams, paginationParams, handleTableChange, setSearch } =
+    usePagination<Role>({
+      defaultSorts: [{ field: 'createdAt', order: 'descend' }],
+      defaultFilters: [],
+    });
+
+  const prevSearchRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (filters.search !== prevSearchRef.current) {
+      setSearch(filters.search || '');
+      prevSearchRef.current = filters.search;
+    }
+  }, [filters.search, setSearch]);
+
+  // Convert filter values to API params
+  const apiFilters = convertFiltersToParams({
+    isProtected: filters.isProtected,
+  });
+
+  const queryParams: PaginationParams<Role> = {
+    ...paginationParams,
+    filters: apiFilters,
+  };
+
+  const {
+    data,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetRolesQuery(queryParams);
+
+  const [deleteRole] = useDeleteRoleMutation();
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteRole(id).unwrap();
+      message.success('Role deleted successfully');
+    } catch (error) {
+      message.error('Failed to delete role');
+    }
+  };
+  const columns: TableProps<Role>['columns'] = [
+    {
+      title: 'Code',
+      dataIndex: 'code',
+      key: 'code',
+    },
+    {
+      title: 'Label',
+      dataIndex: 'label',
+      key: 'label',
+    },
+    {
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      render: (description: string) => description || '-',
+    },
+    {
+      title: 'Admin',
+      dataIndex: 'isAdmin',
+      key: 'isAdmin',
+      render: (isAdmin: boolean) => (
+        <Tag color={isAdmin ? 'blue' : 'default'}>
+          {isAdmin ? 'Yes' : 'No'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Protected',
+      dataIndex: 'isProtected',
+      key: 'isProtected',
+      render: (isProtected: boolean) => (
+        <Tag color={isProtected ? 'blue' : 'default'}>
+          {isProtected ? 'Yes' : 'No'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Permissions',
+      dataIndex: 'permissions',
+      key: 'permissions',
+      render: (permissions: Role['permissions']) => (
+        <span>{permissions.length}</span>
+      ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record: Role) => (
+        <Space size="middle">
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => navigate(`/roles/update/${record.id}`)}
+            disabled={record.isProtected}
+            title={record.isProtected ? 'Protected role cannot be edited' : 'Edit role'}
+          />
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => record.id && handleDelete(record.id)}
+            disabled={record.isProtected}
+            title={record.isProtected ? 'Protected role cannot be deleted' : 'Delete role'}
+          />
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <Button
+        icon={<ReloadOutlined />}
+        type="primary"
+        onClick={refetch}
+        loading={isFetching}
+        style={{ marginBottom: 24 }}
+      >
+        Refresh list
+      </Button>
+      <Table
+        columns={columns}
+        dataSource={data?.data}
+        loading={isLoading || isFetching}
+        rowKey="id"
+        pagination={{
+          ...tableParams.pagination,
+          total: data?.meta.total,
+          current: data?.meta.page,
+          pageSize: data?.meta.limit,
+          showSizeChanger: true,
+          showTotal: (total) => `Total ${total} roles`,
+        }}
+        onChange={handleTableChange}
+        scroll={{ x: 'max-content' }}
+      />
+    </>
+  );
+};
+
+export default RolesList;

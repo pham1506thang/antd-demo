@@ -124,6 +124,12 @@ export const DOMAINS = {
   },
 };
 
+export const SUMMARY_DOMAINS = {
+  ROLES: {
+    value: 'summary_roles',
+  },
+};
+
 function generateAllPermissions() {
   return Object.values(DOMAINS).map((domainObj) => ({
     domain: domainObj.value,

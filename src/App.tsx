@@ -19,9 +19,11 @@ import {
   QuestionCircleOutlined,
   BarChartOutlined,
   FileTextOutlined,
+  SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
+import Roles from './pages/Roles';
 import Orders from './pages/Orders';
 import Analytics from './pages/Analytics';
 import Reports from './pages/Reports';
@@ -31,6 +33,8 @@ import Help from './pages/Help';
 import Login from './pages/Login';
 import CreateUserPage from './pages/Users/CreateUser';
 import UpdateUserPage from './pages/Users/UpdateUser';
+import CreateRolePage from './pages/Roles/CreateRole';
+import UpdateRolePage from './pages/Roles/UpdateRole';
 import { tokenService } from '@/services/tokenService';
 import { UserMenuTrigger } from './components/UserMenuTrigger';
 import AppInit from '@/components/AppInit';
@@ -71,6 +75,11 @@ const MenuWrapper: React.FC<{
       key: '/users',
       icon: <UserOutlined />,
       label: 'Users',
+    },
+    {
+      key: '/roles',
+      icon: <SafetyCertificateOutlined />,
+      label: 'Roles',
     },
     {
       key: '/orders',
@@ -224,6 +233,9 @@ const MenuWrapper: React.FC<{
             <Route path="/users" element={<Users />} />
             <Route path="/users/create" element={<CreateUserPage />} />
             <Route path="/users/update/:userId" element={<UpdateUserPage />} />
+            <Route path="/roles" element={<Roles />} />
+            <Route path="/roles/create" element={<CreateRolePage />} />
+            <Route path="/roles/update/:roleId" element={<UpdateRolePage />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/reports" element={<Reports />} />

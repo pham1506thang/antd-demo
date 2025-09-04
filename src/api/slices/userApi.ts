@@ -9,8 +9,6 @@ import { baseApi } from 'api/baseApi';
 import type { PaginationParams, PaginationResult } from '@/models/pagination';
 import { buildQueryString } from '@/api/apiHelper';
 
-type GetUsersResponse = PaginationResult<User>;
-
 interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
@@ -18,7 +16,7 @@ interface ChangePasswordRequest {
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getUsers: builder.query<GetUsersResponse, PaginationParams<User>>({
+    getUsers: builder.query<PaginationResult<User>, PaginationParams<User>>({
       query: (params) => {
         const queryString = buildQueryString(params);
         return {

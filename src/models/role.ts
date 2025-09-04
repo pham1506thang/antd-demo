@@ -4,6 +4,7 @@ export type Role = {
   id: string;
   code: string;
   label: string;
+  description?: string;
   isAdmin: boolean;
   isSuperAdmin: boolean;
   isProtected: boolean;
