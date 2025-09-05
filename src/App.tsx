@@ -35,9 +35,11 @@ import CreateUserPage from './pages/Users/CreateUser';
 import UpdateUserPage from './pages/Users/UpdateUser';
 import CreateRolePage from './pages/Roles/CreateRole';
 import UpdateRolePage from './pages/Roles/UpdateRole';
-import { tokenService } from '@/services/tokenService';
 import { UserMenuTrigger } from './components/UserMenuTrigger';
 import AppInit from '@/components/AppInit';
+import { authApi } from '@/api/slices/authApi';
+import { clearAuthState } from '@/utils/authUtils';
+import { useAuthInit } from '@/hooks/useAuthInit';
 
 const { Header, Sider, Content } = Layout;
 
@@ -46,8 +48,10 @@ const MenuWrapper: React.FC<{
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
 }> = ({ collapsed, setCollapsed }) => {
+  // collapsed is used in JSX below
   const navigate = useNavigate();
   const location = useLocation();
+  const [logout] = authApi.useLogoutMutation();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -56,9 +60,19 @@ const MenuWrapper: React.FC<{
     Modal.confirm({
       title: 'Confirm Logout',
       content: 'Are you sure you want to logout?',
-      onOk: () => {
-        tokenService.removeToken();
-        navigate('/login');
+      onOk: async () => {
+        try {
+          // Call logout API to invalidate session on server
+          await logout().unwrap();
+        } catch (error) {
+          // Even if API fails, continue with local logout
+          console.error('Logout API failed:', error);
+        } finally {
+          // Clear all auth state
+          clearAuthState();
+          // Navigate to login
+          navigate('/login');
+        }
       },
       okText: 'Logout',
       cancelText: 'Cancel',
@@ -252,6 +266,27 @@ const MenuWrapper: React.FC<{
 // Main App component
 const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  
+  // Initialize auth state from server
+  const { isInitialized } = useAuthInit();
+
+  // Show loading while initializing auth
+  if (!isInitialized) {
+    return (
+      <div
+        style={{
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f0f2f5',
+        }}
+      >
+        <div>Initializing...</div>
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter

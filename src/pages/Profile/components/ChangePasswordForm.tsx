@@ -1,7 +1,7 @@
 import React from 'react';
-import { Form, Input, Button, Space, message } from 'antd';
+import { Form, Input, Button, Space } from 'antd';
 import { SaveOutlined, CloseOutlined } from '@ant-design/icons';
-import { userApi } from '@/api/slices/userApi';
+import { authApi } from '@/api/slices/authApi';
 
 interface ChangePasswordFormProps {
   onCancel: () => void;
@@ -19,7 +19,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
   onSuccess,
 }) => {
   const [form] = Form.useForm();
-  const [changePassword] = userApi.useChangePasswordMutation();
+  const [changePassword] = authApi.useChangePasswordMutation();
 
   const handleSubmit = async (values: ChangePasswordValues) => {
     try {

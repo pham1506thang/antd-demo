@@ -10,7 +10,7 @@ export const USER_STATUS = {
 export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
 
 export type User = {
-  id?: string;
+  id: string;
   username: string;
   name?: string;
   email?: string;

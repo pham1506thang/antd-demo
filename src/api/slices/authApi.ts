@@ -1,10 +1,20 @@
 import { baseApi } from 'api/baseApi';
-import { tokenService } from '@/services/tokenService';
 import type { Permission, User } from '@/models';
+import axiosInstance from '@/api/axiosConfig';
 
 interface LoginRequest {
   username: string;
   password: string;
+}
+
+interface UpdateProfileRequest {
+  name?: string;
+  email?: string;
+}
+
+interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface GetAuthResponse {
@@ -27,7 +37,8 @@ export const authApi = baseApi.injectEndpoints({
       onQueryStarted: async (_, { queryFulfilled }) => {
         try {
           const { data } = await queryFulfilled;
-          tokenService.setToken(data.accessToken);
+          // Set the access token to axios instance for subsequent requests
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
         } catch {
           // Handle error if needed
         }
@@ -47,11 +58,27 @@ export const authApi = baseApi.injectEndpoints({
       onQueryStarted: async (_, { queryFulfilled }) => {
         try {
           await queryFulfilled;
-          tokenService.removeToken();
         } catch {
           // Handle error if needed
+        } finally {
+          // Token will be cleared by the component that calls this mutation
+          // This is just for the API definition
         }
       },
+    }),
+    updateProfile: builder.mutation<{ message: string }, UpdateProfileRequest>({
+      query: (profileData) => ({
+        url: '/auths/profile',
+        method: 'PATCH',
+        data: profileData,
+      }),
+    }),
+    changePassword: builder.mutation<{ message: string }, ChangePasswordRequest>({
+      query: (passwordData) => ({
+        url: '/auths/change-password',
+        method: 'PATCH',
+        data: passwordData,
+      }),
     }),
   }),
 });

@@ -6,7 +6,7 @@ import type {
   InternalAxiosRequestConfig,
 } from 'axios';
 import { message } from 'antd';
-import { tokenService } from '@/services/tokenService';
+import { clearAuthState } from '@/utils/authUtils';
 
 // Extend AxiosRequestConfig to include _retry flag
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -27,10 +27,8 @@ const axiosInstance: AxiosInstance = axios.create(AXIOS_CONFIG);
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = tokenService.getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // No need to add Authorization header manually
+    // The server will use refreshToken from httpOnly cookie
     return config;
   },
   (error: AxiosError) => {
@@ -42,13 +40,13 @@ const rawAxios = axios.create(AXIOS_CONFIG);
 
 // Create a flag to track refresh state
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let refreshSubscribers: ((_token: string) => void)[] = [];
 
 // Helper to simulate delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Helper to add callbacks to the subscriber queue
-const addRefreshSubscriber = (callback: (token: string) => void) => {
+const addRefreshSubscriber = (callback: (_token: string) => void) => {
   refreshSubscribers.push(callback);
 };
 
@@ -81,7 +79,7 @@ axiosInstance.interceptors.response.use(
         // If we're already refreshing, queue this request
         try {
           const newToken = await new Promise<string>((resolve, reject) => {
-            addRefreshSubscriber((token: string) => {
+            addRefreshSubscriber((token) => {
               if (token) {
                 resolve(token);
               } else {
@@ -108,7 +106,10 @@ axiosInstance.interceptors.response.use(
         const response = await rawAxios.post('/auths/refresh');
         const { accessToken } = response.data;
 
-        tokenService.setToken(accessToken);
+        // Set the new token to axios instance default headers
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        
+        // Also set for the original request
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
         // Process any queued requests
@@ -116,15 +117,20 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, clear token and process queue with error
-        tokenService.removeToken();
+        // If refresh fails, process queue with error
         processQueue(new Error('Refresh failed'));
 
-        // Just show error message, let components handle navigation
-        message.error('Session expired. Please login again.');
+        // Clear all auth state
+        clearAuthState();
 
-        await delay(1000);
-        window.location.href = '/login';
+        // Show error message
+        message.error('Session expired. Please login again.');
+        
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/login') {
+          await delay(1000);
+          window.location.href = '/login';
+        }
 
         return Promise.reject(refreshError);
       } finally {

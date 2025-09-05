@@ -1,8 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { User } from 'models/user';
-import { authApi } from 'api/slices/authApi';
-import { userApi } from '@/api/slices/userApi';
 import type { Permission } from '@/models';
 
 export interface AuthState {
@@ -10,6 +8,7 @@ export interface AuthState {
   permissions: Permission[];
   isAdmin: boolean;
   isSuperAdmin: boolean;
+  isAuthenticated: boolean;
 }
 
 const initialState: AuthState = {
@@ -17,6 +16,7 @@ const initialState: AuthState = {
   permissions: [],
   isAdmin: false,
   isSuperAdmin: false,
+  isAuthenticated: false,
 };
 
 const sliceName = 'auth';
@@ -28,6 +28,7 @@ export const buildAuthState = (state: {
   ...state,
   isAdmin: state.me.roles.some((role) => role.isAdmin),
   isSuperAdmin: state.me.roles.some((role) => role.isSuperAdmin),
+  isAuthenticated: true,
 });
 
 export const authSlice = createSlice({
@@ -40,6 +41,7 @@ export const authSlice = createSlice({
         permissions: [],
         isAdmin: false,
         isSuperAdmin: false,
+        isAuthenticated: false,
       };
     },
     setAuth: (state, action: PayloadAction<AuthState>) => {
@@ -49,30 +51,6 @@ export const authSlice = createSlice({
       };
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addMatcher(
-        userApi.endpoints.updateUser.matchFulfilled,
-        (state, { payload }) => {
-          if (state.me && payload) {
-            return {
-              ...state,
-              me: {
-                ...state.me,
-                ...payload,
-                roles: state.me.roles,
-              },
-            };
-          }
-
-          return state;
-        }
-      )
-      .addMatcher(authApi.endpoints.logout.matchFulfilled, (state) => {
-        state.me = null;
-        state.permissions = [];
-      });
-  },
 });
 
 export const { clearAuth, setAuth } = authSlice.actions;
@@ -81,5 +59,7 @@ export const meSelector = (state: { [sliceName]: AuthState }) =>
   state[sliceName].me;
 export const permissionsSelector = (state: { [sliceName]: AuthState }) =>
   state[sliceName].permissions;
+export const isAuthenticatedSelector = (state: { [sliceName]: AuthState }) =>
+  state[sliceName].isAuthenticated;
 
 export default authSlice.reducer;
