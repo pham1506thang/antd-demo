@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import UsersList from './components/UsersList';
 import UserStats from './components/UserStats';
 import UserFilters, { type FilterValues } from './components/UserFilters';
+import { DOMAINS } from '@/models/permission';
 
 const { Title } = Typography;
 
@@ -12,7 +13,7 @@ const UsersPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleCreateUser = () => {
-    navigate('/users/create');
+    navigate(`/${DOMAINS.USERS.value}/create`);
   };
 
   return (
@@ -25,10 +26,10 @@ const UsersPage: React.FC = () => {
         }}
       >
         <Title level={2} style={{ margin: 0 }}>
-          Users Management
+          Quản lý người dùng
         </Title>
         <Button type="primary" onClick={handleCreateUser}>
-          Create User
+          Tạo người dùng
         </Button>
       </div>
 

@@ -33,13 +33,17 @@ import Help from './pages/Help';
 import Login from './pages/Login';
 import CreateUserPage from './pages/Users/CreateUser';
 import UpdateUserPage from './pages/Users/UpdateUser';
+import ViewUser from './pages/Users/ViewUser';
 import CreateRolePage from './pages/Roles/CreateRole';
 import UpdateRolePage from './pages/Roles/UpdateRole';
+import NotFound from './pages/NotFound';
+import Forbidden from './pages/Forbidden';
 import { UserMenuTrigger } from './components/UserMenuTrigger';
 import AppInit from '@/components/AppInit';
 import { authApi } from '@/api/slices/authApi';
 import { clearAuthState } from '@/utils/authUtils';
 import { useAuthInit } from '@/hooks/useAuthInit';
+import { DOMAINS } from '@/models/permission';
 
 const { Header, Sider, Content } = Layout;
 
@@ -58,8 +62,8 @@ const MenuWrapper: React.FC<{
 
   const handleLogout = () => {
     Modal.confirm({
-      title: 'Confirm Logout',
-      content: 'Are you sure you want to logout?',
+      title: 'Xác nhận đăng xuất',
+      content: 'Bạn có chắc chắn muốn đăng xuất không?',
       onOk: async () => {
         try {
           // Call logout API to invalidate session on server
@@ -74,8 +78,8 @@ const MenuWrapper: React.FC<{
           navigate('/login');
         }
       },
-      okText: 'Logout',
-      cancelText: 'Cancel',
+      okText: 'Đăng xuất',
+      cancelText: 'Hủy',
     });
   };
 
@@ -83,47 +87,47 @@ const MenuWrapper: React.FC<{
     {
       key: '/',
       icon: <DashboardOutlined />,
-      label: 'Dashboard',
+      label: 'Bảng điều khiển',
     },
     {
-      key: '/users',
+      key: `/${DOMAINS.USERS.value}`,
       icon: <UserOutlined />,
-      label: 'Users',
+      label: 'Người dùng',
     },
     {
       key: '/roles',
       icon: <SafetyCertificateOutlined />,
-      label: 'Roles',
+      label: 'Vai trò',
     },
     {
       key: '/orders',
       icon: <ShoppingCartOutlined />,
-      label: 'Orders',
+      label: 'Đơn hàng',
     },
     {
       key: '/analytics',
       icon: <BarChartOutlined />,
-      label: 'Analytics',
+      label: 'Phân tích',
     },
     {
       key: '/reports',
       icon: <FileTextOutlined />,
-      label: 'Reports',
+      label: 'Báo cáo',
     },
     {
       key: '/profile',
       icon: <UserOutlined />,
-      label: 'Profile',
+      label: 'Hồ sơ',
     },
     {
       key: '/settings',
       icon: <SettingOutlined />,
-      label: 'Settings',
+      label: 'Cài đặt',
     },
     {
       key: '/help',
       icon: <QuestionCircleOutlined />,
-      label: 'Help',
+      label: 'Trợ giúp',
     },
   ];
 
@@ -131,12 +135,12 @@ const MenuWrapper: React.FC<{
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: 'Profile',
+      label: 'Hồ sơ',
     },
     {
       key: 'settings',
       icon: <SettingOutlined />,
-      label: 'Settings',
+      label: 'Cài đặt',
     },
     {
       type: 'divider',
@@ -144,7 +148,7 @@ const MenuWrapper: React.FC<{
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: 'Logout',
+      label: 'Đăng xuất',
       danger: true,
     },
   ];
@@ -239,14 +243,17 @@ const MenuWrapper: React.FC<{
             padding: 24,
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
-            minHeight: 280,
+            minHeight: 'calc(100vh - 112px)', // 64px header + 48px margin
+            height: 'calc(100vh - 112px)',
+            overflowY: 'auto',
           }}
         >
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/users/create" element={<CreateUserPage />} />
-            <Route path="/users/update/:userId" element={<UpdateUserPage />} />
+            <Route path={`/${DOMAINS.USERS.value}`} element={<Users />} />
+            <Route path={`/${DOMAINS.USERS.value}/create`} element={<CreateUserPage />} />
+            <Route path={`/${DOMAINS.USERS.value}/:userId`} element={<ViewUser />} />
+            <Route path={`/${DOMAINS.USERS.value}/update/:userId`} element={<UpdateUserPage />} />
             <Route path="/roles" element={<Roles />} />
             <Route path="/roles/create" element={<CreateRolePage />} />
             <Route path="/roles/update/:roleId" element={<UpdateRolePage />} />
@@ -256,6 +263,8 @@ const MenuWrapper: React.FC<{
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/help" element={<Help />} />
+            <Route path="/403" element={<Forbidden />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Content>
       </Layout>

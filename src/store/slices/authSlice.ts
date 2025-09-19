@@ -50,10 +50,21 @@ export const authSlice = createSlice({
         ...action.payload,
       };
     },
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.me) {
+        state.me = { ...state.me, ...action.payload };
+        // Rebuild auth state to update computed properties
+        const newState = buildAuthState({
+          me: state.me,
+          permissions: state.permissions,
+        });
+        Object.assign(state, newState);
+      }
+    },
   },
 });
 
-export const { clearAuth, setAuth } = authSlice.actions;
+export const { clearAuth, setAuth, updateUser } = authSlice.actions;
 
 export const meSelector = (state: { [sliceName]: AuthState }) =>
   state[sliceName].me;

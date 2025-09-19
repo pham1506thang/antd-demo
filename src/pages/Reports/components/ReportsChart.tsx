@@ -35,7 +35,7 @@ const ReportsChart: React.FC = () => {
   };
 
   return (
-    <Card title="Reports Overview">
+    <Card title="Tổng quan báo cáo">
       <Column {...config} />
     </Card>
   );

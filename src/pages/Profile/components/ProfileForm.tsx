@@ -56,27 +56,27 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       initialValues={initialValues}
       onFinish={handleSubmit}
     >
-      <Form.Item name="name" label="Name">
-        <Input placeholder="Enter name" />
+      <Form.Item name="name" label="Tên">
+        <Input placeholder="Nhập tên" />
       </Form.Item>
 
       <Form.Item
         name="email"
         label="Email"
         rules={[
-          { type: 'email', message: 'Please enter a valid email!' },
+          { type: 'email', message: 'Vui lòng nhập email hợp lệ!' },
         ]}
       >
-        <Input placeholder="Enter email" />
+        <Input placeholder="Nhập email" />
       </Form.Item>
 
       <Form.Item>
         <Space>
           <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
-            Save Changes
+            Lưu thay đổi
           </Button>
           <Button onClick={onCancel} icon={<CloseOutlined />}>
-            Cancel
+            Hủy
           </Button>
         </Space>
       </Form.Item>

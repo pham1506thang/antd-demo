@@ -22,13 +22,13 @@ const PermissionPresets: React.FC<PermissionPresetsProps> = ({
   // Generate presets based on available permissions
   const presets: PermissionPreset[] = [
     {
-      name: "Admin",
-      description: "Full access to all features",
+      name: 'Admin',
+      description: 'Full access to all features',
       permissions: permissions?.map(p => p.id) || [],
     },
     {
-      name: "Editor", 
-      description: "Content management access",
+      name: 'Editor', 
+      description: 'Content management access',
       permissions: permissions?.filter(p => 
         p.domain === 'articles' || 
         p.domain === 'categories' || 
@@ -37,8 +37,8 @@ const PermissionPresets: React.FC<PermissionPresetsProps> = ({
       ).map(p => p.id) || [],
     },
     {
-      name: "Viewer",
-      description: "Read-only access",
+      name: 'Viewer',
+      description: 'Read-only access',
       permissions: permissions?.filter(p => 
         p.action === 'view' || 
         p.action === 'view_all' || 
@@ -47,8 +47,8 @@ const PermissionPresets: React.FC<PermissionPresetsProps> = ({
       ).map(p => p.id) || [],
     },
     {
-      name: "Moderator",
-      description: "Content moderation access", 
+      name: 'Moderator',
+      description: 'Content moderation access', 
       permissions: permissions?.filter(p => 
         p.action === 'moderate' || 
         p.action === 'review' ||
@@ -58,15 +58,15 @@ const PermissionPresets: React.FC<PermissionPresetsProps> = ({
       ).map(p => p.id) || [],
     },
     {
-      name: "User Manager",
-      description: "User management access",
+      name: 'Quản lý người dùng',
+      description: 'User management access',
       permissions: permissions?.filter(p => 
         p.domain === 'users' || p.domain === 'roles'
       ).map(p => p.id) || [],
     },
     {
-      name: "Analytics",
-      description: "Analytics and reports access",
+      name: 'Analytics',
+      description: 'Analytics and reports access',
       permissions: permissions?.filter(p => 
         p.domain === 'analytics' || 
         p.domain === 'reports' ||

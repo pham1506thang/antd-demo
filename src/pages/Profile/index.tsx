@@ -99,20 +99,20 @@ const ProfilePage: React.FC = () => {
 
             {!isEditing && !isChangingPassword && (
               <Descriptions column={2}>
-                <Descriptions.Item label="Username">
+                <Descriptions.Item label="Tên đăng nhập">
                   {me.username}
                 </Descriptions.Item>
                 <Descriptions.Item label="Email">{me.email}</Descriptions.Item>
-                <Descriptions.Item label="Name">{me.name}</Descriptions.Item>
-                <Descriptions.Item label="Status">
+                <Descriptions.Item label="Họ và tên">{me.name}</Descriptions.Item>
+                <Descriptions.Item label="Trạng thái">
                   <StatusTag status={me.status} />
                 </Descriptions.Item>
-                <Descriptions.Item label="Last Login">
+                <Descriptions.Item label="Lần đăng nhập cuối">
                   {me.lastLogin
                     ? new Date(me.lastLogin).toLocaleString()
                     : 'Never'}
                 </Descriptions.Item>
-                <Descriptions.Item label="Roles" span={2}>
+                <Descriptions.Item label="Vai trò" span={2}>
                   <Space size={[8, 8]} wrap>
                     {me.roles.map((role) => (
                       <Tooltip

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Tabs, Card, Row, Col, Space, Typography, Badge, type FormInstance } from 'antd';
+import { Form, Input, Button, Tabs, Card, Row, Col, Space, Typography, Badge, Checkbox, type FormInstance } from 'antd';
 import { useGetPermissionsQuery } from '@/api/slices/permissionApi';
 import type { Role } from '@/models/role';
 import type { CreateRoleDTO, UpdateRoleDTO } from '@/models/dto/role';
@@ -84,13 +84,13 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
     setSelectedPermissions(permissionIds);
   };
 
-  const handleSelectAll = () => {
-    if (!permissionsData) return;
-    setSelectedPermissions(selectAllPermissions(permissionsData));
-  };
-
-  const handleClearAll = () => {
-    setSelectedPermissions(clearAllPermissions());
+  const handleTotalCheckAll = (checked: boolean) => {
+    if (checked) {
+      if (!permissionsData) return;
+      setSelectedPermissions(selectAllPermissions(permissionsData));
+    } else {
+      setSelectedPermissions(clearAllPermissions());
+    }
   };
 
   const handleSubmit = async (values: any) => {
@@ -116,14 +116,14 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
   };
 
   const getButtonText = () => {
-    return isUpdateMode ? 'Update Role' : 'Create Role';
+    return isUpdateMode ? 'Cập nhật vai trò' : 'Tạo vai trò';
   };
 
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       {/* Basic Information */}
-      <Card title="Basic Information">
+      <Card title="Thông tin cơ bản">
         <Form
           form={form}
           layout="vertical"
@@ -134,11 +134,11 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
             <Col span={12}>
               <Form.Item
                 name="code"
-                label="Role Code"
-                rules={[{ required: true, message: 'Please input the code!' }]}
+                label="Mã vai trò"
+                rules={[{ required: true, message: 'Vui lòng nhập mã vai trò!' }]}
               >
                 <Input 
-                  placeholder="Enter role code" 
+                  placeholder="Nhập mã vai trò" 
                   disabled={isUpdateMode}
                   style={{ 
                     backgroundColor: isUpdateMode ? '#f5f5f5' : 'white',
@@ -150,20 +150,20 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
             <Col span={12}>
               <Form.Item
                 name="label"
-                label="Role Label"
-                rules={[{ required: true, message: 'Please input the label!' }]}
+                label="Tên vai trò"
+                rules={[{ required: true, message: 'Vui lòng nhập tên vai trò!' }]}
               >
-                <Input placeholder="Enter role label" />
+                <Input placeholder="Nhập tên vai trò" />
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item
             name="description"
-            label="Description"
+            label="Mô tả"
           >
             <Input 
-              placeholder="Enter role description (optional)"
+              placeholder="Nhập mô tả vai trò (tùy chọn)"
               maxLength={200}
               showCount
             />
@@ -173,9 +173,9 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
       </Card>
 
       {/* Permission Management */}
-      <Card title="Permission Management">
+      <Card title="Quản lý quyền">
         <Tabs defaultActiveKey="permissions" type="card">
-          <TabPane tab="By Domain" key="permissions">
+          <TabPane tab="Theo miền" key="permissions">
             <PermissionDomainSelector
               permissions={permissionsData || []}
               selectedPermissions={selectedPermissions}
@@ -185,14 +185,14 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
             />
           </TabPane>
 
-          <TabPane tab="Presets" key="presets">
+          <TabPane tab="Mẫu có sẵn" key="presets">
             <PermissionPresets
               permissions={permissionsData || []}
               onPresetSelect={handlePresetSelect}
             />
           </TabPane>
 
-          <TabPane tab="Advanced" key="advanced">
+          <TabPane tab="Nâng cao" key="advanced">
             <PermissionAdvancedEditor
               permissions={permissionsData || []}
               selectedPermissions={selectedPermissions}
@@ -207,14 +207,15 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
         <Row justify="space-between" align="middle">
           <Col>
             <Space>
-              <Text strong>Total Permissions: </Text>
+              <Text strong>Tổng quyền: </Text>
               <Badge count={selectedPermissions.length} style={{ backgroundColor: '#1890ff' }} />
-              <Button onClick={handleSelectAll} size="small">
-                Select All
-              </Button>
-              <Button onClick={handleClearAll} size="small">
-                Clear All
-              </Button>
+              <Checkbox
+                checked={selectedPermissions.length === (permissionsData?.length || 0) && selectedPermissions.length > 0}
+                indeterminate={selectedPermissions.length > 0 && selectedPermissions.length < (permissionsData?.length || 0)}
+                onChange={(e) => handleTotalCheckAll(e.target.checked)}
+              >
+                {selectedPermissions.length === (permissionsData?.length || 0) && selectedPermissions.length > 0 ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+              </Checkbox>
             </Space>
           </Col>
           <Col>

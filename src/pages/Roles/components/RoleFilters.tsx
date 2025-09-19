@@ -32,16 +32,16 @@ const RoleFilters: React.FC<RoleFiltersProps> = ({ values, onChange }) => {
       onValuesChange={onValuesChange}
     >
       <Space>
-        <Form.Item name="search" label="Search">
+        <Form.Item name="search" label="Tìm kiếm">
           <Input
-            placeholder="Search by code, label..."
+            placeholder="Tìm kiếm theo mã, tên..."
             prefix={<SearchOutlined />}
           />
         </Form.Item>
-        <Form.Item name="isProtected" label="Protected Role" valuePropName="checked">
+        <Form.Item name="isProtected" label="Vai trò được bảo vệ" valuePropName="checked">
           <Switch 
-            checkedChildren="Yes" 
-            unCheckedChildren="No"
+            checkedChildren="Có" 
+            unCheckedChildren="Không"
           />
         </Form.Item>
         <Form.Item label=" ">
@@ -50,7 +50,7 @@ const RoleFilters: React.FC<RoleFiltersProps> = ({ values, onChange }) => {
             icon={<UndoOutlined />}
             onClick={handleReset}
           >
-            Reset filters
+Đặt lại bộ lọc
           </Button>
         </Form.Item>
       </Space>

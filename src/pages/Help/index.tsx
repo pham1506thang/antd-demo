@@ -9,24 +9,24 @@ const HelpPage: React.FC = () => {
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <Title level={2}>
-        <QuestionCircleOutlined /> Help Center
+        <QuestionCircleOutlined /> Trung tâm trợ giúp
       </Title>
 
-      <Card title="Frequently Asked Questions">
+      <Card title="Câu hỏi thường gặp">
         <Collapse defaultActiveKey={['1']}>
-          <Panel header="How do I reset my password?" key="1">
+          <Panel header="Làm thế nào để đặt lại mật khẩu?" key="1">
             <Paragraph>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </Paragraph>
           </Panel>
-          <Panel header="How can I update my profile?" key="2">
+          <Panel header="Làm thế nào để cập nhật hồ sơ?" key="2">
             <Paragraph>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </Paragraph>
           </Panel>
-          <Panel header="Where can I find my order history?" key="3">
+          <Panel header="Tôi có thể tìm lịch sử đơn hàng ở đâu?" key="3">
             <Paragraph>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -35,14 +35,14 @@ const HelpPage: React.FC = () => {
         </Collapse>
       </Card>
 
-      <Card title="Need More Help?">
+      <Card title="Cần thêm trợ giúp?">
         <Space direction="vertical" size="middle">
           <Paragraph>
-            If you can&apos;t find the answer to your question in our FAQ,
-            please contact our support team.
+            Nếu bạn không tìm thấy câu trả lời trong FAQ,
+            vui lòng liên hệ với đội ngũ hỗ trợ của chúng tôi.
           </Paragraph>
           <Button type="primary" icon={<MessageOutlined />}>
-            Contact Support
+            Liên hệ hỗ trợ
           </Button>
         </Space>
       </Card>

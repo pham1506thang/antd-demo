@@ -12,7 +12,7 @@ import { clearAuthState } from '@/utils/authUtils';
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 const AXIOS_CONFIG: CreateAxiosDefaults = {
   baseURL: BASE_URL,
   timeout: 10000,

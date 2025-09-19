@@ -12,25 +12,25 @@ import SalesChart from './components/SalesChart';
 const Dashboard: React.FC = () => {
   return (
     <div>
-      <h2>Dashboard</h2>
+      <h2>Bảng điều khiển</h2>
       <Row gutter={[16, 16]}>
         <Col span={8}>
           <StatisticCard
-            title="Active Users"
+            title="Người dùng hoạt động"
             value={1128}
             icon={<UserOutlined />}
           />
         </Col>
         <Col span={8}>
           <StatisticCard
-            title="Orders"
+            title="Đơn hàng"
             value={93}
             icon={<ShoppingCartOutlined />}
           />
         </Col>
         <Col span={8}>
           <StatisticCard
-            title="Revenue"
+            title="Doanh thu"
             value={15600}
             prefix="$"
             precision={2}

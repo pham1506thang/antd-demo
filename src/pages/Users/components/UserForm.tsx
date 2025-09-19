@@ -127,13 +127,13 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
   const getButtonText = () => {
     switch (currentAction) {
       case USER_FORM_ACTIONS.CREATE:
-        return 'Create User';
+        return 'Tạo người dùng';
       case USER_FORM_ACTIONS.UPDATE_INFO:
-        return 'Update Info';
+        return 'Cập nhật thông tin';
       case USER_FORM_ACTIONS.CHANGE_PASSWORD:
-        return 'Change Password';
+        return 'Đổi mật khẩu';
       case USER_FORM_ACTIONS.ASSIGN_ROLE:
-        return 'Assign Roles';
+        return 'Gán vai trò';
     }
   };
 
@@ -149,7 +149,7 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
       {(currentAction === USER_FORM_ACTIONS.CREATE ||
         currentAction === USER_FORM_ACTIONS.UPDATE_INFO) && (
         <>
-          <Form.Item name="avatar" label="Avatar">
+          <Form.Item name="avatar" label="Ảnh đại diện">
             <CenteredDiv>
               <AvatarUpload />
             </CenteredDiv>
@@ -157,26 +157,26 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
           {currentAction === USER_FORM_ACTIONS.CREATE && (
             <Form.Item
               name="username"
-              label="Username"
+              label="Tên đăng nhập"
               rules={[
-                { required: true, message: 'Please input the username!' },
+                { required: true, message: 'Vui lòng nhập tên đăng nhập!' },
               ]}
             >
-              <Input prefix={<UserOutlined />} placeholder="Username" />
+              <Input prefix={<UserOutlined />} placeholder="Tên đăng nhập" />
             </Form.Item>
           )}
           <Form.Item
             name="name"
-            label="Full Name"
-            rules={[{ required: true, message: 'Please input the full name!' }]}
+            label="Họ và tên"
+            rules={[{ required: true, message: 'Vui lòng nhập họ và tên!' }]}
           >
-            <Input placeholder="Full Name" />
+            <Input placeholder="Họ và tên" />
           </Form.Item>
 
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ type: 'email', message: 'Please input a valid email!' }]}
+            rules={[{ type: 'email', message: 'Vui lòng nhập email hợp lệ!' }]}
           >
             <Input prefix={<MailOutlined />} placeholder="Email" />
           </Form.Item>
@@ -188,20 +188,20 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
         <>
           <Form.Item
             name="password"
-            label="Password"
-            rules={[{ required: true, message: 'Please input the password!' }]}
+            label="Mật khẩu"
+            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
             hasFeedback
           >
-            <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+            <Input.Password prefix={<LockOutlined />} placeholder="Mật khẩu" />
           </Form.Item>
 
           <Form.Item
             name="confirm"
-            label="Confirm Password"
+            label="Xác nhận mật khẩu"
             dependencies={['password']}
             hasFeedback
             rules={[
-              { required: true, message: 'Please confirm your password!' },
+              { required: true, message: 'Vui lòng xác nhận mật khẩu!' },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
@@ -209,7 +209,7 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
                   }
                   return Promise.reject(
                     new Error(
-                      'The two passwords that you entered do not match!'
+                      'Hai mật khẩu bạn nhập không khớp!'
                     )
                   );
                 },
@@ -218,7 +218,7 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Confirm Password"
+              placeholder="Xác nhận mật khẩu"
             />
           </Form.Item>
         </>
@@ -229,40 +229,40 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
         <>
           <Form.Item
             name="currentPassword"
-            label="Current Password"
+            label="Mật khẩu hiện tại"
             rules={[
               {
                 required: true,
-                message: 'Please input your current password!',
+                message: 'Vui lòng nhập mật khẩu hiện tại!',
               },
             ]}
             hasFeedback
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Current Password"
+              placeholder="Mật khẩu hiện tại"
             />
           </Form.Item>
           <Form.Item
             name="newPassword"
-            label="New Password"
+            label="Mật khẩu mới"
             rules={[
-              { required: true, message: 'Please input the new password!' },
+              { required: true, message: 'Vui lòng nhập mật khẩu mới!' },
             ]}
             hasFeedback
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="New Password"
+              placeholder="Mật khẩu mới"
             />
           </Form.Item>
           <Form.Item
             name="confirm"
-            label="Confirm New Password"
+            label="Xác nhận mật khẩu mới"
             dependencies={['newPassword']}
             hasFeedback
             rules={[
-              { required: true, message: 'Please confirm your new password!' },
+              { required: true, message: 'Vui lòng xác nhận mật khẩu mới!' },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('newPassword') === value) {
@@ -270,7 +270,7 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
                   }
                   return Promise.reject(
                     new Error(
-                      'The two passwords that you entered do not match!'
+                      'Hai mật khẩu bạn nhập không khớp!'
                     )
                   );
                 },
@@ -279,7 +279,7 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Confirm New Password"
+              placeholder="Xác nhận mật khẩu mới"
             />
           </Form.Item>
         </>
@@ -288,10 +288,10 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
       {/* --- Fields for ROLES (create and assign-role) --- */}
       {(currentAction === USER_FORM_ACTIONS.CREATE ||
         currentAction === USER_FORM_ACTIONS.ASSIGN_ROLE) && (
-        <Form.Item name="roles" label="Roles">
+        <Form.Item name="roles" label="Vai trò">
           <Select
             mode="multiple"
-            placeholder="Select roles"
+            placeholder="Chọn vai trò"
             loading={isRolesLoading}
           >
             {rolesData?.map((role) => (
@@ -307,10 +307,10 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
       {currentAction === USER_FORM_ACTIONS.UPDATE_INFO && (
         <Form.Item
           name="status"
-          label="Status"
-          rules={[{ required: true, message: 'Please select a status!' }]}
+          label="Trạng thái"
+          rules={[{ required: true, message: 'Vui lòng chọn trạng thái!' }]}
         >
-          <Select placeholder="Select status">
+          <Select placeholder="Chọn trạng thái">
             {Object.values(USER_STATUS).map((status: UserStatus) => (
               <Option key={status} value={status}>
                 <span style={{ textTransform: 'capitalize' }}>{status}</span>
@@ -330,19 +330,19 @@ function UserForm<T extends User | undefined>(props: UserFormProps<T>) {
                   onClick={() => setAction(USER_FORM_ACTIONS.UPDATE_INFO)}
                   disabled={action === USER_FORM_ACTIONS.UPDATE_INFO}
                 >
-                  Update Info
+                  Cập nhật thông tin
                 </Button>
                 <Button
                   onClick={() => setAction(USER_FORM_ACTIONS.CHANGE_PASSWORD)}
                   disabled={action === USER_FORM_ACTIONS.CHANGE_PASSWORD}
                 >
-                  Change Password
+                  Đổi mật khẩu
                 </Button>
                 <Button
                   onClick={() => setAction(USER_FORM_ACTIONS.ASSIGN_ROLE)}
                   disabled={action === USER_FORM_ACTIONS.ASSIGN_ROLE}
                 >
-                  Assign Roles
+                  Gán vai trò
                 </Button>
               </Space>
             )}

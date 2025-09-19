@@ -25,7 +25,7 @@ const CreateRolePage: React.FC = () => {
       };
 
       await createRole(roleData).unwrap();
-      message.success('Role created successfully');
+      message.success('Tạo vai trò thành công');
       form.resetFields();
       navigate('/roles');
     } catch (error) {
@@ -35,7 +35,7 @@ const CreateRolePage: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>Create New Role</Title>
+      <Title level={2}>Tạo vai trò mới</Title>
       <Card>
         <RoleForm onSubmit={onFinish} isLoading={isCreating} />
       </Card>

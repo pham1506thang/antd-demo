@@ -37,7 +37,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
     <Form form={form} layout="vertical" onFinish={handleSubmit}>
       <Form.Item
         name="currentPassword"
-        label="Current Password"
+        label="Mật khẩu hiện tại"
         rules={[
           { required: true, message: 'Please input your current password!' },
         ]}
@@ -47,7 +47,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
 
       <Form.Item
         name="newPassword"
-        label="New Password"
+        label="Mật khẩu mới"
         rules={[
           { required: true, message: 'Please input your new password!' },
           { min: 8, message: 'Password must be at least 8 characters!' },
@@ -59,7 +59,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
 
       <Form.Item
         name="confirmPassword"
-        label="Confirm Password"
+        label="Xác nhận mật khẩu"
         dependencies={['newPassword']}
         hasFeedback
         rules={[

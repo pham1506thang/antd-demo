@@ -35,7 +35,7 @@ const SalesChart: React.FC = () => {
   };
 
   return (
-    <Card title="Sales Overview">
+    <Card title="Tổng quan doanh số">
       <Line {...config} />
     </Card>
   );

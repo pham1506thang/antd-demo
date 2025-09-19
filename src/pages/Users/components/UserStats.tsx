@@ -13,7 +13,7 @@ const UserStats: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Total Users"
+            title="Tổng người dùng"
             value={1234}
             prefix={<UserOutlined />}
           />
@@ -22,7 +22,7 @@ const UserStats: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Active Users"
+            title="Người dùng hoạt động"
             value={892}
             prefix={<TeamOutlined />}
             valueStyle={{ color: '#3f8600' }}
@@ -42,7 +42,7 @@ const UserStats: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Inactive Users"
+            title="Người dùng không hoạt động"
             value={342}
             prefix={<UserSwitchOutlined />}
             valueStyle={{ color: '#cf1322' }}

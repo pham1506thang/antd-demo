@@ -13,7 +13,7 @@ const ReportsSummary: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Total Reports"
+            title="Tổng báo cáo"
             value={124}
             prefix={<FileOutlined />}
           />
@@ -22,7 +22,7 @@ const ReportsSummary: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Completed"
+            title="Hoàn thành"
             value={89}
             prefix={<CheckCircleOutlined />}
             valueStyle={{ color: '#52c41a' }}
@@ -32,7 +32,7 @@ const ReportsSummary: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="In Progress"
+            title="Đang xử lý"
             value={23}
             prefix={<ClockCircleOutlined />}
             valueStyle={{ color: '#1677ff' }}
@@ -42,7 +42,7 @@ const ReportsSummary: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Pending Review"
+            title="Chờ duyệt"
             value={12}
             prefix={<ExclamationCircleOutlined />}
             valueStyle={{ color: '#faad14' }}

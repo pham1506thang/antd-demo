@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, message } from 'antd';
+import { Avatar, Upload, message } from 'antd';
 import type { UploadChangeParam } from 'antd/es/upload';
 import type { RcFile, UploadFile } from 'antd/es/upload/interface';
 import {
@@ -12,6 +12,7 @@ import styled from 'styled-components';
 
 interface AvatarUploadProps {
   avatarUrl?: string;
+  size?: number;
 }
 
 const StyledUpload = styled(Upload)`
@@ -28,12 +29,10 @@ const StyledUpload = styled(Upload)`
   }
 `;
 
-const AvatarContainer = styled.div`
+const AvatarContainer = styled.div<{ size: number }>`
   position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  overflow: hidden;
+  width: ${props => props.size}px;
+  height: ${props => props.size}px;
   cursor: pointer;
 
   &:hover .overlay {
@@ -43,45 +42,22 @@ const AvatarContainer = styled.div`
 
 const Overlay = styled.div`
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.6);
-  padding: 8px;
-  text-align: center;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  color: white;
 `;
 
-const styles = {
-  placeholder: {
-    width: 120,
-    height: 120,
-    borderRadius: '50%',
-    backgroundColor: '#fafafa',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column' as const,
-    cursor: 'pointer',
-    border: '1px dashed #d9d9d9',
-  },
-  icon: {
-    fontSize: 32,
-    color: '#999',
-  },
-  uploadText: {
-    marginTop: 8,
-    color: '#666',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover' as const,
-  },
-};
-
-const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl }) => {
+const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl, size = 120 }) => {
   const [loading, setLoading] = useState(false);
   const [updateAvatar] = userApi.useUpdateAvatarMutation();
 
@@ -92,7 +68,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl }) => {
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error('Image must be smaller than 2MB!');
+      message.error('Hình ảnh phải nhỏ hơn 2MB!');
     }
     return isJpgOrPng && isLt2M;
   };
@@ -106,7 +82,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl }) => {
     if (info.file.status === 'done') {
       try {
         await updateAvatar(info.file.response.url);
-        message.success('Avatar updated successfully');
+        message.success('Cập nhật ảnh đại diện thành công');
       } catch (error) {
         message.error('Failed to update avatar');
       } finally {
@@ -125,28 +101,19 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl }) => {
       beforeUpload={beforeUpload}
       onChange={handleChange}
     >
-      {avatarUrl ? (
-        <AvatarContainer>
-          <img src={avatarUrl} alt="avatar" style={styles.image} />
-          <Overlay className="overlay">
-            <CameraOutlined style={{ color: 'white', fontSize: 24 }} />
-            <div style={{ color: 'white', marginTop: 4, fontSize: 12 }}>
-              Change Photo
-            </div>
-          </Overlay>
-        </AvatarContainer>
-      ) : (
-        <div style={styles.placeholder}>
-          {loading ? (
-            <LoadingOutlined style={styles.icon} />
-          ) : (
-            <>
-              <UserOutlined style={styles.icon} />
-              <div style={styles.uploadText}>Upload</div>
-            </>
-          )}
-        </div>
-      )}
+      <AvatarContainer size={size}>
+        <Avatar 
+          size={size} 
+          src={avatarUrl} 
+          icon={loading ? <LoadingOutlined /> : <UserOutlined />}
+        />
+        <Overlay className="overlay">
+          <CameraOutlined style={{ fontSize: Math.max(16, size * 0.2) }} />
+          <div style={{ fontSize: Math.max(10, size * 0.1), marginTop: 4 }}>
+            {avatarUrl ? 'Đổi ảnh' : 'Tải ảnh lên'}
+          </div>
+        </Overlay>
+      </AvatarContainer>
     </StyledUpload>
   );
 };

@@ -37,7 +37,7 @@ const UpdateUserPage: React.FC = () => {
   const onFinish: UserFormSubmitPayload = async (payload) => {
     try {
       if (!id) {
-        message.error('User ID not found!');
+        message.error('Không tìm thấy ID người dùng!');
         return;
       }
 
@@ -50,7 +50,7 @@ const UpdateUserPage: React.FC = () => {
             avatarUrl: payload.values.avatarUrl,
             status: payload.values.status,
           }).unwrap();
-          message.success('User information updated successfully!');
+          message.success('Cập nhật thông tin người dùng thành công!');
           break;
         }
         case 'change-password': {
@@ -61,17 +61,17 @@ const UpdateUserPage: React.FC = () => {
             currentPassword: payload.values.currentPassword,
             newPassword: payload.values.newPassword,
           }).unwrap();
-          message.success('Password changed successfully!');
+          message.success('Đổi mật khẩu thành công!');
           break;
         }
         case 'assign-role': {
           await assignUserRole({ id, roles: payload.values.roles }).unwrap();
-          message.success('User roles updated successfully!');
+          message.success('Cập nhật vai trò người dùng thành công!');
           break;
         }
         default: {
           // This should not happen with the current form setup
-          message.error('Invalid action!');
+          message.error('Hành động không hợp lệ!');
           break;
         }
       }
@@ -83,18 +83,18 @@ const UpdateUserPage: React.FC = () => {
   };
 
   if (isUserLoading) {
-    return <div>Loading...</div>;
+    return <div>Đang tải...</div>;
   }
 
   if (!user) {
-    return <div>User not found.</div>;
+    return <div>Không tìm thấy người dùng.</div>;
   }
 
   const isLoading = isUpdatingInfo || isChangingPassword || isAssigningRole;
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>Update User</Title>
+      <Title level={2}>Cập nhật người dùng</Title>
       <Card>
         <UserForm<User>
           initialValues={user}

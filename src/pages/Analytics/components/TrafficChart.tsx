@@ -37,7 +37,7 @@ const TrafficChart: React.FC = () => {
   }, [] as any[]);
 
   return (
-    <Card title="Traffic Overview">
+    <Card title="Tổng quan lưu lượng">
       <Line {...config} data={transformedData} />
     </Card>
   );

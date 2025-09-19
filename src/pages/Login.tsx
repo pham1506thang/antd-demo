@@ -48,7 +48,7 @@ const Login: React.FC = () => {
       }}
     >
       <Card style={{ width: 400, padding: '24px 24px 0' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: 32 }}>Login</h2>
+        <h2 style={{ textAlign: 'center', marginBottom: 32 }}>Đăng nhập</h2>
         <Form
           name="login"
           onFinish={handleSubmit}
@@ -57,22 +57,22 @@ const Login: React.FC = () => {
         >
           <Form.Item
             name="username"
-            rules={[{ required: true, message: 'Please input your username!' }]}
+            rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Username"
+              placeholder="Tên đăng nhập"
               size="large"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
-            rules={[{ required: true, message: 'Please input your password!' }]}
+            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Password"
+              placeholder="Mật khẩu"
               size="large"
             />
           </Form.Item>
@@ -85,7 +85,7 @@ const Login: React.FC = () => {
               block
               size="large"
             >
-              Log in
+              Đăng nhập
             </Button>
           </Form.Item>
         </Form>

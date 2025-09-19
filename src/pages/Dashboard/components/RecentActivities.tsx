@@ -10,28 +10,28 @@ const activities = [
   {
     id: 1,
     user: 'John Doe',
-    action: 'placed an order',
+    action: 'đã đặt hàng',
     time: '2 minutes ago',
     type: 'order',
   },
   {
     id: 2,
     user: 'Jane Smith',
-    action: 'left a review',
+    action: 'đã để lại đánh giá',
     time: '5 minutes ago',
     type: 'review',
   },
   {
     id: 3,
     user: 'Mike Johnson',
-    action: 'registered',
+    action: 'đã đăng ký',
     time: '10 minutes ago',
     type: 'user',
   },
   {
     id: 4,
     user: 'Sarah Wilson',
-    action: 'sent a message',
+    action: 'đã gửi tin nhắn',
     time: '15 minutes ago',
     type: 'message',
   },
@@ -63,7 +63,7 @@ const getTagColor = (type: string) => {
 
 const RecentActivities: React.FC = () => {
   return (
-    <Card title="Recent Activities">
+    <Card title="Hoạt động gần đây">
       <List
         itemLayout="horizontal"
         dataSource={activities}

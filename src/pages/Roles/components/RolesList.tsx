@@ -53,50 +53,50 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
   const handleDelete = async (id: string) => {
     try {
       await deleteRole(id).unwrap();
-      message.success('Role deleted successfully');
+      message.success('Xóa vai trò thành công');
     } catch (error) {
-      message.error('Failed to delete role');
+      message.error('Xóa vai trò thất bại');
     }
   };
   const columns: TableProps<Role>['columns'] = [
     {
-      title: 'Code',
+      title: 'Mã',
       dataIndex: 'code',
       key: 'code',
     },
     {
-      title: 'Label',
+      title: 'Tên',
       dataIndex: 'label',
       key: 'label',
     },
     {
-      title: 'Description',
+      title: 'Mô tả',
       dataIndex: 'description',
       key: 'description',
       render: (description: string) => description || '-',
     },
     {
-      title: 'Admin',
+      title: 'Quản trị',
       dataIndex: 'isAdmin',
       key: 'isAdmin',
       render: (isAdmin: boolean) => (
         <Tag color={isAdmin ? 'blue' : 'default'}>
-          {isAdmin ? 'Yes' : 'No'}
+          {isAdmin ? 'Có' : 'Không'}
         </Tag>
       ),
     },
     {
-      title: 'Protected',
+      title: 'Bảo vệ',
       dataIndex: 'isProtected',
       key: 'isProtected',
       render: (isProtected: boolean) => (
         <Tag color={isProtected ? 'blue' : 'default'}>
-          {isProtected ? 'Yes' : 'No'}
+          {isProtected ? 'Có' : 'Không'}
         </Tag>
       ),
     },
     {
-      title: 'Permissions',
+      title: 'Quyền',
       dataIndex: 'permissions',
       key: 'permissions',
       render: (permissions: Role['permissions']) => (
@@ -104,7 +104,7 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
       ),
     },
     {
-      title: 'Actions',
+      title: 'Thao tác',
       key: 'actions',
       render: (_, record: Role) => (
         <Space size="middle">
@@ -112,8 +112,8 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
             type="text"
             icon={<EditOutlined />}
             onClick={() => navigate(`/roles/update/${record.id}`)}
-            disabled={record.isProtected}
-            title={record.isProtected ? 'Protected role cannot be edited' : 'Edit role'}
+            // disabled={record.isProtected}
+            title={record.isProtected ? 'Vai trò được bảo vệ không thể chỉnh sửa' : 'Chỉnh sửa vai trò'}
           />
           <Button
             type="text"
@@ -121,7 +121,7 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
             icon={<DeleteOutlined />}
             onClick={() => record.id && handleDelete(record.id)}
             disabled={record.isProtected}
-            title={record.isProtected ? 'Protected role cannot be deleted' : 'Delete role'}
+            title={record.isProtected ? 'Vai trò được bảo vệ không thể xóa' : 'Xóa vai trò'}
           />
         </Space>
       ),
@@ -137,7 +137,7 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
         loading={isFetching}
         style={{ marginBottom: 24 }}
       >
-        Refresh list
+Làm mới danh sách
       </Button>
       <Table
         columns={columns}
@@ -150,7 +150,7 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
           current: data?.meta.page,
           pageSize: data?.meta.limit,
           showSizeChanger: true,
-          showTotal: (total) => `Total ${total} roles`,
+          showTotal: (total) => `Tổng ${total} vai trò`,
         }}
         onChange={handleTableChange}
         scroll={{ x: 'max-content' }}

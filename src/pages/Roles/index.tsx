@@ -25,10 +25,10 @@ const RolesPage: React.FC = () => {
         }}
       >
         <Title level={2} style={{ margin: 0 }}>
-          Roles Management
+          Quản lý vai trò
         </Title>
         <Button type="primary" onClick={handleCreateRole}>
-          Create Role
+          Tạo vai trò
         </Button>
       </div>
 

@@ -1,6 +1,8 @@
 import { baseApi } from 'api/baseApi';
 import type { Permission, User } from '@/models';
+import { DOMAINS } from '@/models/permission';
 import axiosInstance from '@/api/axiosConfig';
+import { updateUser } from '@/store/slices/authSlice';
 
 interface LoginRequest {
   username: string;
@@ -72,6 +74,16 @@ export const authApi = baseApi.injectEndpoints({
         method: 'PATCH',
         data: profileData,
       }),
+      invalidatesTags: [{ type: DOMAINS.USERS.value, id: 'LIST' }],
+      onQueryStarted: async (profileData, { dispatch, queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          // Update user info in store after successful update
+          dispatch(updateUser(profileData));
+        } catch {
+          // Handle error if needed
+        }
+      },
     }),
     changePassword: builder.mutation<{ message: string }, ChangePasswordRequest>({
       query: (passwordData) => ({

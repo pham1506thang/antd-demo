@@ -40,7 +40,7 @@ const data: PageData[] = [
 
 const TopPages: React.FC = () => {
   return (
-    <Card title="Top Pages">
+    <Card title="Trang phổ biến">
       <List
         dataSource={data}
         renderItem={(item) => (

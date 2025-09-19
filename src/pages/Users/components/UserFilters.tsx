@@ -47,25 +47,25 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
       onValuesChange={onValuesChange}
     >
       <Space>
-        <Form.Item name="search" label="Search">
+        <Form.Item name="search" label="Tìm kiếm">
           <Input
-            placeholder="Search by name, email..."
+            placeholder="Tìm kiếm theo tên, email..."
             prefix={<SearchOutlined />}
           />
         </Form.Item>
-        <Form.Item name="status" label="Status">
+        <Form.Item name="status" label="Trạng thái">
           <Select
             mode="multiple"
-            placeholder="Select status"
+            placeholder="Chọn trạng thái"
             allowClear
             style={{ minWidth: 200 }}
             options={statusOptions}
           />
         </Form.Item>
-        <Form.Item name="roles" label="Role">
+        <Form.Item name="roles" label="Vai trò">
           <Select
             mode="multiple"
-            placeholder="Select role"
+            placeholder="Chọn vai trò"
             allowClear
             style={{ minWidth: 200 }}
             loading={isRolesLoading}
@@ -83,7 +83,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
             icon={<UndoOutlined />}
             onClick={handleReset}
           >
-            Reset filters
+Đặt lại bộ lọc
           </Button>
         </Form.Item>
       </Space>

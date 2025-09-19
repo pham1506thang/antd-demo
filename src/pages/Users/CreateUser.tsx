@@ -5,6 +5,7 @@ import { useApiFormErrorHandler } from '@/hooks/useApiFormErrorHandler';
 import UserForm from './components/UserForm';
 import type { CreateUserDTO } from '@/models';
 import { useNavigate } from 'react-router-dom';
+import { DOMAINS } from '@/models/permission';
 
 type UserFormProps = React.ComponentProps<typeof UserForm<undefined>>;
 
@@ -27,9 +28,9 @@ const CreateUserPage: React.FC = () => {
       };
 
       await createUser(userData).unwrap();
-      message.success('User created successfully');
+      message.success('Tạo người dùng thành công');
       form.resetFields();
-      navigate('/users');
+      navigate(`/${DOMAINS.USERS.value}`);
     } catch (error) {
       handleFormApiError(error, form);
     }
@@ -37,7 +38,7 @@ const CreateUserPage: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>Create New User</Title>
+      <Title level={2}>Tạo người dùng mới</Title>
       <Card>
         <UserForm onSubmit={onFinish} isLoading={isCreating} />
       </Card>

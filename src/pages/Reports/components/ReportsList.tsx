@@ -65,7 +65,7 @@ const getStatusColor = (status: string) => {
 
 const ReportsList: React.FC = () => {
   return (
-    <Card title="Recent Reports">
+    <Card title="Báo cáo gần đây">
       <List
         dataSource={data}
         renderItem={(item) => (

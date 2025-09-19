@@ -13,7 +13,7 @@ const VisitorStats: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Total Visitors"
+            title="Tổng lượt truy cập"
             value={15234}
             prefix={<UserOutlined />}
           />
@@ -22,7 +22,7 @@ const VisitorStats: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Page Views"
+            title="Lượt xem trang"
             value={45678}
             prefix={<EyeOutlined />}
             valueStyle={{ color: '#1677ff' }}
@@ -42,7 +42,7 @@ const VisitorStats: React.FC = () => {
       <Col span={6}>
         <Card>
           <Statistic
-            title="Bounce Rate"
+            title="Tỷ lệ thoát"
             value={32.8}
             prefix={<RiseOutlined />}
             suffix="%"

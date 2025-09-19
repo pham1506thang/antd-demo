@@ -29,7 +29,7 @@ const UpdateRolePage: React.FC = () => {
   const onFinish: RoleFormSubmitPayload = async (payload) => {
     try {
       if (!id) {
-        message.error('Role ID not found!');
+        message.error('Không tìm thấy ID vai trò!');
         return;
       }
 
@@ -39,30 +39,30 @@ const UpdateRolePage: React.FC = () => {
         description: payload.values.description,
         permissions: payload.values.permissions,
       }).unwrap();
-      message.success('Role updated successfully!');
+      message.success('Cập nhật vai trò thành công!');
     } catch (error) {
       handleFormApiError(error, payload.form);
     }
   };
 
   if (isRoleLoading) {
-    return <div>Loading...</div>;
+    return <div>Đang tải...</div>;
   }
 
   if (!role) {
-    return <div>Role not found.</div>;
+    return <div>Không tìm thấy vai trò.</div>;
   }
 
   if (role.isProtected) {
     return (
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <Title level={2}>Update Role</Title>
+        <Title level={2}>Cập nhật vai trò</Title>
         <Card>
           <div style={{ textAlign: 'center', padding: '40px' }}>
             <Title level={4} type="warning">
-              This role is protected and cannot be edited
+              Vai trò này được bảo vệ và không thể chỉnh sửa
             </Title>
-            <p>Protected roles are system roles that cannot be modified for security reasons.</p>
+            <p>Các vai trò được bảo vệ là vai trò hệ thống không thể chỉnh sửa vì lý do bảo mật.</p>
           </div>
         </Card>
       </Space>
@@ -71,7 +71,7 @@ const UpdateRolePage: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>Update Role</Title>
+      <Title level={2}>Cập nhật vai trò</Title>
       <Card>
         <RoleForm<Role>
           initialValues={role}

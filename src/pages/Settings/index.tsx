@@ -20,38 +20,38 @@ const SettingsPage: React.FC = () => {
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       <Title level={2}>
-        <SettingOutlined /> Settings
+        <SettingOutlined /> Cài đặt
       </Title>
 
-      <Card title="General Settings">
+      <Card title="Cài đặt chung">
         <Form
           form={form}
           layout="vertical"
           initialValues={{
-            siteName: 'My Admin Dashboard',
+            siteName: 'Bảng điều khiển quản trị',
             language: 'en',
             darkMode: false,
             emailNotifications: true,
           }}
         >
-          <Form.Item label="Site Name" name="siteName">
+          <Form.Item label="Tên trang web" name="siteName">
             <Input />
           </Form.Item>
 
-          <Form.Item label="Language" name="language">
+          <Form.Item label="Ngôn ngữ" name="language">
             <Select>
-              <Option value="en">English</Option>
-              <Option value="es">Spanish</Option>
-              <Option value="fr">French</Option>
+              <Option value="en">Tiếng Anh</Option>
+              <Option value="es">Tiếng Tây Ban Nha</Option>
+              <Option value="fr">Tiếng Pháp</Option>
             </Select>
           </Form.Item>
 
-          <Form.Item label="Dark Mode" name="darkMode" valuePropName="checked">
+          <Form.Item label="Chế độ tối" name="darkMode" valuePropName="checked">
             <Switch />
           </Form.Item>
 
           <Form.Item
-            label="Email Notifications"
+            label="Thông báo email"
             name="emailNotifications"
             valuePropName="checked"
           >
@@ -59,7 +59,7 @@ const SettingsPage: React.FC = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary">Save Changes</Button>
+            <Button type="primary">Lưu thay đổi</Button>
           </Form.Item>
         </Form>
       </Card>

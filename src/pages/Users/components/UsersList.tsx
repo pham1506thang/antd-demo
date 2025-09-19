@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Table, Space, Button, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, ReloadOutlined, EyeOutlined } from '@ant-design/icons';
 import type { User, UserStatus } from 'models/user';
 import type { Role } from 'models/role';
 import { userApi } from 'api/slices/userApi';
@@ -14,6 +14,7 @@ import { TIME_FORMAT } from '@/models';
 import { RoleTag } from '@/components/RoleTag';
 import { useNavigate } from 'react-router-dom';
 import StatusTag from '@/components/StatusTag';
+import { DOMAINS } from '@/models/permission';
 
 interface UsersListProps {
   filters: FilterValues;
@@ -59,21 +60,21 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
   const handleDelete = async (id: string) => {
     try {
       await deleteUser(id).unwrap();
-      message.success('User deleted successfully');
+      message.success('Xóa người dùng thành công');
     } catch (error) {
-      message.error('Failed to delete user');
+      message.error('Xóa người dùng thất bại');
     }
   };
 
   const columns: ColumnsType<User> = [
     {
-      title: 'Username',
+      title: 'Tên đăng nhập',
       dataIndex: 'username',
       key: 'username',
       sorter: true,
     },
     {
-      title: 'Name',
+      title: 'Họ và tên',
       dataIndex: 'name',
       key: 'name',
       sorter: true,
@@ -85,7 +86,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       sorter: true,
     },
     {
-      title: 'Roles',
+      title: 'Vai trò',
       dataIndex: 'roles',
       key: 'roles',
       width: 200,
@@ -104,35 +105,40 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       ),
     },
     {
-      title: 'Status',
+      title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
       sorter: true,
       render: (status: UserStatus) => <StatusTag status={status} />,
     },
     {
-      title: 'Created At',
+      title: 'Ngày tạo',
       dataIndex: 'createdAt',
       key: 'createdAt',
       sorter: true,
       render: (date: string) => (date ? format(date, TIME_FORMAT) : ''),
     },
     {
-      title: 'Last Login',
+      title: 'Lần đăng nhập cuối',
       dataIndex: 'lastLogin',
       key: 'lastLogin',
       sorter: true,
-      render: (date: string) => (date ? format(date, TIME_FORMAT) : 'Never'),
+      render: (date: string) => (date ? format(date, TIME_FORMAT) : 'Chưa đăng nhập'),
     },
     {
-      title: 'Actions',
+      title: 'Thao tác',
       key: 'actions',
       render: (_, record: User) => (
         <Space size="middle">
           <Button
             type="text"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/${DOMAINS.USERS.value}/${record.id}`)}
+          />
+          <Button
+            type="text"
             icon={<EditOutlined />}
-            onClick={() => navigate(`/users/update/${record.id}`)}
+            onClick={() => navigate(`/${DOMAINS.USERS.value}/update/${record.id}`)}
           />
           <Button
             type="text"
@@ -154,7 +160,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
         loading={isFetching}
         style={{ marginBottom: 24 }}
       >
-        Refresh list
+Làm mới danh sách
       </Button>
       <Table
         columns={columns}
@@ -167,7 +173,7 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
           current: usersData?.meta.page,
           pageSize: usersData?.meta.limit,
           showSizeChanger: true,
-          showTotal: (total) => `Total ${total} users`,
+          showTotal: (total) => `Tổng ${total} người dùng`,
         }}
         onChange={handleTableChange}
         scroll={{ x: 'max-content' }}

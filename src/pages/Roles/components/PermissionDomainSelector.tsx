@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Collapse, Row, Col, Checkbox, Button, Space, Badge } from 'antd';
+import { Collapse, Row, Col, Checkbox, Space, Badge } from 'antd';
 import { DOMAINS } from '@/models/permission';
 import type { Permission } from '@/models/permission';
 
@@ -35,14 +35,12 @@ const PermissionDomainSelector: React.FC<PermissionDomainSelectorProps> = ({
     }).filter(group => group.totalCount > 0); // Only show domains with permissions
   }, [permissions, selectedPermissions]);
 
-  const handleSelectAll = (domain: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelectAllDomain(domain);
-  };
-
-  const handleDeselectAll = (domain: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDeselectAllDomain(domain);
+  const handleDomainCheckAll = (domain: string, checked: boolean) => {
+    if (checked) {
+      onSelectAllDomain(domain);
+    } else {
+      onDeselectAllDomain(domain);
+    }
   };
 
   return (
@@ -60,24 +58,13 @@ const PermissionDomainSelector: React.FC<PermissionDomainSelectorProps> = ({
             </Space>
           }
           extra={
-            <Space>
-              <Button 
-                size="small" 
-                type="link"
-                onClick={(e) => handleSelectAll(group.domain, e)}
-                disabled={group.selectedCount === group.totalCount}
-              >
-                Select All
-              </Button>
-              <Button 
-                size="small" 
-                type="link"
-                onClick={(e) => handleDeselectAll(group.domain, e)}
-                disabled={group.selectedCount === 0}
-              >
-                Clear
-              </Button>
-            </Space>
+            <Checkbox
+              checked={group.selectedCount === group.totalCount}
+              indeterminate={group.selectedCount > 0 && group.selectedCount < group.totalCount}
+              onChange={(e) => handleDomainCheckAll(group.domain, e.target.checked)}
+            >
+              {group.selectedCount === group.totalCount ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+            </Checkbox>
           }
         >
           <Row gutter={[8, 8]}>
