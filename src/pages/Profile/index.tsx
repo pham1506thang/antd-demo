@@ -49,7 +49,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 0' }}>
-      <Title level={2}>Profile</Title>
+      <Title level={2}>Hồ sơ cá nhân</Title>
 
       <Row gutter={[24, 24]}>
         <Col span={24}>
@@ -82,14 +82,14 @@ const ProfilePage: React.FC = () => {
                     onClick={handleEditClick}
                     type={isEditing ? 'primary' : 'default'}
                   >
-                    Edit Profile
+                    Chỉnh sửa hồ sơ
                   </Button>
                   <Button
                     icon={<LockOutlined />}
                     onClick={handleChangePasswordClick}
                     type={isChangingPassword ? 'primary' : 'default'}
                   >
-                    Change Password
+                    Đổi mật khẩu
                   </Button>
                 </Space>
               </Col>
@@ -107,10 +107,10 @@ const ProfilePage: React.FC = () => {
                 <Descriptions.Item label="Trạng thái">
                   <StatusTag status={me.status} />
                 </Descriptions.Item>
-                <Descriptions.Item label="Lần đăng nhập cuối">
+                <Descriptions.Item label="Lần đăng nhập cuối" span={2}>
                   {me.lastLogin
                     ? new Date(me.lastLogin).toLocaleString()
-                    : 'Never'}
+                    : 'Chưa bao giờ'}
                 </Descriptions.Item>
                 <Descriptions.Item label="Vai trò" span={2}>
                   <Space size={[8, 8]} wrap>
@@ -120,12 +120,12 @@ const ProfilePage: React.FC = () => {
                         title={
                           <>
                             {role.isAdmin &&
-                              'Administrator role with full access'}
+                              'Vai trò quản trị viên với quyền truy cập đầy đủ'}
                             {role.isProtected &&
-                              'Protected role with restricted access'}
+                              'Vai trò được bảo vệ với quyền truy cập hạn chế'}
                             {!role.isAdmin &&
                               !role.isProtected &&
-                              'Standard role'}
+                              'Vai trò tiêu chuẩn'}
                           </>
                         }
                       >
@@ -145,7 +145,7 @@ const ProfilePage: React.FC = () => {
                 onCancel={handleCancel}
                 onSuccess={() => {
                   setIsEditing(false);
-                  message.success('Profile updated successfully');
+                  message.success('Cập nhật hồ sơ thành công');
                 }}
               />
             )}
@@ -155,7 +155,7 @@ const ProfilePage: React.FC = () => {
                 onCancel={handleCancel}
                 onSuccess={() => {
                   setIsChangingPassword(false);
-                  message.success('Password changed successfully');
+                  message.success('Đổi mật khẩu thành công');
                 }}
               />
             )}

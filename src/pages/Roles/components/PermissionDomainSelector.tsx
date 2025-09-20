@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Collapse, Row, Col, Checkbox, Space, Badge } from 'antd';
 import { DOMAINS } from '@/models/permission';
 import type { Permission } from '@/models/permission';
+import { COLORS } from '@/constants/colors';
 
 const { Panel } = Collapse;
 
@@ -53,7 +54,7 @@ const PermissionDomainSelector: React.FC<PermissionDomainSelectorProps> = ({
               <span style={{ fontWeight: 500 }}>{group.domainLabel}</span>
               <Badge 
                 count={`${group.selectedCount}/${group.totalCount}`} 
-                style={{ backgroundColor: group.selectedCount === group.totalCount ? '#52c41a' : '#1890ff' }}
+                style={{ backgroundColor: group.selectedCount === group.totalCount ? COLORS.SUCCESS : COLORS.PRIMARY }}
               />
             </Space>
           }

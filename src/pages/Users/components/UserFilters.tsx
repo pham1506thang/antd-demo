@@ -1,9 +1,10 @@
 import React from 'react';
-import { Form, Input, Select, Button, Space } from 'antd';
+import { Form, Input, Select, Button, Space, Tag } from 'antd';
 import { SearchOutlined, UndoOutlined } from '@ant-design/icons';
 import { USER_STATUS } from 'models/user';
-import { getUserStatusText } from '@/helpers/user';
+import { getUserStatusText, getUserStatusColor } from '@/helpers/user';
 import { useGetSummaryRolesQuery } from '@/api/slices/roleApi';
+import { COLORS } from '@/constants/colors';
 
 const { Option } = Select;
 
@@ -29,9 +30,9 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
   const { data: rolesData, isLoading: isRolesLoading } =
     useGetSummaryRolesQuery();
 
-  const onValuesChange = (_changedValues: any, allValues: FilterValues) => {
+  const onValuesChange = (_changedValues: any, _allValues: FilterValues) => {
     // Call the onChange prop with the changed values and all values
-    onChange(allValues);
+    onChange(_allValues);
   };
 
   const handleReset = () => {
@@ -51,6 +52,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
           <Input
             placeholder="Tìm kiếm theo tên, email..."
             prefix={<SearchOutlined />}
+            style={{ width: '100%' }}
           />
         </Form.Item>
         <Form.Item name="status" label="Trạng thái">
@@ -60,6 +62,29 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
             allowClear
             style={{ minWidth: 200 }}
             options={statusOptions}
+            optionRender={(option) => {
+              const color = getUserStatusColor(option.value as string);
+              return (
+                <div style={{ 
+                  color: color,
+                }}>
+                  {option.label}
+                </div>
+              );
+            }}
+            tagRender={(props) => {
+              const { label, value, closable, onClose } = props;
+              return (
+                <Tag
+                  color={getUserStatusColor(value as string)}
+                  closable={closable}
+                  onClose={onClose}
+                  style={{ marginRight: 3 }}
+                >
+                  {label}
+                </Tag>
+              );
+            }}
           />
         </Form.Item>
         <Form.Item name="roles" label="Vai trò">
@@ -67,7 +92,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
             mode="multiple"
             placeholder="Chọn vai trò"
             allowClear
-            style={{ minWidth: 200 }}
+            style={{ minWidth: 200, width: '100%' }}
             loading={isRolesLoading}
           >
             {rolesData?.map((role) => (

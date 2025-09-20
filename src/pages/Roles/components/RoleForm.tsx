@@ -3,6 +3,7 @@ import { Form, Input, Button, Tabs, Card, Row, Col, Space, Typography, Badge, Ch
 import { useGetPermissionsQuery } from '@/api/slices/permissionApi';
 import type { Role } from '@/models/role';
 import type { CreateRoleDTO, UpdateRoleDTO } from '@/models/dto/role';
+import { COLORS } from '@/constants/colors';
 import PermissionDomainSelector from './PermissionDomainSelector';
 import PermissionPresets from './PermissionPresets';
 import PermissionAdvancedEditor from './PermissionAdvancedEditor';
@@ -141,7 +142,7 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
                   placeholder="Nhập mã vai trò" 
                   disabled={isUpdateMode}
                   style={{ 
-                    backgroundColor: isUpdateMode ? '#f5f5f5' : 'white',
+                    backgroundColor: isUpdateMode ? COLORS.GRAY_3 : COLORS.GRAY_1,
                     cursor: isUpdateMode ? 'not-allowed' : 'text'
                   }}
                 />
@@ -208,7 +209,7 @@ function RoleForm<T extends Role | undefined>(props: RoleFormProps<T>) {
           <Col>
             <Space>
               <Text strong>Tổng quyền: </Text>
-              <Badge count={selectedPermissions.length} style={{ backgroundColor: '#1890ff' }} />
+              <Badge count={selectedPermissions.length} style={{ backgroundColor: COLORS.PRIMARY }} />
               <Checkbox
                 checked={selectedPermissions.length === (permissionsData?.length || 0) && selectedPermissions.length > 0}
                 indeterminate={selectedPermissions.length > 0 && selectedPermissions.length < (permissionsData?.length || 0)}

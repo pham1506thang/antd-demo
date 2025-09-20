@@ -9,28 +9,44 @@ interface ErrorViewProps {
   showBackButton?: boolean;
   onBack?: () => void;
   backButtonText?: string;
+  status?: number;
 }
 
 const ErrorView: React.FC<ErrorViewProps> = ({
-  message = 'Lỗi',
-  description = 'Đã xảy ra lỗi. Vui lòng thử lại.',
+  message,
+  description,
   type = 'error',
   showBackButton = true,
   onBack,
-  backButtonText = 'Quay lại'
+  backButtonText = 'Quay lại',
+  status
 }) => {
+  // Determine message and description based on status
+  const getErrorContent = () => {
+    if (status === 404) {
+      return {
+        message: message || 'Không tìm thấy',
+        description: description || 'Trang hoặc tài nguyên bạn đang tìm kiếm không tồn tại.'
+      };
+    }
+
+    return {
+      message: message || 'Lỗi',
+      description: description || 'Đã xảy ra lỗi. Vui lòng thử lại.'
+    };
+  };
+
+  const errorContent = getErrorContent();
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
       {showBackButton && onBack && (
-        <div style={{ marginBottom: 16 }}>
-          <Button icon={<ArrowLeftOutlined />} onClick={onBack}>
-            {backButtonText}
-          </Button>
-        </div>
+        <Button icon={<ArrowLeftOutlined />} onClick={onBack}>
+          {backButtonText}
+        </Button>
       )}
       <Alert
-        message={message}
-        description={description}
+        message={errorContent.message}
+        description={errorContent.description}
         type={type}
         showIcon
       />

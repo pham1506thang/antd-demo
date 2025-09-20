@@ -1,8 +1,12 @@
 import React from 'react';
 import { Typography, Card, Space, message } from 'antd';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { userApi } from '@/api/slices/userApi';
 import { useApiFormErrorHandler } from '@/hooks/useApiFormErrorHandler';
+import { isApiError } from '@/models/error';
+import { DOMAINS } from '@/models/permission';
+import LoadingView from '@/components/LoadingView';
+import ErrorView from '@/components/ErrorView';
 import UserForm from './components/UserForm';
 import type { User } from '@/models/user';
 
@@ -15,9 +19,10 @@ const { Title } = Typography;
 
 const UpdateUserPage: React.FC = () => {
   const { userId: id } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
 
   // Queries
-  const { data: user, isLoading: isUserLoading } = userApi.useGetUserQuery(
+  const { data: user, isLoading: isUserLoading, error } = userApi.useGetUserQuery(
     id!,
     {
       skip: !id,
@@ -33,6 +38,10 @@ const UpdateUserPage: React.FC = () => {
     userApi.useAssignUserRoleMutation();
 
   const { handleFormApiError } = useApiFormErrorHandler();
+
+  const handleBack = () => {
+    navigate(`/${DOMAINS.USERS.value}`);
+  };
 
   const onFinish: UserFormSubmitPayload = async (payload) => {
     try {
@@ -83,11 +92,20 @@ const UpdateUserPage: React.FC = () => {
   };
 
   if (isUserLoading) {
-    return <div>Đang tải...</div>;
+    return <LoadingView message="Đang tải thông tin người dùng..." />;
   }
 
-  if (!user) {
-    return <div>Không tìm thấy người dùng.</div>;
+  if (error || !user) {
+    // Extract status code from error, default to 404 if no user data
+    const statusCode = error && isApiError(error) ? error.statusCode : 404;
+    
+    return (
+      <ErrorView
+        status={statusCode}
+        onBack={handleBack}
+        backButtonText="Quay lại danh sách"
+      />
+    );
   }
 
   const isLoading = isUpdatingInfo || isChangingPassword || isAssigningRole;

@@ -1,18 +1,19 @@
 import { USER_STATUS } from '@/models';
+import { TAG_COLORS } from '@/constants/colors';
 
 // Status color mapping
 export const getUserStatusColor = (status: string) => {
   switch (status) {
     case USER_STATUS.ACTIVE:
-      return 'green';
+      return TAG_COLORS.GREEN;
     case USER_STATUS.INACTIVE:
-      return 'gray';
+      return TAG_COLORS.DEFAULT;
     case USER_STATUS.PENDING:
-      return 'orange';
+      return TAG_COLORS.ORANGE;
     case USER_STATUS.SUSPENDED:
-      return 'red';
+      return TAG_COLORS.RED;
     default:
-      return 'default';
+      return TAG_COLORS.DEFAULT;
   }
 };
 
@@ -20,13 +21,13 @@ export const getUserStatusColor = (status: string) => {
 export const getUserStatusText = (status: string) => {
   switch (status) {
     case USER_STATUS.ACTIVE:
-      return 'Active';
+      return 'Hoạt động';
     case USER_STATUS.INACTIVE:
-      return 'Inactive';
+      return 'Không hoạt động';
     case USER_STATUS.PENDING:
-      return 'Pending';
+      return 'Chờ duyệt';
     case USER_STATUS.SUSPENDED:
-      return 'Suspended';
+      return 'Bị đình chỉ';
     default:
       return status;
   }

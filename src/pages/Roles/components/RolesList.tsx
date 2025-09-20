@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Table, Tag, Space, Button, message } from 'antd';
-import { EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, ReloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { TableProps } from 'antd';
 import type { Role } from '@/models/role';
@@ -8,6 +8,7 @@ import type { PaginationParams } from '@/models/pagination';
 import { useDeleteRoleMutation, useGetRolesQuery } from '@/api/slices/roleApi';
 import { usePagination } from '@/hooks/usePagination';
 import { convertFiltersToParams } from '@/api/apiHelper';
+import { getRoleProtectionColor, getRoleProtectionText } from '@/helpers/role';
 import type { FilterValues } from './RoleFilters';
 
 interface RolesListProps {
@@ -90,8 +91,8 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
       dataIndex: 'isProtected',
       key: 'isProtected',
       render: (isProtected: boolean) => (
-        <Tag color={isProtected ? 'blue' : 'default'}>
-          {isProtected ? 'Có' : 'Không'}
+        <Tag color={getRoleProtectionColor(isProtected)}>
+          {getRoleProtectionText(isProtected)}
         </Tag>
       ),
     },
@@ -99,8 +100,10 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
       title: 'Quyền',
       dataIndex: 'permissions',
       key: 'permissions',
-      render: (permissions: Role['permissions']) => (
-        <span>{permissions.length}</span>
+      render: (permissions: Role['permissions'], record: Role) => (
+        <span>
+          {record.isSuperAdmin ? 'Tất cả' : permissions.length}
+        </span>
       ),
     },
     {
@@ -110,10 +113,14 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
         <Space size="middle">
           <Button
             type="text"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/roles/${record.id}`)}
+          />
+          <Button
+            type="text"
             icon={<EditOutlined />}
             onClick={() => navigate(`/roles/update/${record.id}`)}
-            // disabled={record.isProtected}
-            title={record.isProtected ? 'Vai trò được bảo vệ không thể chỉnh sửa' : 'Chỉnh sửa vai trò'}
+            disabled={record.isProtected}
           />
           <Button
             type="text"
@@ -121,7 +128,6 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
             icon={<DeleteOutlined />}
             onClick={() => record.id && handleDelete(record.id)}
             disabled={record.isProtected}
-            title={record.isProtected ? 'Vai trò được bảo vệ không thể xóa' : 'Xóa vai trò'}
           />
         </Space>
       ),

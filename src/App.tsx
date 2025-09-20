@@ -36,6 +36,7 @@ import UpdateUserPage from './pages/Users/UpdateUser';
 import ViewUser from './pages/Users/ViewUser';
 import CreateRolePage from './pages/Roles/CreateRole';
 import UpdateRolePage from './pages/Roles/UpdateRole';
+import ViewRole from './pages/Roles/ViewRole';
 import NotFound from './pages/NotFound';
 import Forbidden from './pages/Forbidden';
 import { UserMenuTrigger } from './components/UserMenuTrigger';
@@ -256,6 +257,7 @@ const MenuWrapper: React.FC<{
             <Route path={`/${DOMAINS.USERS.value}/update/:userId`} element={<UpdateUserPage />} />
             <Route path="/roles" element={<Roles />} />
             <Route path="/roles/create" element={<CreateRolePage />} />
+            <Route path="/roles/:roleId" element={<ViewRole />} />
             <Route path="/roles/update/:roleId" element={<UpdateRolePage />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/analytics" element={<Analytics />} />

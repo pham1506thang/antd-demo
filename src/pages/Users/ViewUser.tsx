@@ -4,7 +4,8 @@ import { Typography, Card, Space, Button, Descriptions, Avatar, Tag } from 'antd
 import { ArrowLeftOutlined, EditOutlined, UserOutlined } from '@ant-design/icons';
 import { userApi } from '@/api/slices/userApi';
 import { DOMAINS } from '@/models/permission';
-import { getUserStatusColor } from '@/helpers/user';
+import { getUserStatusColor, getUserStatusText } from '@/helpers/user';
+import { isApiError } from '@/models/error';
 import LoadingView from '@/components/LoadingView';
 import ErrorView from '@/components/ErrorView';
 import styled from 'styled-components';
@@ -45,24 +46,13 @@ const ViewUser: React.FC = () => {
     return <LoadingView message="Đang tải thông tin người dùng..." />;
   }
 
-  if (error) {
+  if (error || !user) {
+    // Extract status code from error, default to 404 if no user data
+    const statusCode = error && isApiError(error) ? error.statusCode : 404;
+    
     return (
       <ErrorView
-        message="Lỗi"
-        description="Không thể tải thông tin người dùng. Vui lòng thử lại."
-        type="error"
-        onBack={handleBack}
-        backButtonText="Quay lại danh sách"
-      />
-    );
-  }
-
-  if (!user) {
-    return (
-      <ErrorView
-        message="Không tìm thấy"
-        description="Không tìm thấy người dùng."
-        type="warning"
+        status={statusCode}
         onBack={handleBack}
         backButtonText="Quay lại danh sách"
       />
@@ -108,7 +98,7 @@ const ViewUser: React.FC = () => {
           
           <Descriptions.Item label="Trạng thái">
             <Tag color={getUserStatusColor(user.status)}>
-              {user.status.toUpperCase()}
+              {getUserStatusText(user.status)}
             </Tag>
           </Descriptions.Item>
           

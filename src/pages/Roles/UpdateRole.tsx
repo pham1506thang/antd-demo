@@ -1,9 +1,13 @@
 import React from 'react';
 import { Typography, Card, Space, message } from 'antd';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import RoleForm from './components/RoleForm';
 import { useGetRoleQuery, useUpdateRoleMutation } from '@/api/slices/roleApi';
 import { useApiFormErrorHandler } from '@/hooks/useApiFormErrorHandler';
+import { isApiError } from '@/models/error';
+import { DOMAINS } from '@/models/permission';
+import LoadingView from '@/components/LoadingView';
+import ErrorView from '@/components/ErrorView';
 import type { Role } from '@/models/role';
 
 // Get the props type from RoleForm for type-safety
@@ -14,11 +18,12 @@ type RoleFormSubmitPayload = React.ComponentProps<
 const { Title } = Typography;
 
 const UpdateRolePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { roleId } = useParams<{ roleId: string }>();
+  const navigate = useNavigate();
 
   // Queries
-  const { data: role, isLoading: isRoleLoading } = useGetRoleQuery(id!, {
-    skip: !id,
+  const { data: role, isLoading: isRoleLoading, error } = useGetRoleQuery(roleId!, {
+    skip: !roleId,
   });
 
   // Mutations
@@ -26,15 +31,19 @@ const UpdateRolePage: React.FC = () => {
 
   const { handleFormApiError } = useApiFormErrorHandler();
 
+  const handleBack = () => {
+    navigate(`/${DOMAINS.ROLES.value}`);
+  };
+
   const onFinish: RoleFormSubmitPayload = async (payload) => {
     try {
-      if (!id) {
+      if (!roleId) {
         message.error('Không tìm thấy ID vai trò!');
         return;
       }
 
       await updateRole({
-        id,
+        id: roleId,
         label: payload.values.label,
         description: payload.values.description,
         permissions: payload.values.permissions,
@@ -46,11 +55,20 @@ const UpdateRolePage: React.FC = () => {
   };
 
   if (isRoleLoading) {
-    return <div>Đang tải...</div>;
+    return <LoadingView message="Đang tải thông tin vai trò..." />;
   }
 
-  if (!role) {
-    return <div>Không tìm thấy vai trò.</div>;
+  if (error || !role) {
+    // Extract status code from error, default to 404 if no role data
+    const statusCode = error && isApiError(error) ? error.statusCode : 404;
+    
+    return (
+      <ErrorView
+        status={statusCode}
+        onBack={handleBack}
+        backButtonText="Quay lại danh sách"
+      />
+    );
   }
 
   if (role.isProtected) {
