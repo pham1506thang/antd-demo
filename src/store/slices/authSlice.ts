@@ -72,5 +72,9 @@ export const permissionsSelector = (state: { [sliceName]: AuthState }) =>
   state[sliceName].permissions;
 export const isAuthenticatedSelector = (state: { [sliceName]: AuthState }) =>
   state[sliceName].isAuthenticated;
+export const isAdminSelector = (state: { [sliceName]: AuthState }) =>
+  state[sliceName].isAdmin;
+export const isSuperAdminSelector = (state: { [sliceName]: AuthState }) =>
+  state[sliceName].isSuperAdmin;
 
 export default authSlice.reducer;

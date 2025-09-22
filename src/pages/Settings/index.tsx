@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Typography,
   Card,
   Form,
   Input,
@@ -10,18 +9,18 @@ import {
   Space,
 } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
+import { TitleWithoutMargin } from '@/components';
 
-const { Title } = Typography;
 const { Option } = Select;
 
-const SettingsPage: React.FC = () => {
+export const SettingsPage: React.FC = () => {
   const [form] = Form.useForm();
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>
-        <SettingOutlined /> Cài đặt
-      </Title>
+      <TitleWithoutMargin level={2} icon={<SettingOutlined />}>
+        Cài đặt
+      </TitleWithoutMargin>
 
       <Card title="Cài đặt chung">
         <Form
@@ -67,4 +66,3 @@ const SettingsPage: React.FC = () => {
   );
 };
 
-export default SettingsPage;

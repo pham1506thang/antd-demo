@@ -13,7 +13,7 @@ import { SearchOutlined, UndoOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 
-const ProductFilters: React.FC = () => {
+export const ProductFilters: React.FC = () => {
   const [form] = Form.useForm();
 
   const handleReset = () => {
@@ -85,4 +85,3 @@ const ProductFilters: React.FC = () => {
   );
 };
 
-export default ProductFilters;

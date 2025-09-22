@@ -9,7 +9,7 @@ interface StatisticCardProps {
   icon?: React.ReactNode;
 }
 
-const StatisticCard: React.FC<StatisticCardProps> = ({
+export const StatisticCard: React.FC<StatisticCardProps> = ({
   title,
   value,
   prefix,
@@ -28,4 +28,3 @@ const StatisticCard: React.FC<StatisticCardProps> = ({
   );
 };
 
-export default StatisticCard;

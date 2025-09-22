@@ -1,5 +1,14 @@
-export type DomainType = string;
+// Extract domain keys from DOMAINS object
+export type DomainKey = keyof typeof DOMAINS;
 
+// Extract action keys for each domain
+export type ActionKeyForDomain<T extends DomainKey> = keyof typeof DOMAINS[T]['actions'];
+
+// Union of all possible action keys
+export type ActionKey = keyof typeof DOMAINS[DomainKey]['actions'];
+
+// Legacy types for backward compatibility
+export type DomainType = string;
 export type ActionType = string;
 
 export type Permission = {

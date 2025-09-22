@@ -1,7 +1,7 @@
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-const Forbidden = () => {
+export const Forbidden = () => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
@@ -36,5 +36,3 @@ const Forbidden = () => {
     </div>
   );
 };
-
-export default Forbidden;

@@ -7,7 +7,7 @@ import {
   ApiOutlined,
 } from '@ant-design/icons';
 
-const RoleStats: React.FC = () => {
+export const RoleStats: React.FC = () => {
   return (
     <Row gutter={16}>
       <Col span={6}>
@@ -53,4 +53,3 @@ const RoleStats: React.FC = () => {
   );
 };
 
-export default RoleStats;

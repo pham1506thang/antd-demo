@@ -11,7 +11,7 @@ const data = [
   { month: 'Jun', completed: 67, inProgress: 16, pending: 8 },
 ];
 
-const ReportsChart: React.FC = () => {
+export const ReportsChart: React.FC = () => {
   // Transform data for stacked column chart
   const transformedData = data.reduce((acc, item) => {
     acc.push(
@@ -28,9 +28,6 @@ const ReportsChart: React.FC = () => {
     xField: 'month',
     yField: 'value',
     seriesField: 'type',
-    label: {
-      position: 'middle',
-    },
     color: ['#52c41a', '#1677ff', '#faad14'],
   };
 
@@ -41,4 +38,3 @@ const ReportsChart: React.FC = () => {
   );
 };
 
-export default ReportsChart;

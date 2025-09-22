@@ -63,7 +63,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const ReportsList: React.FC = () => {
+export const ReportsList: React.FC = () => {
   return (
     <Card title="Báo cáo gần đây">
       <List
@@ -104,4 +104,3 @@ const ReportsList: React.FC = () => {
   );
 };
 
-export default ReportsList;

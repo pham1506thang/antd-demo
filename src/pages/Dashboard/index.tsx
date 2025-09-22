@@ -1,18 +1,19 @@
 import React from 'react';
-import { Card, Row, Col, Statistic } from 'antd';
+import { Row, Col } from 'antd';
 import {
   UserOutlined,
   ShoppingCartOutlined,
   DollarOutlined,
 } from '@ant-design/icons';
-import StatisticCard from './components/StatisticCard';
-import RecentActivities from './components/RecentActivities';
-import SalesChart from './components/SalesChart';
+import { StatisticCard } from './components/StatisticCard';
+import { RecentActivities } from './components/RecentActivities';
+import { SalesChart } from './components/SalesChart';
+import { TitleWithoutMargin } from '@/components';
 
-const Dashboard: React.FC = () => {
+export const Dashboard: React.FC = () => {
   return (
     <div>
-      <h2>Bảng điều khiển</h2>
+      <TitleWithoutMargin level={2}>Bảng điều khiển</TitleWithoutMargin>
       <Row gutter={[16, 16]}>
         <Col span={8}>
           <StatisticCard
@@ -49,5 +50,3 @@ const Dashboard: React.FC = () => {
     </div>
   );
 };
-
-export default Dashboard;

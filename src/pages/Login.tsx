@@ -11,7 +11,7 @@ interface LoginForm {
   password: string;
 }
 
-const Login: React.FC = () => {
+export const Login: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
@@ -93,5 +93,3 @@ const Login: React.FC = () => {
     </div>
   );
 };
-
-export default Login;

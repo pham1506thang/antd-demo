@@ -38,7 +38,7 @@ const data: PageData[] = [
   },
 ];
 
-const TopPages: React.FC = () => {
+export const TopPages: React.FC = () => {
   return (
     <Card title="Trang phổ biến">
       <List
@@ -79,4 +79,3 @@ const TopPages: React.FC = () => {
   );
 };
 
-export default TopPages;

@@ -4,8 +4,6 @@ import { DOMAINS } from '@/models/permission';
 import type { Permission } from '@/models/permission';
 import { COLORS } from '@/constants/colors';
 
-const { Panel } = Collapse;
-
 interface PermissionDomainSelectorProps {
   permissions: Permission[];
   selectedPermissions: string[];
@@ -14,7 +12,7 @@ interface PermissionDomainSelectorProps {
   onDeselectAllDomain: (domain: string) => void;
 }
 
-const PermissionDomainSelector: React.FC<PermissionDomainSelectorProps> = ({
+export const PermissionDomainSelector: React.FC<PermissionDomainSelectorProps> = ({
   permissions,
   selectedPermissions,
   onPermissionChange,
@@ -45,29 +43,29 @@ const PermissionDomainSelector: React.FC<PermissionDomainSelectorProps> = ({
   };
 
   return (
-    <Collapse defaultActiveKey={groupedPermissions[0]?.domain}>
-      {groupedPermissions.map((group) => (
-        <Panel
-          key={group.domain}
-          header={
-            <Space>
-              <span style={{ fontWeight: 500 }}>{group.domainLabel}</span>
-              <Badge 
-                count={`${group.selectedCount}/${group.totalCount}`} 
-                style={{ backgroundColor: group.selectedCount === group.totalCount ? COLORS.SUCCESS : COLORS.PRIMARY }}
-              />
-            </Space>
-          }
-          extra={
-            <Checkbox
-              checked={group.selectedCount === group.totalCount}
-              indeterminate={group.selectedCount > 0 && group.selectedCount < group.totalCount}
-              onChange={(e) => handleDomainCheckAll(group.domain, e.target.checked)}
-            >
-              {group.selectedCount === group.totalCount ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
-            </Checkbox>
-          }
-        >
+    <Collapse 
+      defaultActiveKey={groupedPermissions[0]?.domain}
+      items={groupedPermissions.map((group) => ({
+        key: group.domain,
+        label: (
+          <Space>
+            <span style={{ fontWeight: 500 }}>{group.domainLabel}</span>
+            <Badge 
+              count={`${group.selectedCount}/${group.totalCount}`} 
+              style={{ backgroundColor: group.selectedCount === group.totalCount ? COLORS.SUCCESS : COLORS.PRIMARY }}
+            />
+          </Space>
+        ),
+        extra: (
+          <Checkbox
+            checked={group.selectedCount === group.totalCount}
+            indeterminate={group.selectedCount > 0 && group.selectedCount < group.totalCount}
+            onChange={(e) => handleDomainCheckAll(group.domain, e.target.checked)}
+          >
+            {group.selectedCount === group.totalCount ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+          </Checkbox>
+        ),
+        children: (
           <Row gutter={[8, 8]}>
             {group.permissions.map((permission) => (
               <Col span={8} key={permission.id}>
@@ -80,10 +78,9 @@ const PermissionDomainSelector: React.FC<PermissionDomainSelectorProps> = ({
               </Col>
             ))}
           </Row>
-        </Panel>
-      ))}
-    </Collapse>
+        ),
+      }))}
+    />
   );
 };
 
-export default PermissionDomainSelector;

@@ -13,14 +13,15 @@ import { format } from 'date-fns';
 import { TIME_FORMAT } from '@/models';
 import { RoleTag } from '@/components/RoleTag';
 import { useNavigate } from 'react-router-dom';
-import StatusTag from '@/components/StatusTag';
+import { StatusTag } from '@/components/StatusTag';
 import { DOMAINS } from '@/models/permission';
+import { RestrictedAction } from '@/components/RestrictedAction';
 
 interface UsersListProps {
   filters: FilterValues;
 }
 
-const UsersList: React.FC<UsersListProps> = ({ filters }) => {
+export const UsersList: React.FC<UsersListProps> = ({ filters }) => {
   const navigate = useNavigate();
   const { tableParams, paginationParams, handleTableChange, setSearch } =
     usePagination<User>({
@@ -130,22 +131,28 @@ const UsersList: React.FC<UsersListProps> = ({ filters }) => {
       key: 'actions',
       render: (_, record: User) => (
         <Space size="middle">
-          <Button
-            type="text"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/${DOMAINS.USERS.value}/${record.id}`)}
-          />
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/${DOMAINS.USERS.value}/update/${record.id}`)}
-          />
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => record.id && handleDelete(record.id)}
-          />
+          <RestrictedAction domain="USERS" action="VIEW">
+            <Button
+              type="text"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(`/${DOMAINS.USERS.value}/${record.id}`)}
+            />
+          </RestrictedAction>
+          <RestrictedAction domain="USERS" action="EDIT">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => navigate(`/${DOMAINS.USERS.value}/edit/${record.id}`)}
+            />
+          </RestrictedAction>
+          <RestrictedAction domain="USERS" action="DELETE">
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => record.id && handleDelete(record.id)}
+            />
+          </RestrictedAction>
         </Space>
       ),
     },
@@ -182,4 +189,3 @@ Làm mới danh sách
   );
 };
 
-export default UsersList;

@@ -1,49 +1,46 @@
 import React from 'react';
-import { Typography, Card, Space, message } from 'antd';
-import { userApi } from '@/api/slices/userApi';
-import { useApiFormErrorHandler } from '@/hooks/useApiFormErrorHandler';
-import UserForm from './components/UserForm';
-import type { CreateUserDTO } from '@/models';
+import { Space, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { UserFormLayout, type UserFormPayload } from './components';
+import { USER_FORM_ACTIONS } from './constants';
+import { userApi } from '@/api/slices/userApi';
 import { DOMAINS } from '@/models/permission';
+import { TitleWithoutMargin } from '@/components';
+import { useApiFormErrorHandler } from '@/hooks/useApiFormErrorHandler';
 
-type UserFormProps = React.ComponentProps<typeof UserForm<undefined>>;
-
-const { Title } = Typography;
-
-const CreateUserPage: React.FC = () => {
+export const CreateUserPage: React.FC = () => {
   const navigate = useNavigate();
-  const [createUser, { isLoading: isCreating }] =
-    userApi.useCreateUserMutation();
+
+  const [createUser, { isLoading: isCreating }] = userApi.useCreateUserMutation();
   const { handleFormApiError } = useApiFormErrorHandler();
 
-  const onFinish: UserFormProps['onSubmit'] = async ({ values, form }) => {
+  const handleSubmit = async ({ action, values, form }: UserFormPayload) => {
     try {
-      const userData: CreateUserDTO = {
-        username: values.username,
-        name: values.name,
-        email: values.email,
-        password: values.password!,
-        roles: values.roles,
-      };
+      if (action !== USER_FORM_ACTIONS.CREATE) {
+        message.error('Hành động không hợp lệ');
+        return;
+      }
+
+      const userData = values;
 
       await createUser(userData).unwrap();
       message.success('Tạo người dùng thành công');
-      form.resetFields();
       navigate(`/${DOMAINS.USERS.value}`);
+      form.resetFields();
     } catch (error) {
+      console.log('error', error);
       handleFormApiError(error, form);
     }
   };
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>Tạo người dùng mới</Title>
-      <Card>
-        <UserForm onSubmit={onFinish} isLoading={isCreating} />
-      </Card>
+      <TitleWithoutMargin level={2}>Tạo người dùng mới</TitleWithoutMargin>
+      <UserFormLayout
+        onSubmit={handleSubmit}
+        isLoading={isCreating}
+      />
     </Space>
   );
 };
 
-export default CreateUserPage;

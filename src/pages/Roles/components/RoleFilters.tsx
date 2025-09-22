@@ -12,7 +12,7 @@ interface RoleFiltersProps {
   onChange: (allValues: FilterValues) => void;
 }
 
-const RoleFilters: React.FC<RoleFiltersProps> = ({ values, onChange }) => {
+export const RoleFilters: React.FC<RoleFiltersProps> = ({ values, onChange }) => {
   const [form] = Form.useForm<FilterValues>();
 
   const onValuesChange = (_changedValues: any, allValues: FilterValues) => {
@@ -58,4 +58,3 @@ const RoleFilters: React.FC<RoleFiltersProps> = ({ values, onChange }) => {
   );
 };
 
-export default RoleFilters;

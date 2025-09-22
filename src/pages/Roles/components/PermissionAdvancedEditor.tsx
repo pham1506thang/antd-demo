@@ -11,7 +11,7 @@ interface PermissionAdvancedEditorProps {
   onPermissionChange: (permissionId: string, checked: boolean) => void;
 }
 
-const PermissionAdvancedEditor: React.FC<PermissionAdvancedEditorProps> = ({
+export const PermissionAdvancedEditor: React.FC<PermissionAdvancedEditorProps> = ({
   permissions,
   selectedPermissions,
   onPermissionChange,
@@ -101,4 +101,3 @@ const PermissionAdvancedEditor: React.FC<PermissionAdvancedEditorProps> = ({
   );
 };
 
-export default PermissionAdvancedEditor;

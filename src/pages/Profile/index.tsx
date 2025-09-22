@@ -3,7 +3,6 @@ import {
   Card,
   Row,
   Col,
-  Typography,
   Descriptions,
   Button,
   Space,
@@ -13,16 +12,12 @@ import {
 } from 'antd';
 import { EditOutlined, LockOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
-import ProfileForm from './components/ProfileForm';
-import ChangePasswordForm from './components/ChangePasswordForm';
-import AvatarUpload from 'components/AvatarUpload';
-import { RoleTag } from 'components/index';
-import StatusTag from 'components/StatusTag';
+import { ProfileForm } from './components/ProfileForm';
+import { ChangePasswordForm } from './components/ChangePasswordForm';
+import { AvatarUpload, RoleTag, TitleWithoutMargin, StatusTag } from '@/components';
 import { meSelector } from '@/store/slices/authSlice';
 
-const { Title } = Typography;
-
-const ProfilePage: React.FC = () => {
+export const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
 
@@ -48,8 +43,8 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '24px 0' }}>
-      <Title level={2}>Hồ sơ cá nhân</Title>
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <TitleWithoutMargin level={2}>Hồ sơ cá nhân</TitleWithoutMargin>
 
       <Row gutter={[24, 24]}>
         <Col span={24}>
@@ -64,9 +59,9 @@ const ProfilePage: React.FC = () => {
                   size="small"
                   style={{ width: '100%' }}
                 >
-                  <Title level={4} style={{ margin: 0 }}>
+                  <TitleWithoutMargin level={4}>
                     {me.name || me.username}
-                  </Title>
+                  </TitleWithoutMargin>
                   <Space size={[0, 8]} wrap>
                     {me.roles.map((role) => (
                       <RoleTag key={role.id} role={role} />
@@ -162,8 +157,6 @@ const ProfilePage: React.FC = () => {
           </Card>
         </Col>
       </Row>
-    </div>
+    </Space>
   );
 };
-
-export default ProfilePage;

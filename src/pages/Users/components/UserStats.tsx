@@ -7,7 +7,7 @@ import {
   UserSwitchOutlined,
 } from '@ant-design/icons';
 
-const UserStats: React.FC = () => {
+export const UserStats: React.FC = () => {
   return (
     <Row gutter={16}>
       <Col span={6}>
@@ -53,4 +53,3 @@ const UserStats: React.FC = () => {
   );
 };
 
-export default UserStats;

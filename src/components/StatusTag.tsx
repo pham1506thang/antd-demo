@@ -7,10 +7,8 @@ interface StatusTagProps {
   status: UserStatus;
 }
 
-const StatusTag: React.FC<StatusTagProps> = ({ status }) => {
+export const StatusTag: React.FC<StatusTagProps> = ({ status }) => {
   return (
     <Tag color={getUserStatusColor(status)}>{getUserStatusText(status)}</Tag>
   );
 };
-
-export default StatusTag;

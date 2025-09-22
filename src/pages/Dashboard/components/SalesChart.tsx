@@ -17,7 +17,7 @@ const data = [
   { month: 'Dec', sales: 8000 },
 ];
 
-const SalesChart: React.FC = () => {
+export const SalesChart: React.FC = () => {
   const config = {
     data,
     xField: 'month',
@@ -41,4 +41,3 @@ const SalesChart: React.FC = () => {
   );
 };
 
-export default SalesChart;

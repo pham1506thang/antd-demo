@@ -14,7 +14,7 @@ interface PrivateRouteProps {
   children: React.ReactNode;
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
+export const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
 
@@ -57,5 +57,3 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 
   return <>{children}</>;
 };
-
-export default PrivateRoute;

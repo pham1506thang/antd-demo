@@ -1,8 +1,7 @@
 import React from 'react';
-import { Typography, Card, Table, Tag, Space } from 'antd';
+import { Card, Table, Tag, Space } from 'antd';
 import { ShoppingCartOutlined } from '@ant-design/icons';
-
-const { Title } = Typography;
+import { TitleWithoutMargin } from '@/components';
 
 interface Order {
   key: string;
@@ -13,7 +12,7 @@ interface Order {
   date: string;
 }
 
-const mockData: Order[] = [
+export const mockData: Order[] = [
   {
     key: '1',
     orderNumber: 'ORD-001',
@@ -32,7 +31,7 @@ const mockData: Order[] = [
   },
 ];
 
-const OrdersPage: React.FC = () => {
+export const OrdersPage: React.FC = () => {
   const columns = [
     {
       title: 'Order Number',
@@ -69,9 +68,9 @@ const OrdersPage: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>
-        <ShoppingCartOutlined /> Orders
-      </Title>
+      <TitleWithoutMargin level={2} icon={<ShoppingCartOutlined />}>
+        Orders
+      </TitleWithoutMargin>
       <Card>
         <Table
           columns={columns}
@@ -83,4 +82,3 @@ const OrdersPage: React.FC = () => {
   );
 };
 
-export default OrdersPage;

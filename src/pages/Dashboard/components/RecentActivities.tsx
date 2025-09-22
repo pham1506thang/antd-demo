@@ -61,7 +61,7 @@ const getTagColor = (type: string) => {
   }
 };
 
-const RecentActivities: React.FC = () => {
+export const RecentActivities: React.FC = () => {
   return (
     <Card title="Hoạt động gần đây">
       <List
@@ -87,4 +87,3 @@ const RecentActivities: React.FC = () => {
   );
 };
 
-export default RecentActivities;

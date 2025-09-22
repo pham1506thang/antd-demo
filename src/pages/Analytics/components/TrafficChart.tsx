@@ -12,7 +12,7 @@ const data = [
   { date: '2024-03-21', visitors: 3900, pageViews: 8600 },
 ];
 
-const TrafficChart: React.FC = () => {
+export const TrafficChart: React.FC = () => {
   const config = {
     data,
     xField: 'date',
@@ -43,4 +43,3 @@ const TrafficChart: React.FC = () => {
   );
 };
 
-export default TrafficChart;

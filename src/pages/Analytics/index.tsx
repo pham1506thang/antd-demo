@@ -1,18 +1,17 @@
 import React from 'react';
-import { Typography, Row, Col, Space } from 'antd';
+import { Row, Col, Space } from 'antd';
 import { BarChartOutlined } from '@ant-design/icons';
-import VisitorStats from './components/VisitorStats';
-import TrafficChart from './components/TrafficChart';
-import TopPages from './components/TopPages';
+import { VisitorStats } from './components/VisitorStats';
+import { TrafficChart } from './components/TrafficChart';
+import { TopPages } from './components/TopPages';
+import { TitleWithoutMargin } from '@/components';
 
-const { Title } = Typography;
-
-const AnalyticsPage: React.FC = () => {
+export const AnalyticsPage: React.FC = () => {
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>
-        <BarChartOutlined /> Analytics
-      </Title>
+      <TitleWithoutMargin level={2} icon={<BarChartOutlined />}>
+        Analytics
+      </TitleWithoutMargin>
 
       <VisitorStats />
 
@@ -28,4 +27,3 @@ const AnalyticsPage: React.FC = () => {
   );
 };
 
-export default AnalyticsPage;

@@ -15,7 +15,7 @@ interface PermissionPresetsProps {
   onPresetSelect: (permissionIds: string[]) => void;
 }
 
-const PermissionPresets: React.FC<PermissionPresetsProps> = ({
+export const PermissionPresets: React.FC<PermissionPresetsProps> = ({
   permissions,
   onPresetSelect,
 }) => {
@@ -115,4 +115,3 @@ const PermissionPresets: React.FC<PermissionPresetsProps> = ({
   );
 };
 
-export default PermissionPresets;

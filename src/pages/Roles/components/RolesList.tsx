@@ -10,12 +10,14 @@ import { usePagination } from '@/hooks/usePagination';
 import { convertFiltersToParams } from '@/api/apiHelper';
 import { getRoleProtectionColor, getRoleProtectionText } from '@/helpers/role';
 import type { FilterValues } from './RoleFilters';
+import { RestrictedAction } from '@/components/RestrictedAction';
+import { DOMAINS } from '@/models';
 
 interface RolesListProps {
   filters: FilterValues;
 }
 
-const RolesList: React.FC<RolesListProps> = ({ filters }) => {
+export const RolesList: React.FC<RolesListProps> = ({ filters }) => {
   const navigate = useNavigate();
   const { tableParams, paginationParams, handleTableChange, setSearch } =
     usePagination<Role>({
@@ -111,24 +113,29 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
       key: 'actions',
       render: (_, record: Role) => (
         <Space size="middle">
-          <Button
-            type="text"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/roles/${record.id}`)}
-          />
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/roles/update/${record.id}`)}
-            disabled={record.isProtected}
-          />
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => record.id && handleDelete(record.id)}
-            disabled={record.isProtected}
-          />
+          <RestrictedAction domain="ROLES" action="VIEW">
+            <Button
+              type="text"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(`/roles/${record.id}`)}
+            />
+          </RestrictedAction>
+          <RestrictedAction domain="ROLES" action="EDIT">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => navigate(`/${DOMAINS.ROLES.value}/edit/${record.id}`)}
+            />
+          </RestrictedAction>
+          <RestrictedAction domain="ROLES" action="DELETE">
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => record.id && handleDelete(record.id)}
+              disabled={record.isProtected}
+            />
+          </RestrictedAction>
         </Space>
       ),
     },
@@ -143,7 +150,7 @@ const RolesList: React.FC<RolesListProps> = ({ filters }) => {
         loading={isFetching}
         style={{ marginBottom: 24 }}
       >
-Làm mới danh sách
+        Làm mới danh sách
       </Button>
       <Table
         columns={columns}
@@ -165,4 +172,3 @@ Làm mới danh sách
   );
 };
 
-export default RolesList;

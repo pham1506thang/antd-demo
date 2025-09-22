@@ -21,29 +21,30 @@ import {
   FileTextOutlined,
   SafetyCertificateOutlined,
 } from '@ant-design/icons';
-import Dashboard from './pages/Dashboard';
-import Users from './pages/Users';
-import Roles from './pages/Roles';
-import Orders from './pages/Orders';
-import Analytics from './pages/Analytics';
-import Reports from './pages/Reports';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import Help from './pages/Help';
-import Login from './pages/Login';
-import CreateUserPage from './pages/Users/CreateUser';
-import UpdateUserPage from './pages/Users/UpdateUser';
-import ViewUser from './pages/Users/ViewUser';
-import CreateRolePage from './pages/Roles/CreateRole';
-import UpdateRolePage from './pages/Roles/UpdateRole';
-import ViewRole from './pages/Roles/ViewRole';
-import NotFound from './pages/NotFound';
-import Forbidden from './pages/Forbidden';
-import { UserMenuTrigger } from './components/UserMenuTrigger';
-import AppInit from '@/components/AppInit';
+import { Dashboard } from './pages/Dashboard';
+import { UsersPage as Users } from './pages/Users';
+import { RolesPage as Roles } from './pages/Roles';
+import { OrdersPage as Orders } from './pages/Orders';
+import { AnalyticsPage as Analytics } from './pages/Analytics';
+import { ReportsPage as Reports } from './pages/Reports';
+import { ProfilePage } from './pages/Profile';
+import { SettingsPage as Settings } from './pages/Settings';
+import { HelpPage as Help } from './pages/Help';
+import { Login } from './pages/Login';
+import { CreateUserPage } from './pages/Users/CreateUser';
+import { EditUserPage } from './pages/Users/EditUser';
+import { ViewUser } from './pages/Users/ViewUser';
+import { CreateRolePage } from './pages/Roles/CreateRole';
+import { EditRolePage } from './pages/Roles/EditRole';
+import { ViewRole } from './pages/Roles/ViewRole';
+import { NotFound } from './pages/NotFound';
+import { Forbidden } from './pages/Forbidden';
+import { UserMenuTrigger, RouteGuard } from './components';
+import { AppInit } from '@/components/AppInit';
 import { authApi } from '@/api/slices/authApi';
 import { clearAuthState } from '@/utils/authUtils';
 import { useAuthInit } from '@/hooks/useAuthInit';
+import { usePermissionCheck } from '@/hooks/usePermissionCheck';
 import { DOMAINS } from '@/models/permission';
 
 const { Header, Sider, Content } = Layout;
@@ -53,10 +54,11 @@ const MenuWrapper: React.FC<{
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
 }> = ({ collapsed, setCollapsed }) => {
-  // collapsed is used in JSX below
+  // collapsed is used in JSX below (lines 217-225)
   const navigate = useNavigate();
   const location = useLocation();
   const [logout] = authApi.useLogoutMutation();
+  const checkPermission = usePermissionCheck();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -84,53 +86,72 @@ const MenuWrapper: React.FC<{
     });
   };
 
-  const menuItems = [
+  // Define menu items with their corresponding domains
+  const allMenuItems = [
     {
       key: '/',
       icon: <DashboardOutlined />,
       label: 'Bảng điều khiển',
+      domain: null, // Dashboard doesn't require specific permission
     },
     {
       key: `/${DOMAINS.USERS.value}`,
       icon: <UserOutlined />,
       label: 'Người dùng',
+      domain: DOMAINS.USERS.value,
     },
     {
       key: '/roles',
       icon: <SafetyCertificateOutlined />,
       label: 'Vai trò',
+      domain: DOMAINS.ROLES.value,
     },
     {
       key: '/orders',
       icon: <ShoppingCartOutlined />,
       label: 'Đơn hàng',
+      domain: null, // Orders doesn't have specific domain in DOMAINS
     },
     {
       key: '/analytics',
       icon: <BarChartOutlined />,
       label: 'Phân tích',
+      domain: DOMAINS.ANALYTICS.value,
     },
     {
       key: '/reports',
       icon: <FileTextOutlined />,
       label: 'Báo cáo',
+      domain: DOMAINS.REPORTS.value,
     },
     {
       key: '/profile',
       icon: <UserOutlined />,
       label: 'Hồ sơ',
+      domain: null, // Profile is always accessible
     },
     {
       key: '/settings',
       icon: <SettingOutlined />,
       label: 'Cài đặt',
+      domain: DOMAINS.SETTINGS.value,
     },
     {
       key: '/help',
       icon: <QuestionCircleOutlined />,
       label: 'Trợ giúp',
+      domain: null, // Help is always accessible
     },
   ];
+
+  // Filter menu items based on permissions
+  const menuItems = allMenuItems.filter(item => {
+    // Always show items without domain requirement
+    if (!item.domain) return true;
+    
+    // Check permission for items with domain requirement
+    return checkPermission(item.domain, 'view');
+  });
 
   const userMenuItems: MenuProps['items'] = [
     {
@@ -166,7 +187,7 @@ const MenuWrapper: React.FC<{
         navigate('/settings');
         break;
     }
-  };
+    };
 
   return (
     <Layout>
@@ -250,21 +271,81 @@ const MenuWrapper: React.FC<{
           }}
         >
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path={`/${DOMAINS.USERS.value}`} element={<Users />} />
-            <Route path={`/${DOMAINS.USERS.value}/create`} element={<CreateUserPage />} />
-            <Route path={`/${DOMAINS.USERS.value}/:userId`} element={<ViewUser />} />
-            <Route path={`/${DOMAINS.USERS.value}/update/:userId`} element={<UpdateUserPage />} />
-            <Route path="/roles" element={<Roles />} />
-            <Route path="/roles/create" element={<CreateRolePage />} />
-            <Route path="/roles/:roleId" element={<ViewRole />} />
-            <Route path="/roles/update/:roleId" element={<UpdateRolePage />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/help" element={<Help />} />
+            <Route path="/" element={
+              <RouteGuard>
+                <Dashboard />
+              </RouteGuard>
+            } />
+            <Route path={`/${DOMAINS.USERS.value}`} element={
+              <RouteGuard domain="USERS" action="VIEW">
+                <Users />
+              </RouteGuard>
+            } />
+            <Route path={`/${DOMAINS.USERS.value}/create`} element={
+              <RouteGuard domain="USERS" action="CREATE">
+                <CreateUserPage />
+              </RouteGuard>
+            } />
+            <Route path={`/${DOMAINS.USERS.value}/:userId`} element={
+              <RouteGuard domain="USERS" action="VIEW">
+                <ViewUser />
+              </RouteGuard>
+            } />
+            <Route path={`/${DOMAINS.USERS.value}/edit/:userId`} element={
+              <RouteGuard domain="USERS" action="VIEW">
+                <EditUserPage />
+              </RouteGuard>
+            } />
+            <Route path={`/${DOMAINS.ROLES.value}`} element={
+              <RouteGuard domain="ROLES" action="VIEW">
+                <Roles />
+              </RouteGuard>
+            } />
+            <Route path={`/${DOMAINS.ROLES.value}/create`} element={
+              <RouteGuard domain="ROLES" action="CREATE">
+                <CreateRolePage />
+              </RouteGuard>
+            } />
+            <Route path={`/${DOMAINS.ROLES.value}/:roleId`} element={
+              <RouteGuard domain="ROLES" action="VIEW">
+                <ViewRole />
+              </RouteGuard>
+            } />
+            <Route path={`/${DOMAINS.ROLES.value}/edit/:roleId`} element={
+              <RouteGuard domain="ROLES" action="VIEW">
+                <EditRolePage />
+              </RouteGuard>
+            } />
+            <Route path="/orders" element={
+              <RouteGuard>
+                <Orders />
+              </RouteGuard>
+            } />
+            <Route path="/analytics" element={
+              <RouteGuard domain="ANALYTICS" action="ACCESS">
+                <Analytics />
+              </RouteGuard>
+            } />
+            <Route path="/reports" element={
+              <RouteGuard domain="REPORTS" action="VIEW_TRAFFIC">
+                <Reports />
+              </RouteGuard>
+            } />
+            <Route path="/profile" element={
+              <RouteGuard>
+                <ProfilePage />
+              </RouteGuard>
+            } />
+            <Route path="/settings" element={
+              <RouteGuard domain="SETTINGS" action="GENERAL">
+                <Settings />
+              </RouteGuard>
+            } />
+            <Route path="/help" element={
+              <RouteGuard>
+                <Help />
+              </RouteGuard>
+            } />
             <Route path="/403" element={<Forbidden />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -275,7 +356,7 @@ const MenuWrapper: React.FC<{
 };
 
 // Main App component
-const App: React.FC = () => {
+export const App: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   
   // Initialize auth state from server
@@ -317,5 +398,3 @@ const App: React.FC = () => {
     </BrowserRouter>
   );
 };
-
-export default App;

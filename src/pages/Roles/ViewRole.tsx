@@ -1,36 +1,24 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Card, Space, Button, Descriptions, Tag, Collapse, Row, Col, Badge } from 'antd';
+import { Card, Space, Button, Descriptions, Tag, Collapse, Row, Col, Badge, Flex, Typography } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { useGetRoleQuery } from '@/api/slices/roleApi';
 import { DOMAINS } from '@/models/permission';
 import { isApiError } from '@/models/error';
-import { getRoleProtectionColor, getRoleProtectionText, getRoleProtectionDescription, getRoleProtectionIconColor } from '@/helpers/role';
+import { getRoleProtectionColor, getRoleProtectionText, getRoleProtectionDescription } from '@/helpers/role';
 import { COLORS } from '@/constants/colors';
-import LoadingView from '@/components/LoadingView';
-import ErrorView from '@/components/ErrorView';
+import { LoadingView, ErrorView } from '@/components';
+import { RestrictedAction } from '@/components/RestrictedAction';
+import { TitleWithoutMargin } from '@/components';
 import styled from 'styled-components';
 
-const { Title, Text } = Typography;
-
-const CenteredDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-`;
+const { Text } = Typography;
 
 const PermissionSection = styled.div`
   margin-top: 16px;
 `;
 
-const ViewRole: React.FC = () => {
+export const ViewRole: React.FC = () => {
   const { roleId } = useParams<{ roleId: string }>();
   const navigate = useNavigate();
 
@@ -40,7 +28,7 @@ const ViewRole: React.FC = () => {
   });
 
   const handleEdit = () => {
-    navigate(`/${DOMAINS.ROLES.value}/update/${roleId}`);
+    navigate(`/${DOMAINS.ROLES.value}/edit/${roleId}`);
   };
 
   const handleBack = () => {
@@ -114,29 +102,22 @@ const ViewRole: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <ButtonContainer>
+      <Flex justify="space-between" align="center">
         <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
           Quay lại danh sách
         </Button>
         {!role.isProtected && (
-          <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-            Chỉnh sửa
-          </Button>
+          <RestrictedAction domain="ROLES" action="EDIT">
+            <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
+              Chỉnh sửa
+            </Button>
+          </RestrictedAction>
         )}
-      </ButtonContainer>
+      </Flex>
 
-      <Title level={2}>Chi tiết vai trò</Title>
+      <TitleWithoutMargin level={2}>Chi tiết vai trò</TitleWithoutMargin>
       
       <Card>
-        <CenteredDiv>
-          <SafetyCertificateOutlined 
-            style={{ 
-              fontSize: '120px', 
-              color: getRoleProtectionIconColor(role.isProtected)
-            }} 
-          />
-        </CenteredDiv>
-
         <Descriptions
           bordered
           column={1}
@@ -179,7 +160,7 @@ const ViewRole: React.FC = () => {
 
         {role.isSuperAdmin ? (
           <PermissionSection>
-            <Title level={4}>Quyền hạn</Title>
+            <TitleWithoutMargin level={4}>Quyền hạn</TitleWithoutMargin>
             <div style={{ 
               padding: '16px', 
               background: COLORS.BG_SUCCESS, 
@@ -194,7 +175,7 @@ const ViewRole: React.FC = () => {
           </PermissionSection>
         ) : role.permissions.length > 0 && (
           <PermissionSection>
-            <Title level={4}>Danh sách quyền</Title>
+            <TitleWithoutMargin level={4}>Danh sách quyền</TitleWithoutMargin>
             <Collapse 
               defaultActiveKey={groupedPermissionsArray[0]?.domain}
               items={collapseItems}
@@ -215,4 +196,3 @@ const ViewRole: React.FC = () => {
   );
 };
 
-export default ViewRole;

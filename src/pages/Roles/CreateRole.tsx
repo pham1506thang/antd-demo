@@ -1,33 +1,31 @@
 import React from 'react';
-import { Typography, Card, Space, message } from 'antd';
+import { Space, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import RoleForm from './components/RoleForm';
+import { RoleFormLayout, type RoleFormPayload } from './components/RoleFormLayout';
+import { ROLE_FORM_ACTIONS } from './constants';
 import { useCreateRoleMutation } from '@/api/slices/roleApi';
+import { TitleWithoutMargin } from '@/components';
 import { useApiFormErrorHandler } from '@/hooks/useApiFormErrorHandler';
-import type { CreateRoleDTO } from '@/models/dto/role';
 
-type RoleFormProps = React.ComponentProps<typeof RoleForm<undefined>>;
-
-const { Title } = Typography;
-
-const CreateRolePage: React.FC = () => {
+export const CreateRolePage: React.FC = () => {
   const navigate = useNavigate();
+
   const [createRole, { isLoading: isCreating }] = useCreateRoleMutation();
   const { handleFormApiError } = useApiFormErrorHandler();
 
-  const onFinish: RoleFormProps['onSubmit'] = async ({ values, form }) => {
+  const handleSubmit = async ({ action, values, form }: RoleFormPayload) => {
     try {
-      const roleData: CreateRoleDTO = {
-        code: values.code,
-        label: values.label,
-        description: values.description,
-        permissions: values.permissions,
-      };
+      if (action !== ROLE_FORM_ACTIONS.CREATE) {
+        message.error('Hành động không hợp lệ');
+        return;
+      }
+
+      const roleData = values;
 
       await createRole(roleData).unwrap();
       message.success('Tạo vai trò thành công');
-      form.resetFields();
       navigate('/roles');
+      form.resetFields();
     } catch (error) {
       handleFormApiError(error, form);
     }
@@ -35,12 +33,12 @@ const CreateRolePage: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>Tạo vai trò mới</Title>
-      <Card>
-        <RoleForm onSubmit={onFinish} isLoading={isCreating} />
-      </Card>
+      <TitleWithoutMargin level={2}>Tạo vai trò mới</TitleWithoutMargin>
+      <RoleFormLayout
+        onSubmit={handleSubmit}
+        isLoading={isCreating}
+      />
     </Space>
   );
 };
 
-export default CreateRolePage;

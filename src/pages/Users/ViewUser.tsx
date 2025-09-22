@@ -1,31 +1,15 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Card, Space, Button, Descriptions, Avatar, Tag } from 'antd';
+import { Card, Space, Button, Descriptions, Avatar, Tag, Flex } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, UserOutlined } from '@ant-design/icons';
 import { userApi } from '@/api/slices/userApi';
 import { DOMAINS } from '@/models/permission';
 import { getUserStatusColor, getUserStatusText } from '@/helpers/user';
 import { isApiError } from '@/models/error';
-import LoadingView from '@/components/LoadingView';
-import ErrorView from '@/components/ErrorView';
-import styled from 'styled-components';
+import { LoadingView, ErrorView, RestrictedAction, TitleWithoutMargin } from '@/components';
 
-const { Title } = Typography;
 
-const CenteredDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-`;
-
-const ViewUser: React.FC = () => {
+export const ViewUser: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
 
@@ -35,7 +19,7 @@ const ViewUser: React.FC = () => {
   });
 
   const handleEdit = () => {
-    navigate(`/${DOMAINS.USERS.value}/update/${userId}`);
+    navigate(`/${DOMAINS.USERS.value}/edit/${userId}`);
   };
 
   const handleBack = () => {
@@ -62,27 +46,29 @@ const ViewUser: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <ButtonContainer>
+      <Flex justify="space-between" align="center">
         <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
           Quay lại danh sách
         </Button>
-        <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
-          Chỉnh sửa
-        </Button>
-      </ButtonContainer>
+        <RestrictedAction domain="USERS" action="EDIT">
+          <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>
+            Chỉnh sửa
+          </Button>
+        </RestrictedAction>
+      </Flex>
 
-      <Title level={2}>Chi tiết người dùng</Title>
+      <TitleWithoutMargin level={2}>Chi tiết người dùng</TitleWithoutMargin>
       
       <Card>
-        <CenteredDiv>
+        <Flex justify="center" style={{ marginBottom: 24 }}>
           <Avatar size={120} src={user.avatarUrl} icon={<UserOutlined />} />
-        </CenteredDiv>
+        </Flex>
 
         <Descriptions
           bordered
           column={1}
           size="middle"
-          labelStyle={{ fontWeight: 'bold', width: '200px' }}
+          styles={{ label: { fontWeight: 'bold', width: '200px' } }}
         >
           <Descriptions.Item label="Tên đăng nhập">
             {user.username}
@@ -129,4 +115,3 @@ const ViewUser: React.FC = () => {
   );
 };
 
-export default ViewUser;

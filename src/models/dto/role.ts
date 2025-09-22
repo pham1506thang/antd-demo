@@ -8,5 +8,8 @@ export interface CreateRoleDTO {
 export interface UpdateRoleDTO {
   label?: string;
   description?: string;
+}
+
+export interface AssignPermissionsDTO {
   permissions: string[];
 }

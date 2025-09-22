@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Typography, Card, Space, Button } from 'antd';
+import { Card, Space, Button, Flex } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import RolesList from './components/RolesList';
-import RoleStats from './components/RoleStats';
-import RoleFilters, { type FilterValues } from './components/RoleFilters';
+import { RolesList } from './components/RolesList';
+import { RoleStats } from './components/RoleStats';
+import { RoleFilters, type FilterValues } from './components/RoleFilters';
+import { RestrictedAction, TitleWithoutMargin } from '@/components';
 
-const { Title } = Typography;
-
-const RolesPage: React.FC = () => {
+export const RolesPage: React.FC = () => {
   const [filters, setFilters] = useState<FilterValues>({});
   const navigate = useNavigate();
 
@@ -17,20 +16,19 @@ const RolesPage: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
+      <Flex
+        justify="space-between"
+        align="center"
       >
-        <Title level={2} style={{ margin: 0 }}>
+        <TitleWithoutMargin level={2}>
           Quản lý vai trò
-        </Title>
-        <Button type="primary" onClick={handleCreateRole}>
-          Tạo vai trò
-        </Button>
-      </div>
+        </TitleWithoutMargin>
+        <RestrictedAction domain="ROLES" action="CREATE">
+          <Button type="primary" onClick={handleCreateRole}>
+            Tạo vai trò
+          </Button>
+        </RestrictedAction>
+      </Flex>
 
       <RoleStats />
 
@@ -42,4 +40,3 @@ const RolesPage: React.FC = () => {
   );
 };
 
-export default RolesPage;

@@ -7,7 +7,7 @@ import {
   RiseOutlined,
 } from '@ant-design/icons';
 
-const VisitorStats: React.FC = () => {
+export const VisitorStats: React.FC = () => {
   return (
     <Row gutter={16}>
       <Col span={6}>
@@ -55,4 +55,3 @@ const VisitorStats: React.FC = () => {
   );
 };
 
-export default VisitorStats;

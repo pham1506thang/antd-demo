@@ -7,7 +7,7 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
-const ReportsSummary: React.FC = () => {
+export const ReportsSummary: React.FC = () => {
   return (
     <Row gutter={16}>
       <Col span={6}>
@@ -53,4 +53,3 @@ const ReportsSummary: React.FC = () => {
   );
 };
 
-export default ReportsSummary;

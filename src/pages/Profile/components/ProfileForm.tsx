@@ -10,7 +10,7 @@ interface ProfileFormProps {
   onSuccess: () => void;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({
+export const ProfileForm: React.FC<ProfileFormProps> = ({
   initialValues,
   onCancel,
   onSuccess,
@@ -84,4 +84,3 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   );
 };
 
-export default ProfileForm;

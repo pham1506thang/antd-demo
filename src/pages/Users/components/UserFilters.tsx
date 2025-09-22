@@ -4,7 +4,6 @@ import { SearchOutlined, UndoOutlined } from '@ant-design/icons';
 import { USER_STATUS } from 'models/user';
 import { getUserStatusText, getUserStatusColor } from '@/helpers/user';
 import { useGetSummaryRolesQuery } from '@/api/slices/roleApi';
-import { COLORS } from '@/constants/colors';
 
 const { Option } = Select;
 
@@ -25,7 +24,7 @@ interface UserFiltersProps {
   onChange: (allValues: FilterValues) => void;
 }
 
-const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
+export const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
   const [form] = Form.useForm<FilterValues>();
   const { data: rolesData, isLoading: isRolesLoading } =
     useGetSummaryRolesQuery();
@@ -65,7 +64,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
             optionRender={(option) => {
               const color = getUserStatusColor(option.value as string);
               return (
-                <div style={{ 
+                <div style={{
                   color: color,
                 }}>
                   {option.label}
@@ -108,7 +107,7 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
             icon={<UndoOutlined />}
             onClick={handleReset}
           >
-Đặt lại bộ lọc
+            Đặt lại bộ lọc
           </Button>
         </Form.Item>
       </Space>
@@ -116,4 +115,3 @@ const UserFilters: React.FC<UserFiltersProps> = ({ values, onChange }) => {
   );
 };
 
-export default UserFilters;

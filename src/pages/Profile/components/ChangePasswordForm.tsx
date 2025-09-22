@@ -14,7 +14,7 @@ interface ChangePasswordValues {
   confirmPassword: string;
 }
 
-const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
+export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
   onCancel,
   onSuccess,
 }) => {
@@ -39,7 +39,7 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         name="currentPassword"
         label="Mật khẩu hiện tại"
         rules={[
-          { required: true, message: 'Please input your current password!' },
+          { required: true, message: 'Vui lòng nhập mật khẩu hiện tại!' },
         ]}
       >
         <Input.Password />
@@ -49,8 +49,8 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         name="newPassword"
         label="Mật khẩu mới"
         rules={[
-          { required: true, message: 'Please input your new password!' },
-          { min: 8, message: 'Password must be at least 8 characters!' },
+          { required: true, message: 'Vui lòng nhập mật khẩu mới!' },
+          { min: 8, message: 'Mật khẩu phải có ít nhất 8 ký tự!' },
         ]}
         hasFeedback
       >
@@ -63,13 +63,13 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         dependencies={['newPassword']}
         hasFeedback
         rules={[
-          { required: true, message: 'Please confirm your password!' },
+          { required: true, message: 'Vui lòng xác nhận mật khẩu!' },
           ({ getFieldValue }) => ({
             validator(_, value) {
               if (!value || getFieldValue('newPassword') === value) {
                 return Promise.resolve();
               }
-              return Promise.reject(new Error('The passwords do not match!'));
+              return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
             },
           }),
         ]}
@@ -80,10 +80,10 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
       <Form.Item>
         <Space>
           <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
-            Change Password
+            Đổi mật khẩu
           </Button>
           <Button onClick={onCancel} icon={<CloseOutlined />}>
-            Cancel
+            Hủy
           </Button>
         </Space>
       </Form.Item>
@@ -91,4 +91,3 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
   );
 };
 
-export default ChangePasswordForm;

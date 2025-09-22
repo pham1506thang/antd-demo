@@ -7,7 +7,7 @@ interface AppInitProps {
   children: React.ReactNode;
 }
 
-const AppInit: React.FC<AppInitProps> = ({ children }) => {
+export const AppInit: React.FC<AppInitProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isAuthenticated = useAppSelector(isAuthenticatedSelector);
@@ -30,5 +30,3 @@ const AppInit: React.FC<AppInitProps> = ({ children }) => {
   // If authenticated, render children
   return <>{children}</>;
 };
-
-export default AppInit;

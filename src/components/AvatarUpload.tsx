@@ -57,7 +57,7 @@ const Overlay = styled.div`
   color: white;
 `;
 
-const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl, size = 120 }) => {
+export const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl, size = 120 }) => {
   const [loading, setLoading] = useState(false);
   const [updateAvatar] = userApi.useUpdateAvatarMutation();
 
@@ -117,5 +117,3 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({ avatarUrl, size = 120 }) =>
     </StyledUpload>
   );
 };
-
-export default AvatarUpload;

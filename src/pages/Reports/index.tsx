@@ -1,18 +1,17 @@
 import React from 'react';
-import { Typography, Space, Row, Col } from 'antd';
+import { Space, Row, Col } from 'antd';
 import { FileTextOutlined } from '@ant-design/icons';
-import ReportsList from './components/ReportsList';
-import ReportsSummary from './components/ReportsSummary';
-import ReportsChart from './components/ReportsChart';
+import { ReportsList } from './components/ReportsList';
+import { ReportsSummary } from './components/ReportsSummary';
+import { ReportsChart } from './components/ReportsChart';
+import { TitleWithoutMargin } from '@/components';
 
-const { Title } = Typography;
-
-const ReportsPage: React.FC = () => {
+export const ReportsPage: React.FC = () => {
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>
-        <FileTextOutlined /> Reports
-      </Title>
+      <TitleWithoutMargin level={2} icon={<FileTextOutlined />}>
+        Reports
+      </TitleWithoutMargin>
 
       <ReportsSummary />
 
@@ -28,4 +27,3 @@ const ReportsPage: React.FC = () => {
   );
 };
 
-export default ReportsPage;

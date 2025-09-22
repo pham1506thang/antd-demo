@@ -12,7 +12,7 @@ interface ErrorViewProps {
   status?: number;
 }
 
-const ErrorView: React.FC<ErrorViewProps> = ({
+export const ErrorView: React.FC<ErrorViewProps> = ({
   message,
   description,
   type = 'error',
@@ -53,5 +53,3 @@ const ErrorView: React.FC<ErrorViewProps> = ({
     </Space>
   );
 };
-
-export default ErrorView;

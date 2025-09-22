@@ -6,7 +6,7 @@ interface LoadingViewProps {
   size?: 'small' | 'default' | 'large';
 }
 
-const LoadingView: React.FC<LoadingViewProps> = ({ 
+export const LoadingView: React.FC<LoadingViewProps> = ({ 
   message = 'Đang tải...', 
   size = 'large' 
 }) => {
@@ -17,5 +17,3 @@ const LoadingView: React.FC<LoadingViewProps> = ({
     </div>
   );
 };
-
-export default LoadingView;

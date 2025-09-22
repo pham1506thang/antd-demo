@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { Typography, Card, Space, Button } from 'antd';
+import { Card, Space, Button, Flex } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import UsersList from './components/UsersList';
-import UserStats from './components/UserStats';
-import UserFilters, { type FilterValues } from './components/UserFilters';
+import { UsersList, UserStats, UserFilters, type FilterValues } from './components';
 import { DOMAINS } from '@/models/permission';
+import { RestrictedAction, TitleWithoutMargin } from '@/components';
 
-const { Title } = Typography;
-
-const UsersPage: React.FC = () => {
+export const UsersPage: React.FC = () => {
   const [filters, setFilters] = useState<FilterValues>({});
   const navigate = useNavigate();
 
@@ -18,20 +15,19 @@ const UsersPage: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
+      <Flex
+        justify="space-between"
+        align="center"
       >
-        <Title level={2} style={{ margin: 0 }}>
+        <TitleWithoutMargin level={2}>
           Quản lý người dùng
-        </Title>
-        <Button type="primary" onClick={handleCreateUser}>
-          Tạo người dùng
-        </Button>
-      </div>
+        </TitleWithoutMargin>
+        <RestrictedAction domain="USERS" action="CREATE">
+          <Button type="primary" onClick={handleCreateUser}>
+            Tạo người dùng
+          </Button>
+        </RestrictedAction>
+      </Flex>
 
       <UserStats />
 
@@ -43,4 +39,3 @@ const UsersPage: React.FC = () => {
   );
 };
 
-export default UsersPage;

@@ -1,38 +1,53 @@
 import React from 'react';
-import { Typography, Card, Collapse, Space, Button } from 'antd';
+import { Card, Collapse, Space, Button, Typography } from 'antd';
 import { QuestionCircleOutlined, MessageOutlined } from '@ant-design/icons';
+import { TitleWithoutMargin } from '@/components';
 
-const { Title, Paragraph } = Typography;
-const { Panel } = Collapse;
+const { Paragraph } = Typography;
 
-const HelpPage: React.FC = () => {
+export const HelpPage: React.FC = () => {
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <Title level={2}>
-        <QuestionCircleOutlined /> Trung tâm trợ giúp
-      </Title>
+      <TitleWithoutMargin level={2} icon={<QuestionCircleOutlined />}>
+        Trung tâm trợ giúp
+      </TitleWithoutMargin>
 
       <Card title="Câu hỏi thường gặp">
-        <Collapse defaultActiveKey={['1']}>
-          <Panel header="Làm thế nào để đặt lại mật khẩu?" key="1">
-            <Paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </Paragraph>
-          </Panel>
-          <Panel header="Làm thế nào để cập nhật hồ sơ?" key="2">
-            <Paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </Paragraph>
-          </Panel>
-          <Panel header="Tôi có thể tìm lịch sử đơn hàng ở đâu?" key="3">
-            <Paragraph>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </Paragraph>
-          </Panel>
-        </Collapse>
+        <Collapse 
+          defaultActiveKey={['1']}
+          items={[
+            {
+              key: '1',
+              label: 'Làm thế nào để đặt lại mật khẩu?',
+              children: (
+                <Paragraph>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </Paragraph>
+              ),
+            },
+            {
+              key: '2',
+              label: 'Làm thế nào để cập nhật hồ sơ?',
+              children: (
+                <Paragraph>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </Paragraph>
+              ),
+            },
+            {
+              key: '3',
+              label: 'Tôi có thể tìm lịch sử đơn hàng ở đâu?',
+              children: (
+                <Paragraph>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </Paragraph>
+              ),
+            },
+          ]}
+        />
       </Card>
 
       <Card title="Cần thêm trợ giúp?">
@@ -50,4 +65,3 @@ const HelpPage: React.FC = () => {
   );
 };
 
-export default HelpPage;
