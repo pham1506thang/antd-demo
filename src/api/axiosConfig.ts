@@ -27,6 +27,12 @@ const axiosInstance: AxiosInstance = axios.create(AXIOS_CONFIG);
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Handle FormData - don't set Content-Type for FormData
+    if (config.data instanceof FormData) {
+      // Remove Content-Type header to let browser set it with boundary
+      delete config.headers['Content-Type'];
+    }
+    
     // No need to add Authorization header manually
     // The server will use refreshToken from httpOnly cookie
     return config;

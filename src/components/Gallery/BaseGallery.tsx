@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useState, useRef } from 'react';
 import {
   Modal,
   Row,
@@ -11,72 +12,88 @@ import {
   Space,
   Tag,
   Typography,
+  Select,
+  Pagination,
 } from 'antd';
 import {
   SearchOutlined,
   CheckOutlined,
   CloudUploadOutlined,
+  FilterOutlined,
 } from '@ant-design/icons';
 import type { Media } from '@/models/media';
-import { mediaApi } from '@/api/slices/mediaApi';
 import { COLORS } from '@/constants/colors';
+import { MEDIA_IMAGE_SIZES } from '@/constants/media';
 
 const { Search } = Input;
 const { Text } = Typography;
 
-export interface GalleryModalProps {
+export interface BaseGalleryProps {
   open: boolean;
   onClose: () => void;
   mode: 'single' | 'multiple';
-  onSelect: (images: Media[]) => void;
+  onSelect: (mediaItems: Media[]) => void;
   selectedImages?: Media[];
-  category?: 'general' | 'profile';
+  category: 'general' | 'profile';
+  // Data and loading states
+  images: Media[];
+  loading: boolean;
+  totalImages: number;
+  currentPage: number;
+  pageSize: number;
+  // Search and sort states
+  searchText: string;
+  sortBy: string;
+  sortOrder: 'ASC' | 'DESC';
+  // Event handlers
+  onSearch: (value: string) => void;
+  onSortChange: (value: string) => void;
+  onPageChange: (page: number) => void;
+  onImageSelect: (image: Media) => void;
+  onUpload: (file: File) => Promise<void>;
+  // UI customization
+  title: string;
+  searchPlaceholder: string;
+  uploadButtonText: string;
+  infoText: string;
+  paginationText: (total: number, range: [number, number]) => string;
+  // Media utilities
+  generateThumbnailUrl: (mediaId: string, category: 'general' | 'profile') => string;
+  generateDisplayUrl: (mediaId: string, category: 'general' | 'profile', size: string) => string;
 }
 
-export const GalleryModal: React.FC<GalleryModalProps> = ({
+export const BaseGallery: React.FC<BaseGalleryProps> = ({
   open,
   onClose,
   mode = 'single',
   onSelect,
   selectedImages = [],
-  category = 'general',
+  category,
+  images,
+  loading,
+  totalImages,
+  currentPage,
+  pageSize,
+  searchText,
+  sortBy,
+  sortOrder,
+  onSearch,
+  onSortChange,
+  onPageChange,
+  onImageSelect,
+  onUpload,
+  title,
+  searchPlaceholder,
+  uploadButtonText,
+  infoText,
+  paginationText,
+  generateThumbnailUrl,
+  generateDisplayUrl,
 }) => {
-  const [images, setImages] = useState<Media[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const [selectedImageIds, setSelectedImageIds] = useState<string[]>(
     selectedImages.map(img => img.id)
   );
-  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const loadImages = useCallback(async (search?: string) => {
-    setLoading(true);
-    try {
-      const result = await mediaApi.getImages({
-        category,
-        search,
-        limit: 50,
-      });
-      setImages(result.data);
-    } catch (error) {
-      message.error('Không thể tải danh sách ảnh');
-    } finally {
-      setLoading(false);
-    }
-  }, [category]);
-
-  // Load images when modal opens
-  useEffect(() => {
-    if (open) {
-      loadImages();
-    }
-  }, [open, loadImages]);
-
-  const handleSearch = (value: string) => {
-    setSearchText(value);
-    loadImages(value);
-  };
 
   const handleImageSelect = (image: Media) => {
     if (mode === 'single') {
@@ -90,18 +107,15 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
         }
       });
     }
+    onImageSelect(image);
   };
 
   const handleUpload = async (file: File) => {
-    setUploading(true);
     try {
-      const newImage = await mediaApi.uploadImage(file);
-      setImages(prev => [newImage, ...prev]);
+      await onUpload(file);
       message.success('Upload ảnh thành công');
     } catch (error) {
       message.error('Upload ảnh thất bại');
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -118,18 +132,20 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      event.target.value = '';
       handleUpload(file);
     }
   };
 
   const selectedCount = selectedImageIds.length;
   const maxSelection = mode === 'single' ? 1 : 10;
-
+  const totalPages = Math.ceil(totalImages / pageSize);
+  
   return (
     <Modal
       title={
         <Space>
-          <span>Chọn ảnh</span>
+          <span>{title}</span>
           {selectedCount > 0 && (
             <Tag color="blue">Đã chọn {selectedCount} ảnh</Tag>
           )}
@@ -155,25 +171,39 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
       ]}
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        {/* Search and Upload */}
+        {/* Search, Filter and Upload */}
         <Row gutter={16} align="middle">
           <Col flex="auto">
             <Search
-              placeholder="Tìm kiếm ảnh..."
+              placeholder={searchPlaceholder}
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              onSearch={handleSearch}
+              onChange={(e) => onSearch(e.target.value)}
+              onSearch={onSearch}
               enterButton={<SearchOutlined />}
             />
+          </Col>
+          <Col>
+            <Select
+              value={`${sortBy}_${sortOrder}`}
+              onChange={onSortChange}
+              style={{ width: 150 }}
+              suffixIcon={<FilterOutlined />}
+            >
+              <Select.Option value="createdAt_DESC">Mới nhất</Select.Option>
+              <Select.Option value="createdAt_ASC">Cũ nhất</Select.Option>
+              <Select.Option value="originalName_ASC">Tên A-Z</Select.Option>
+              <Select.Option value="originalName_DESC">Tên Z-A</Select.Option>
+              <Select.Option value="size_DESC">Kích thước lớn</Select.Option>
+              <Select.Option value="size_ASC">Kích thước nhỏ</Select.Option>
+            </Select>
           </Col>
           <Col>
             <Button
               type="primary"
               icon={<CloudUploadOutlined />}
               onClick={handleUploadClick}
-              loading={uploading}
             >
-              Upload
+              {uploadButtonText}
             </Button>
             <input
               ref={fileInputRef}
@@ -182,6 +212,20 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
               style={{ display: 'none' }}
               onChange={handleFileChange}
             />
+          </Col>
+        </Row>
+
+        {/* Info Bar */}
+        <Row justify="space-between" align="middle">
+          <Col>
+            <Text type="secondary">
+              {infoText}
+            </Text>
+          </Col>
+          <Col>
+            <Text type="secondary">
+              Trang {currentPage} / {totalPages}
+            </Text>
           </Col>
         </Row>
 
@@ -240,7 +284,7 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
 
                       {/* Image */}
                       <Image
-                        src={image.thumbnailUrl}
+                        src={generateThumbnailUrl(image.id, image.category)}
                         alt={image.originalName}
                         style={{
                           width: '100%',
@@ -250,7 +294,9 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
                           display: 'block',
                           background: COLORS.GRAY_2,
                         }}
-                        preview={false}
+                        preview={{
+                          src: generateDisplayUrl(image.id, image.category, MEDIA_IMAGE_SIZES.LARGE)
+                        }}
                       />
 
                       {/* Image Info */}
@@ -275,6 +321,23 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
             </Row>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <Row justify="center">
+            <Col>
+              <Pagination
+                current={currentPage}
+                total={totalImages}
+                pageSize={pageSize}
+                onChange={onPageChange}
+                showSizeChanger={false}
+                showQuickJumper
+                showTotal={paginationText}
+              />
+            </Col>
+          </Row>
+        )}
       </Space>
     </Modal>
   );

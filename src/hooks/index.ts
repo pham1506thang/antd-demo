@@ -2,4 +2,5 @@ export * from './useApiFormErrorHandler';
 export * from './usePermissionCheck';
 export * from './useAuthInit';
 export * from './usePagination';
-export * from './useApiFormErrorHandler';
+// New media hooks (preferred)
+export * from './media';

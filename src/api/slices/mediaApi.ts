@@ -1,165 +1,371 @@
-import type { Media, MediaSize, MediaTag } from '@/models/media';
+import { baseApi } from '../baseApi';
+import type { 
+  Media, 
+  MediaResponseDto, 
+  MediaListQueryDto, 
+  UpdateMediaDto,
+  FileUrlResponse,
+  TagsResponse,
+  MediaListResponse,
+  MediaSizesResponse
+} from '@/models/media';
+import { MEDIA_IMAGE_SIZES } from '@/constants/media';
 
-// Mock data generator
-const generateMockImages = (count: number): Media[] => {
-  const categories = ['general', 'profile'] as const;
-  const fileTypes = ['image'] as const;
-  const mimeTypes = ['image/jpeg', 'image/png', 'image/webp'] as const;
-  
-  return Array.from({ length: count }, (_, index) => {
-    const id = `media_${index + 1}`;
-    const category = categories[index % categories.length];
-    const mimeType = mimeTypes[index % mimeTypes.length];
-    const width = 300 + (index % 5) * 100; // 300-700px
-    const height = 200 + (index % 4) * 100; // 200-500px
-    
-    return {
-      id,
-      originalName: `image_${index + 1}.${mimeType.split('/')[1]}`,
-      fileName: `${id}.${mimeType.split('/')[1]}`,
-      mimeType,
-      fileType: 'image' as const,
-      category,
-      size: 500000 + (index % 10) * 100000, // 500KB - 1.5MB
-      width,
-      height,
-      uploaderId: 'user_1',
-      createdAt: new Date(Date.now() - (index % 30) * 24 * 60 * 60 * 1000),
-      updatedAt: new Date(Date.now() - (index % 7) * 24 * 60 * 60 * 1000),
-      isActive: true,
-      metadata: {
-        tags: [`tag_${index % 5}`, `category_${category}`],
-        description: `Mock image ${index + 1}`,
+
+
+// Media API slice
+export const mediaApiSlice = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    // Cross-category operations
+    searchMedia: builder.query<MediaListResponse, {
+      q: string;
+      category?: 'general' | 'profile';
+      type?: 'image' | 'audio' | 'video';
+      page?: number;
+      limit?: number;
+    }>({
+      query: (params) => ({
+        url: '/medias/search',
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    filterMedia: builder.query<MediaListResponse, MediaListQueryDto>({
+      query: (params) => ({
+        url: '/medias/filter',
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    getAllTags: builder.query<TagsResponse, void>({
+      query: () => ({
+        url: '/medias/tags',
+        method: 'GET',
+      }),
+    }),
+
+    getMediaByTag: builder.query<MediaListResponse, {
+      tagName: string;
+      page?: number;
+      limit?: number;
+    }>({
+      query: ({ tagName, ...params }) => ({
+        url: `${'/medias/by-tag'}/${tagName}`,
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    getFileUrl: builder.query<FileUrlResponse, {
+      mediaId: string;
+      size?: string;
+    }>({
+      query: ({ mediaId, size = MEDIA_IMAGE_SIZES.ORIGINAL }) => ({
+        url: `${'/medias'}/${mediaId}/file/${size}`,
+        method: 'GET',
+      }),
+    }),
+
+    // Profile operations
+    uploadProfileImage: builder.mutation<MediaResponseDto, File>({
+      query: (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return {
+          url: '/medias/profile/upload',
+          method: 'POST',
+          data: formData,
+        };
       },
-      url: `https://picsum.photos/${width}/${height}?random=${index + 1}`,
-      thumbnailUrl: `https://picsum.photos/300/200?random=${index + 1}`,
-    };
-  });
-};
+      transformResponse: (response: MediaResponseDto) => response,
+    }),
 
-// Mock API functions
+    uploadMultipleProfileImages: builder.mutation<MediaResponseDto[], File[]>({
+      query: (files) => {
+        const formData = new FormData();
+        files.forEach((file) => {
+          formData.append('files', file);
+        });
+        return {
+          url: '/medias/profile/upload-multiple',
+          method: 'POST',
+          data: formData,
+        };
+      },
+    }),
+
+    listProfileImages: builder.query<MediaListResponse, {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: 'ASC' | 'DESC';
+    }>({
+      query: (params) => ({
+        url: '/medias/profile',
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    getProfileImageDetails: builder.query<MediaResponseDto, string>({
+      query: (id) => ({
+        url: `${'/medias/profile'}/${id}`,
+        method: 'GET',
+      }),
+    }),
+
+    getProfileImageSizes: builder.query<MediaSizesResponse, string>({
+      query: (id) => ({
+        url: `${'/medias/profile'}/${id}/sizes`,
+        method: 'GET',
+      }),
+    }),
+
+    updateProfileImage: builder.mutation<MediaResponseDto, {
+      id: string;
+      data: UpdateMediaDto;
+    }>({
+      query: ({ id, data }) => ({
+        url: `${'/medias/profile'}/${id}`,
+        method: 'PUT',
+        data,
+      }),
+    }),
+
+    deleteProfileImage: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `${'/medias/profile'}/${id}`,
+        method: 'DELETE',
+      }),
+    }),
+
+    searchProfileImages: builder.query<MediaListResponse, {
+      q: string;
+      page?: number;
+      limit?: number;
+    }>({
+      query: (params) => ({
+        url: '/medias/profile/search',
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    filterProfileImages: builder.query<MediaListResponse, {
+      search?: string;
+      sortBy?: string;
+      sortOrder?: 'ASC' | 'DESC';
+      page?: number;
+      limit?: number;
+    }>({
+      query: (params) => ({
+        url: '/medias/profile/filter',
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    getProfileImagesByTag: builder.query<MediaListResponse, {
+      tagName: string;
+      page?: number;
+      limit?: number;
+    }>({
+      query: ({ tagName, ...params }) => ({
+        url: `${'/medias/profile/by-tag'}/${tagName}`,
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    getProfileImageFileUrl: builder.query<FileUrlResponse, {
+      id: string;
+      size?: string;
+    }>({
+      query: ({ id, size = MEDIA_IMAGE_SIZES.ORIGINAL }) => ({
+        url: `${'/medias/profile'}/${id}/file/${size}`,
+        method: 'GET',
+      }),
+    }),
+
+    // General operations
+    uploadGeneralImage: builder.mutation<MediaResponseDto, File>({
+      query: (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return {
+          url: '/medias/general/upload',
+          method: 'POST',
+          data: formData,
+        };
+      },
+    }),
+
+    uploadMultipleGeneralImages: builder.mutation<MediaResponseDto[], File[]>({
+      query: (files) => {
+        const formData = new FormData();
+        files.forEach((file) => {
+          formData.append('files', file);
+        });
+        return {
+          url: '/medias/general/upload-multiple',
+          method: 'POST',
+          data: formData,
+        };
+      },
+    }),
+
+    listGeneralImages: builder.query<MediaListResponse, {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: 'ASC' | 'DESC';
+    }>({
+      query: (params) => ({
+        url: '/medias/general',
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    getGeneralImageDetails: builder.query<MediaResponseDto, string>({
+      query: (id) => ({
+        url: `${'/medias/general'}/${id}`,
+        method: 'GET',
+      }),
+    }),
+
+    getGeneralImageSizes: builder.query<MediaSizesResponse, string>({
+      query: (id) => ({
+        url: `${'/medias/general'}/${id}/sizes`,
+        method: 'GET',
+      }),
+    }),
+
+    updateGeneralImage: builder.mutation<MediaResponseDto, {
+      id: string;
+      data: UpdateMediaDto;
+    }>({
+      query: ({ id, data }) => ({
+        url: `${'/medias/general'}/${id}`,
+        method: 'PUT',
+        data,
+      }),
+    }),
+
+    deleteGeneralImage: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `${'/medias/general'}/${id}`,
+        method: 'DELETE',
+      }),
+    }),
+
+    searchGeneralImages: builder.query<MediaListResponse, {
+      q: string;
+      page?: number;
+      limit?: number;
+    }>({
+      query: (params) => ({
+        url: '/medias/general/search',
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    filterGeneralImages: builder.query<MediaListResponse, {
+      search?: string;
+      sortBy?: string;
+      sortOrder?: 'ASC' | 'DESC';
+      page?: number;
+      limit?: number;
+    }>({
+      query: (params) => ({
+        url: '/medias/general/filter',
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    getGeneralImagesByTag: builder.query<MediaListResponse, {
+      tagName: string;
+      page?: number;
+      limit?: number;
+    }>({
+      query: ({ tagName, ...params }) => ({
+        url: `${'/medias/general/by-tag'}/${tagName}`,
+        method: 'GET',
+        params,
+      }),
+    }),
+
+    getGeneralImageFileUrl: builder.query<FileUrlResponse, {
+      id: string;
+      size?: string;
+    }>({
+      query: ({ id, size = MEDIA_IMAGE_SIZES.ORIGINAL }) => ({
+        url: `${'/medias/general'}/${id}/file/${size}`,
+        method: 'GET',
+      }),
+    }),
+  }),
+});
+
+// Export hooks for use in components
+export const {
+  // Cross-category operations
+  useSearchMediaQuery,
+  useFilterMediaQuery,
+  useGetAllTagsQuery,
+  useGetMediaByTagQuery,
+  useGetFileUrlQuery,
+  
+  // Profile operations
+  useUploadProfileImageMutation,
+  useUploadMultipleProfileImagesMutation,
+  useListProfileImagesQuery,
+  useGetProfileImageDetailsQuery,
+  useGetProfileImageSizesQuery,
+  useUpdateProfileImageMutation,
+  useDeleteProfileImageMutation,
+  useSearchProfileImagesQuery,
+  useFilterProfileImagesQuery,
+  useGetProfileImagesByTagQuery,
+  useGetProfileImageFileUrlQuery,
+  
+  // General operations
+  useUploadGeneralImageMutation,
+  useUploadMultipleGeneralImagesMutation,
+  useListGeneralImagesQuery,
+  useGetGeneralImageDetailsQuery,
+  useGetGeneralImageSizesQuery,
+  useUpdateGeneralImageMutation,
+  useDeleteGeneralImageMutation,
+  useSearchGeneralImagesQuery,
+  useFilterGeneralImagesQuery,
+  useGetGeneralImagesByTagQuery,
+  useGetGeneralImageFileUrlQuery,
+} = mediaApiSlice;
+
+// Legacy API functions for backward compatibility
 export const mediaApi = {
-  getImages: async (params: {
-    category?: 'general' | 'profile';
-    page?: number;
-    limit?: number;
-    search?: string;
-  } = {}): Promise<{ data: Media[]; total: number; page: number; limit: number }> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let images = generateMockImages(50);
-    
-    // Filter by category
-    if (params.category) {
-      images = images.filter(img => img.category === params.category);
-    }
-    
-    // Filter by search
-    if (params.search) {
-      const searchLower = params.search.toLowerCase();
-      images = images.filter(img => 
-        img.originalName.toLowerCase().includes(searchLower) ||
-        img.metadata.description?.toLowerCase().includes(searchLower) ||
-        img.metadata.tags?.some(tag => tag.toLowerCase().includes(searchLower))
-      );
-    }
-    
-    // Pagination
-    const page = params.page || 1;
-    const limit = params.limit || 20;
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    
-    return {
-      data: images.slice(startIndex, endIndex),
-      total: images.length,
-      page,
-      limit,
-    };
+  getImages: async (): Promise<{ data: Media[]; total: number; page: number; limit: number }> => {
+    // This is now handled by the RTK Query hooks
+    // Keeping for backward compatibility
+    throw new Error('Use RTK Query hooks instead of legacy mediaApi functions');
   },
   
-  uploadImage: async (file: File): Promise<Media> => {
-    // Simulate upload delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const id = `media_${Date.now()}`;
-    const category = 'general'; // Default category
-    
-    return {
-      id,
-      originalName: file.name,
-      fileName: `${id}.${file.name.split('.').pop()}`,
-      mimeType: file.type,
-      fileType: 'image' as const,
-      category,
-      size: file.size,
-      width: 800,
-      height: 600,
-      uploaderId: 'user_1',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isActive: true,
-      metadata: {
-        tags: ['uploaded'],
-        description: `Uploaded image: ${file.name}`,
-      },
-      url: URL.createObjectURL(file),
-      thumbnailUrl: URL.createObjectURL(file),
-    };
+  uploadImage: async (): Promise<Media> => {
+    // This is now handled by the RTK Query hooks
+    // Keeping for backward compatibility
+    throw new Error('Use RTK Query hooks instead of legacy mediaApi functions');
   },
   
-  getImageSizes: async (mediaId: string): Promise<MediaSize[]> => {
-    // Mock sizes for an image
-    return [
-      {
-        id: `${mediaId}_thumbnail`,
-        mediaId,
-        sizeName: 'thumbnail',
-        fileName: `${mediaId}_thumbnail.jpg`,
-        filePath: `/storage/medias/images/2024/01/${mediaId}/thumbnail.jpg`,
-        width: 150,
-        height: 150,
-        size: 15000,
-        quality: 80,
-        createdAt: new Date(),
-      },
-      {
-        id: `${mediaId}_small`,
-        mediaId,
-        sizeName: 'small',
-        fileName: `${mediaId}_small.jpg`,
-        filePath: `/storage/medias/images/2024/01/${mediaId}/small.jpg`,
-        width: 300,
-        height: 300,
-        size: 30000,
-        quality: 85,
-        createdAt: new Date(),
-      },
-      {
-        id: `${mediaId}_medium`,
-        mediaId,
-        sizeName: 'medium',
-        fileName: `${mediaId}_medium.jpg`,
-        filePath: `/storage/medias/images/2024/01/${mediaId}/medium.jpg`,
-        width: 600,
-        height: 600,
-        size: 60000,
-        quality: 90,
-        createdAt: new Date(),
-      },
-      {
-        id: `${mediaId}_large`,
-        mediaId,
-        sizeName: 'large',
-        fileName: `${mediaId}_large.jpg`,
-        filePath: `/storage/medias/images/2024/01/${mediaId}/large.jpg`,
-        width: 1200,
-        height: 1200,
-        size: 120000,
-        quality: 95,
-        createdAt: new Date(),
-      },
-    ];
+  getImageSizes: async () => {
+    // This is now handled by the RTK Query hooks
+    // Keeping for backward compatibility
+    throw new Error('Use RTK Query hooks instead of legacy mediaApi functions');
   },
 };

@@ -13,17 +13,19 @@ const axiosBaseQuery =
       method: AxiosRequestConfig['method'];
       data?: AxiosRequestConfig['data'];
       params?: AxiosRequestConfig['params'];
+      headers?: AxiosRequestConfig['headers'];
     },
     unknown,
     ApiError
   > =>
-  async ({ url, method, data, params }) => {
+  async ({ url, method, data, params, headers }) => {
     try {
       const result = await axiosInstance({
         url,
         method,
         data,
         params,
+        headers,
       });
       return { data: result.data };
     } catch (axiosError) {

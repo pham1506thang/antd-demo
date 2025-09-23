@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Avatar, Space, message } from 'antd';
 import { UserOutlined, CameraOutlined } from '@ant-design/icons';
-import { GalleryModal } from './Gallery';
+import { ProfileGallery } from './Gallery';
 import type { Media } from '@/models/media';
 
 interface AvatarUploadProps {
@@ -19,7 +19,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
   const handleGallerySelect = (images: Media[]) => {
     if (images.length > 0) {
-      onChange?.(images[0].url);
+      // onChange?.(images[0].url);
       message.success('Đã cập nhật avatar');
     }
     setGalleryOpen(false);
@@ -42,12 +42,11 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         Thay đổi avatar
       </Button>
       
-      <GalleryModal
+      <ProfileGallery
         open={galleryOpen}
         onClose={() => setGalleryOpen(false)}
         mode="single"
         onSelect={handleGallerySelect}
-        category="profile"
       />
     </Space>
   );
