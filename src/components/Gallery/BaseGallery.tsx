@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useRef } from 'react';
 import {
   Modal,
@@ -21,9 +20,15 @@ import {
   CloudUploadOutlined,
   FilterOutlined,
 } from '@ant-design/icons';
-import type { Media } from '@/models/media';
+import type { Media, MediaResponseDto } from '@/models/media';
 import { COLORS } from '@/constants/colors';
-import { MEDIA_IMAGE_SIZES } from '@/constants/media';
+import { mediaUtils } from '@/api/slices/mediaApi';
+
+const convertMediaToDto = (media: Media): MediaResponseDto => ({
+  ...media,
+  createdAt: media.createdAt.toISOString(),
+  updatedAt: media.updatedAt.toISOString(),
+});
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -57,9 +62,6 @@ export interface BaseGalleryProps {
   uploadButtonText: string;
   infoText: string;
   paginationText: (total: number, range: [number, number]) => string;
-  // Media utilities
-  generateThumbnailUrl: (mediaId: string, category: 'general' | 'profile') => string;
-  generateDisplayUrl: (mediaId: string, category: 'general' | 'profile', size: string) => string;
 }
 
 export const BaseGallery: React.FC<BaseGalleryProps> = ({
@@ -68,7 +70,6 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
   mode = 'single',
   onSelect,
   selectedImages = [],
-  category,
   images,
   loading,
   totalImages,
@@ -87,8 +88,6 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
   uploadButtonText,
   infoText,
   paginationText,
-  generateThumbnailUrl,
-  generateDisplayUrl,
 }) => {
   const [selectedImageIds, setSelectedImageIds] = useState<string[]>(
     selectedImages.map(img => img.id)
@@ -281,11 +280,10 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
                           <CheckOutlined style={{ color: 'white', fontSize: '12px' }} />
                         </div>
                       )}
-
                       {/* Image */}
                       <Image
-                        src={generateThumbnailUrl(image.id, image.category)}
-                        alt={image.originalName}
+                        src={mediaUtils.getThumbnailUrl(convertMediaToDto(image)) || ''}
+                        alt={image.altText || image.originalName}
                         style={{
                           width: '100%',
                           height: '150px',
@@ -295,7 +293,7 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
                           background: COLORS.GRAY_2,
                         }}
                         preview={{
-                          src: generateDisplayUrl(image.id, image.category, MEDIA_IMAGE_SIZES.LARGE)
+                          src: mediaUtils.getDisplayUrl(convertMediaToDto(image)) || ''
                         }}
                       />
 

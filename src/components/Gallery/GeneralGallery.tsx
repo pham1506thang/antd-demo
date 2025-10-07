@@ -59,12 +59,17 @@ export const GeneralGallery: React.FC<GeneralGalleryProps> = ({
     setCurrentPage(page);
   };
 
-  const handleImageSelect = (image: Media) => {
+  const handleImageSelect = (_image: Media) => {
     // Additional logic for general image selection if needed
   };
 
   const handleUpload = async (file: File) => {
-    await generalMedia.uploadGeneralImage(file);
+    await generalMedia.uploadGeneralImage({ 
+      file,
+      altText: '', // Can be enhanced to get from user input
+      description: '', // Can be enhanced to get from user input
+      isPublic: false // Default to private
+    });
     setCurrentPage(1); // Reset to first page to show the new upload
   };
 
@@ -102,8 +107,6 @@ export const GeneralGallery: React.FC<GeneralGalleryProps> = ({
       uploadButtonText={getUploadButtonText()}
       infoText={getInfoText()}
       paginationText={getPaginationText}
-      generateThumbnailUrl={mediaUtils.generateThumbnailUrl}
-      generateDisplayUrl={mediaUtils.generateDisplayUrl}
     />
   );
 };

@@ -65,7 +65,12 @@ export const ProfileGallery: React.FC<ProfileGalleryProps> = ({
   };
 
   const handleUpload = async (file: File) => {
-    await profileMedia.uploadProfileImage(file);
+    await profileMedia.uploadProfileImage({ 
+      file,
+      altText: '', // Can be enhanced to get from user input
+      description: '', // Can be enhanced to get from user input
+      isPublic: false // Default to private
+    });
     setCurrentPage(1); // Reset to first page to show the new upload
   };
 
@@ -103,8 +108,6 @@ export const ProfileGallery: React.FC<ProfileGalleryProps> = ({
       uploadButtonText={getUploadButtonText()}
       infoText={getInfoText()}
       paginationText={getPaginationText}
-      generateThumbnailUrl={mediaUtils.generateThumbnailUrl}
-      generateDisplayUrl={mediaUtils.generateDisplayUrl}
     />
   );
 };

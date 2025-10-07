@@ -1,39 +1,77 @@
-// Core Media Response DTO from API
+// Media Size Response DTO from API
+export interface MediaSizeResponseDto {
+  sizeName: string;
+  fileName: string;
+  filePath: string;
+  width: number;
+  height: number;
+  size: number;
+  quality?: number;
+  url: string;
+  createdAt: string; // ISO string from API
+}
+
+// Media Tag Response DTO from API
+export interface MediaTagResponseDto {
+  id: string;
+  tagName: string;
+  tagValue: string;
+  createdBy: string;
+  createdAt: string; // ISO string from API
+}
+
+// Core Media Response DTO from API (Updated structure)
 export interface MediaResponseDto {
   id: string;
   originalName: string;
   fileName: string;
   mimeType: string;
+  fileExtension: string;        // NEW FIELD
   fileType: 'image' | 'audio' | 'video';
   category: 'general' | 'profile';
   size: number;
-  width?: number;
-  height?: number;
+  quality?: number;             // NEW FIELD
   uploaderId: string;
   isActive: boolean;
-  metadata: Record<string, any>;
+  isPublic: boolean;            // NEW FIELD
+  altText?: string;             // NEW FIELD
+  description?: string;         // NEW FIELD
+  processingStatus: string;     // NEW FIELD
+  metadata: {
+    processingCompletedAt: string;
+    generatedSizes: string[];
+  };
+  sizes: MediaSizeResponseDto[];   // NEW FIELD - Array of sizes
+  tags: MediaTagResponseDto[];     // NEW FIELD - Array of tags
   createdAt: string; // ISO string from API
   updatedAt: string; // ISO string from API
 }
 
-// Extended Media interface for frontend use
+// Extended Media interface for frontend use (Updated structure)
 export interface Media {
   id: string;
   originalName: string;
   fileName: string;
   mimeType: string;
+  fileExtension: string;        // NEW FIELD
   fileType: 'image' | 'audio' | 'video';
   category: 'general' | 'profile';
   size: number;
-  width?: number;
-  height?: number;
+  quality?: number;             // NEW FIELD
   uploaderId: string;
   isActive: boolean;
-  metadata: Record<string, any>;
+  isPublic: boolean;            // NEW FIELD
+  altText?: string;             // NEW FIELD
+  description?: string;         // NEW FIELD
+  processingStatus: string;     // NEW FIELD
+  metadata: {
+    processingCompletedAt: string;
+    generatedSizes: string[];
+  };
+  sizes: MediaSizeResponseDto[];   // NEW FIELD - Array of sizes
+  tags: MediaTagResponseDto[];     // NEW FIELD - Array of tags
   createdAt: Date; // Converted from string for frontend use
   updatedAt: Date; // Converted from string for frontend use
-  url?: string; // For display - generated from file URL
-  thumbnailUrl?: string; // For grid display - generated from thumbnail size
 }
 
 // Media List Query DTO
@@ -52,11 +90,14 @@ export interface MediaListQueryDto {
   limit?: number;
 }
 
-// Update Media DTO
+// Update Media DTO (Updated for new fields)
 export interface UpdateMediaDto {
   originalName?: string;
-  metadata?: Record<string, any>;
+  altText?: string;             // NEW FIELD
+  description?: string;         // NEW FIELD
+  isPublic?: boolean;           // NEW FIELD
   isActive?: boolean;
+  metadata?: Record<string, any>;
 }
 
 // Media Tag DTO
@@ -69,10 +110,13 @@ export interface MediaTagDto {
   createdAt: string; // ISO string from API
 }
 
-// Media Processing Status DTO
+// Media Processing Status DTO (Updated)
 export interface MediaProcessingStatusDto {
   status: 'pending' | 'processing' | 'completed' | 'failed';
 }
+
+// Processing Status enum for better type safety
+export type ProcessingStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
 // File URL Response
 export interface FileUrlResponse {
@@ -101,25 +145,10 @@ export interface MediaSizesResponse {
   sizes: string[];
 }
 
-// Legacy interfaces for backward compatibility
-export interface MediaSize {
-  id: string;
-  mediaId: string;
-  sizeName: string;
-  fileName: string;
-  filePath: string;
-  width: number;
-  height: number;
-  size: number;
-  quality: number;
-  createdAt: Date;
-}
+// Legacy interfaces removed - use MediaSizeResponseDto and MediaTagResponseDto
 
-export interface MediaTag {
-  id: string;
-  mediaId: string;
-  tagName: string;
-  tagValue: string;
-  createdAt: Date;
-  createdBy: string;
-}
+// Helper types for working with new media structure
+export type MediaSizeName = 'thumbnail' | 'small' | 'medium' | 'large' | 'original';
+
+// Helper function type for getting image URL from sizes array
+export type GetImageUrlFunction = (media: Media, sizeName: MediaSizeName) => string | null;

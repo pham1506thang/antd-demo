@@ -1,53 +1,21 @@
 import { useCallback } from 'react';
-import type { Media } from '@/models/media';
-import { 
-  generateMediaFileUrl, 
-  generateMediaThumbnailUrl, 
-  generateMediaDisplayUrl,
-  convertApiMediaToMedia 
-} from '@/helpers/media';
-import { MEDIA_IMAGE_SIZES } from '@/constants/media';
+import type { Media, MediaResponseDto } from '@/models/media';
+import { convertApiMediaToMedia } from '@/helpers/media';
+import { mediaUtils } from '@/api/slices/mediaApi';
 
 /**
  * Hook for media utilities and helpers
- * Contains only common utilities that can be used across different media types
+ * Simplified - only essential functions
  */
 export const useMediaUtils = () => {
-  // Generate file URL
-  const generateFileUrl = useCallback((
-    mediaId: string, 
-    category: 'general' | 'profile', 
-    size: string = MEDIA_IMAGE_SIZES.ORIGINAL
-  ) => {
-    return generateMediaFileUrl(mediaId, category, size);
-  }, []);
-
-  // Generate thumbnail URL
-  const generateThumbnailUrl = useCallback((
-    mediaId: string, 
-    category: 'general' | 'profile'
-  ) => {
-    return generateMediaThumbnailUrl(mediaId, category);
-  }, []);
-
-  // Generate display URL
-  const generateDisplayUrl = useCallback((
-    mediaId: string, 
-    category: 'general' | 'profile',
-    size: string = MEDIA_IMAGE_SIZES.MEDIUM
-  ) => {
-    return generateMediaDisplayUrl(mediaId, category, size);
-  }, []);
-
   // Convert API response to Media
-  const convertToMedia = useCallback((apiMedia: any): Media => {
+  const convertToMedia = useCallback((apiMedia: MediaResponseDto): Media => {
     return convertApiMediaToMedia(apiMedia);
   }, []);
 
+  // Direct access to mediaUtils from API
   return {
-    generateFileUrl,
-    generateThumbnailUrl,
-    generateDisplayUrl,
     convertToMedia,
+    ...mediaUtils, // Spread all mediaUtils functions
   };
 };

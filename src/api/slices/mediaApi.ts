@@ -1,13 +1,15 @@
 import { baseApi } from '../baseApi';
 import type { 
-  Media, 
   MediaResponseDto, 
   MediaListQueryDto, 
   UpdateMediaDto,
   FileUrlResponse,
   TagsResponse,
   MediaListResponse,
-  MediaSizesResponse
+  MediaSizesResponse,
+  MediaSizeResponseDto,
+  MediaTagResponseDto,
+  ProcessingStatus
 } from '@/models/media';
 import { MEDIA_IMAGE_SIZES } from '@/constants/media';
 
@@ -68,11 +70,18 @@ export const mediaApiSlice = baseApi.injectEndpoints({
       }),
     }),
 
-    // Profile operations
-    uploadProfileImage: builder.mutation<MediaResponseDto, File>({
-      query: (file) => {
+    uploadProfileImage: builder.mutation<MediaResponseDto, {
+      file: File;
+      altText?: string;
+      description?: string;
+      isPublic?: boolean;
+    }>({
+      query: ({ file, altText, description, isPublic }) => {
         const formData = new FormData();
         formData.append('file', file);
+        if (altText) formData.append('altText', altText);
+        if (description) formData.append('description', description);
+        if (isPublic !== undefined) formData.append('isPublic', isPublic.toString());
         return {
           url: '/medias/profile/upload',
           method: 'POST',
@@ -82,12 +91,20 @@ export const mediaApiSlice = baseApi.injectEndpoints({
       transformResponse: (response: MediaResponseDto) => response,
     }),
 
-    uploadMultipleProfileImages: builder.mutation<MediaResponseDto[], File[]>({
-      query: (files) => {
+    uploadMultipleProfileImages: builder.mutation<MediaResponseDto[], {
+      files: File[];
+      altText?: string;
+      description?: string;
+      isPublic?: boolean;
+    }>({
+      query: ({ files, altText, description, isPublic }) => {
         const formData = new FormData();
         files.forEach((file) => {
           formData.append('files', file);
         });
+        if (altText) formData.append('altText', altText);
+        if (description) formData.append('description', description);
+        if (isPublic !== undefined) formData.append('isPublic', isPublic.toString());
         return {
           url: '/medias/profile/upload-multiple',
           method: 'POST',
@@ -190,11 +207,18 @@ export const mediaApiSlice = baseApi.injectEndpoints({
       }),
     }),
 
-    // General operations
-    uploadGeneralImage: builder.mutation<MediaResponseDto, File>({
-      query: (file) => {
+    uploadGeneralImage: builder.mutation<MediaResponseDto, {
+      file: File;
+      altText?: string;
+      description?: string;
+      isPublic?: boolean;
+    }>({
+      query: ({ file, altText, description, isPublic }) => {
         const formData = new FormData();
         formData.append('file', file);
+        if (altText) formData.append('altText', altText);
+        if (description) formData.append('description', description);
+        if (isPublic !== undefined) formData.append('isPublic', isPublic.toString());
         return {
           url: '/medias/general/upload',
           method: 'POST',
@@ -203,12 +227,20 @@ export const mediaApiSlice = baseApi.injectEndpoints({
       },
     }),
 
-    uploadMultipleGeneralImages: builder.mutation<MediaResponseDto[], File[]>({
-      query: (files) => {
+    uploadMultipleGeneralImages: builder.mutation<MediaResponseDto[], {
+      files: File[];
+      altText?: string;
+      description?: string;
+      isPublic?: boolean;
+    }>({
+      query: ({ files, altText, description, isPublic }) => {
         const formData = new FormData();
         files.forEach((file) => {
           formData.append('files', file);
         });
+        if (altText) formData.append('altText', altText);
+        if (description) formData.append('description', description);
+        if (isPublic !== undefined) formData.append('isPublic', isPublic.toString());
         return {
           url: '/medias/general/upload-multiple',
           method: 'POST',
@@ -349,23 +381,87 @@ export const {
   useGetGeneralImageFileUrlQuery,
 } = mediaApiSlice;
 
-// Legacy API functions for backward compatibility
-export const mediaApi = {
-  getImages: async (): Promise<{ data: Media[]; total: number; page: number; limit: number }> => {
-    // This is now handled by the RTK Query hooks
-    // Keeping for backward compatibility
-    throw new Error('Use RTK Query hooks instead of legacy mediaApi functions');
+// Helper functions for working with new media structure
+export const mediaUtils = {
+  /**
+   * Get image URL from media sizes array
+   * @param media - Media object with sizes array
+   * @param sizeName - Size name to get URL for
+   * @returns URL string or null if size not found
+   */
+  getImageUrl: (media: MediaResponseDto, sizeName: string): string | null => {
+    const size: MediaSizeResponseDto | undefined = media.sizes.find(s => s.sizeName === sizeName);
+    return size ? size.url : null;
   },
-  
-  uploadImage: async (): Promise<Media> => {
-    // This is now handled by the RTK Query hooks
-    // Keeping for backward compatibility
-    throw new Error('Use RTK Query hooks instead of legacy mediaApi functions');
+
+  /**
+   * Get thumbnail URL from media sizes array
+   * @param media - Media object with sizes array
+   * @returns Thumbnail URL or null if not found
+   */
+  getThumbnailUrl: (media: MediaResponseDto): string | null => {
+    return mediaUtils.getImageUrl(media, 'thumbnail');
   },
-  
-  getImageSizes: async () => {
-    // This is now handled by the RTK Query hooks
-    // Keeping for backward compatibility
-    throw new Error('Use RTK Query hooks instead of legacy mediaApi functions');
+
+  /**
+   * Get display URL from media sizes array (prefers large, falls back to original)
+   * @param media - Media object with sizes array
+   * @returns Display URL or null if not found
+   */
+  getDisplayUrl: (media: MediaResponseDto): string | null => {
+    return mediaUtils.getImageUrl(media, 'large') || 
+           mediaUtils.getImageUrl(media, 'original') || 
+           media.sizes[0]?.url || null;
   },
+
+  /**
+   * Check if media is processing
+   * @param media - Media object
+   * @returns true if media is still processing
+   */
+  isProcessing: (media: MediaResponseDto): boolean => {
+    const processingStatuses: ProcessingStatus[] = ['pending', 'processing'];
+    return processingStatuses.includes(media.processingStatus as ProcessingStatus);
+  },
+
+  /**
+   * Check if media processing failed
+   * @param media - Media object
+   * @returns true if media processing failed
+   */
+  isProcessingFailed: (media: MediaResponseDto): boolean => {
+    return media.processingStatus === 'failed';
+  },
+
+  /**
+   * Check if media is ready for display
+   * @param media - Media object
+   * @returns true if media is ready for display
+   */
+  isReady: (media: MediaResponseDto): boolean => {
+    return media.processingStatus === 'completed' && media.sizes.length > 0;
+  },
+
+  /**
+   * Get tags by name from media tags array
+   * @param media - Media object with tags array
+   * @param tagName - Tag name to search for
+   * @returns Array of matching tags
+   */
+  getTagsByName: (media: MediaResponseDto, tagName: string): MediaTagResponseDto[] => {
+    return media.tags.filter((tag: MediaTagResponseDto) => tag.tagName === tagName);
+  },
+
+  /**
+   * Get tag value by name from media tags array
+   * @param media - Media object with tags array
+   * @param tagName - Tag name to search for
+   * @returns First matching tag value or null
+   */
+  getTagValue: (media: MediaResponseDto, tagName: string): string | null => {
+    const tag = media.tags.find((tag: MediaTagResponseDto) => tag.tagName === tagName);
+    return tag ? tag.tagValue : null;
+  }
 };
+
+// Legacy API functions removed - use RTK Query hooks directly

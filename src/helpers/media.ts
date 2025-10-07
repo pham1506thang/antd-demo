@@ -8,48 +8,15 @@ import {
 } from '@/constants/media';
 
 /**
- * Convert API response to frontend Media interface
+ * Convert API response to frontend Media interface (Updated for new structure)
  */
 export const convertApiMediaToMedia = (apiMedia: MediaResponseDto): Media => ({
   ...apiMedia,
   createdAt: new Date(apiMedia.createdAt),
   updatedAt: new Date(apiMedia.updatedAt),
-  url: undefined, // Will be generated when needed
-  thumbnailUrl: undefined, // Will be generated when needed
 });
 
-/**
- * Generate file URL for media
- */
-export const generateMediaFileUrl = (
-  mediaId: string, 
-  category: 'general' | 'profile', 
-  size: string = MEDIA_IMAGE_SIZES.ORIGINAL
-): string => {
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-  return `${baseUrl}/medias/${category}/${mediaId}/file/${size}`;
-};
-
-/**
- * Generate thumbnail URL for media
- */
-export const generateMediaThumbnailUrl = (
-  mediaId: string, 
-  category: 'general' | 'profile'
-): string => {
-  return generateMediaFileUrl(mediaId, category, MEDIA_IMAGE_SIZES.THUMBNAIL);
-};
-
-/**
- * Generate display URL for media
- */
-export const generateMediaDisplayUrl = (
-  mediaId: string, 
-  category: 'general' | 'profile',
-  size: string = MEDIA_IMAGE_SIZES.MEDIUM
-): string => {
-  return generateMediaFileUrl(mediaId, category, size);
-};
+// Legacy URL generation functions removed - use mediaUtils from API slice instead
 
 /**
  * Get available image sizes for general media
@@ -178,21 +145,31 @@ export const getMediaDisplayName = (media: Media): string => {
 };
 
 /**
- * Check if media has dimensions (is an image)
+ * Check if media has dimensions (is an image) - Updated for new structure
  */
 export const hasMediaDimensions = (media: Media): boolean => {
-  return isImageFile(media.mimeType) && 
-         typeof media.width === 'number' && 
-         typeof media.height === 'number';
+  if (!isImageFile(media.mimeType)) return false;
+  
+  // Check if any size has dimensions
+  return media.sizes?.some(size => 
+    typeof size.width === 'number' && typeof size.height === 'number'
+  ) || false;
 };
 
 /**
- * Get media aspect ratio
+ * Get media aspect ratio - Updated for new structure
  */
 export const getMediaAspectRatio = (media: Media): number | null => {
   if (!hasMediaDimensions(media)) return null;
   
-  return (media.width! / media.height!);
+  // Get dimensions from the first available size
+  const firstSize = media.sizes?.find(size => 
+    typeof size.width === 'number' && typeof size.height === 'number'
+  );
+  
+  if (!firstSize) return null;
+  
+  return (firstSize.width / firstSize.height);
 };
 
 /**
@@ -220,7 +197,7 @@ export const isMediaSquare = (media: Media): boolean => {
 };
 
 /**
- * Generate media metadata summary
+ * Generate media metadata summary - Updated for new structure
  */
 export const getMediaMetadataSummary = (media: Media): string => {
   const parts: string[] = [];
@@ -231,9 +208,14 @@ export const getMediaMetadataSummary = (media: Media): string => {
   // File size
   parts.push(formatFileSize(media.size));
   
-  // Dimensions (for images)
+  // Dimensions (for images) - get from first available size
   if (hasMediaDimensions(media)) {
-    parts.push(`${media.width}×${media.height}px`);
+    const firstSize = media.sizes?.find(size => 
+      typeof size.width === 'number' && typeof size.height === 'number'
+    );
+    if (firstSize) {
+      parts.push(`${firstSize.width}×${firstSize.height}px`);
+    }
   }
   
   // Category
@@ -270,7 +252,7 @@ export const validateFileForUpload = (
 };
 
 /**
- * Generate media tags for display
+ * Generate media tags for display (Updated for new structure)
  */
 export const getMediaTags = (media: Media): string[] => {
   const tags: string[] = [];
@@ -281,10 +263,18 @@ export const getMediaTags = (media: Media): string[] => {
   // Add file type tag
   tags.push(media.fileType);
   
-  // Add metadata tags if available
-  if (media.metadata?.tags && Array.isArray(media.metadata.tags)) {
-    tags.push(...media.metadata.tags);
+  // Add tags from new tags array
+  if (media.tags && Array.isArray(media.tags)) {
+    media.tags.forEach(tag => {
+      tags.push(`${tag.tagName}:${tag.tagValue}`);
+    });
   }
+  
+  // Add metadata tags if available (legacy - removed as metadata structure changed)
+  // Note: metadata.tags is no longer available in new structure
   
   return [...new Set(tags)]; // Remove duplicates
 };
+
+// Note: These functions are now available in mediaUtils from API slice
+// Use: import { mediaUtils } from '@/api/slices/mediaApi';
