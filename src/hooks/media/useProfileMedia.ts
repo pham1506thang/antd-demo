@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { 
   useUploadProfileImageMutation,
   useUploadMultipleProfileImagesMutation,
@@ -7,7 +7,6 @@ import {
   useDeleteProfileImageMutation,
 } from '@/api/slices/mediaApi';
 import type { MediaImage } from '@/models/media';
-import { useInfinitePagination } from '@/hooks/useInfinitePagination';
 
 export interface UseProfileMediaInfiniteOptions {
   search?: string;
@@ -64,7 +63,7 @@ export const useProfileMedia = () => {
 };
 
 /**
- * Hook for infinite scroll profile media with data accumulation
+ * Hook for infinite scroll profile media using RTK Query merge strategy
  */
 export const useProfileMediaInfinite = (
   options: UseProfileMediaInfiniteOptions = {}
@@ -76,114 +75,70 @@ export const useProfileMediaInfinite = (
     limit = 20,
   } = options;
 
+  // State for pagination
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [search, setSearch] = useState(initialSearch);
+  const [sortBy, setSortBy] = useState(initialSortBy);
+  const [sortOrder, setSortOrder] = useState(initialSortOrder);
+
   // Upload mutations
   const [uploadProfileImage, uploadProfileImageResult] = useUploadProfileImageMutation();
   const [uploadMultipleProfileImages, uploadMultipleProfileImagesResult] = useUploadMultipleProfileImagesMutation();
   const [updateProfileImage] = useUpdateProfileImageMutation();
   const [deleteProfileImage] = useDeleteProfileImageMutation();
 
-  // Infinite pagination hook
-  const {
-    params,
-    setSearch,
-    setSorts,
-    setCursor,
-    reset,
-    loadMore,
-    hasNextPage,
-    nextCursor,
-    updatePaginationInfo,
-  } = useInfinitePagination<MediaImage>({
-    defaultLimit: limit,
-    defaultSearch: initialSearch,
-    defaultSorts: [{ field: initialSortBy as keyof MediaImage, order: initialSortOrder === 'ASC' ? 'ascend' : 'descend' }],
+  // RTK Query with automatic data merging
+  const { data, isLoading, refetch } = useListProfileImagesQuery({
+    cursor: cursor || undefined,
+    limit,
+    search: search || undefined,
+    sorts: [{ field: sortBy as keyof MediaImage, order: sortOrder === 'ASC' ? 'ascend' : 'descend' }],
   });
 
-  // State management
-  const [allImages, setAllImages] = useState<MediaImage[]>([]);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  // Actions
+  const loadMore = useCallback(() => {
+    if (data?.pagination.hasNextPage && data.pagination.nextCursor) {
+      setCursor(data.pagination.nextCursor);
+    }
+  }, [data?.pagination]);
 
-  // API query
-  const { data, isLoading, refetch } = useListProfileImagesQuery(params);
+  const refresh = useCallback(() => {
+    setCursor(null);
+    refetch();
+  }, [refetch]);
 
-  // Process data
-  const processedData = useMemo(() => {
-    if (!data?.data) return { images: [], hasNextPage: false, nextCursor: null };
-    
-    const images = data.data;
-    const hasNextPage = data.pagination.hasNextPage;
-    const nextCursor = data.pagination.nextCursor;
-
-    return { images, hasNextPage, nextCursor };
-  }, [data]);
-
-  // Update accumulated images
-  const updateAccumulatedImages = useCallback((newImages: MediaImage[], isAppend: boolean = true) => {
-    setAllImages(prev => {
-      if (isAppend && prev.length > 0) {
-        // Append new images, avoiding duplicates
-        const existingIds = new Set(prev.map(img => img.id));
-        const uniqueNewImages = newImages.filter(img => !existingIds.has(img.id));
-        return [...prev, ...uniqueNewImages];
-      } else {
-        // Replace all images (for search, sort, or refresh)
-        return newImages;
-      }
-    });
+  const searchImages = useCallback((query: string) => {
+    setSearch(query);
+    setCursor(null); // Reset cursor when searching
   }, []);
 
-  // Refresh function
-  const refresh = useCallback(() => {
-    setAllImages([]);
-    setCursor(null);
-    setIsInitialLoad(true);
-    refetch();
-  }, [setCursor, refetch]);
-
-  // Sort function
-  const sort = useCallback((newSortBy: string, newSortOrder: 'ASC' | 'DESC') => {
-    setSorts([{ field: newSortBy as keyof MediaImage, order: newSortOrder === 'ASC' ? 'ascend' : 'descend' }]);
-    setAllImages([]);
-    setIsInitialLoad(true);
-  }, [setSorts]);
-
-  // Update accumulated images when data changes
-  React.useEffect(() => {
-    if (processedData.images.length > 0) {
-      updateAccumulatedImages(processedData.images, !isInitialLoad);
-      setIsInitialLoad(false);
-    }
-  }, [processedData.images, updateAccumulatedImages, isInitialLoad]);
-
-  // Update pagination info
-  React.useEffect(() => {
-    updatePaginationInfo({
-      hasNextPage: processedData.hasNextPage,
-      nextCursor: processedData.nextCursor,
-    });
-  }, [processedData.hasNextPage, processedData.nextCursor, updatePaginationInfo]);
+  const sortImages = useCallback((newSortBy: string, newSortOrder: 'ASC' | 'DESC') => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+    setCursor(null); // Reset cursor when sorting
+  }, []);
 
   return {
-    // Data
-    images: allImages,
-    hasNextPage,
-    nextCursor,
+    // Data - RTK Query automatically merges accumulated data
+    images: data?.data || [],
+    hasNextPage: data?.pagination.hasNextPage || false,
+    nextCursor: data?.pagination.nextCursor || null,
     
     // Loading states
-    loading: isLoading && isInitialLoad,
-    loadingMore: isLoading && !isInitialLoad,
+    loading: isLoading && !cursor, // Initial load
+    loadingMore: isLoading && !!cursor, // Load more
     uploading: uploadProfileImageResult.isLoading || uploadMultipleProfileImagesResult.isLoading,
     
     // Actions
     loadMore,
     refresh,
-    search: setSearch,
-    sort,
+    search: searchImages,
+    sort: sortImages,
     
     // Upload actions
-    uploadProfileImage: uploadProfileImage,
-    uploadMultipleProfileImages: uploadMultipleProfileImages,
-    updateProfileImage: updateProfileImage,
-    deleteProfileImage: deleteProfileImage,
+    uploadProfileImage,
+    uploadMultipleProfileImages,
+    updateProfileImage,
+    deleteProfileImage,
   };
 };

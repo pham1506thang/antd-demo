@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { 
   useUploadGeneralImageMutation,
   useUploadMultipleGeneralImagesMutation,
@@ -7,7 +7,6 @@ import {
   useDeleteGeneralImageMutation,
 } from '@/api/slices/mediaApi';
 import type { MediaImage } from '@/models/media';
-import { useInfinitePagination } from '@/hooks/useInfinitePagination';
 
 export interface UseGeneralMediaInfiniteOptions {
   search?: string;
@@ -56,6 +55,9 @@ export const useGeneralMedia = () => {
   };
 };
 
+/**
+ * Hook for infinite scroll general media using RTK Query merge strategy
+ */
 export const useGeneralMediaInfinite = (
   options: UseGeneralMediaInfiniteOptions = {}
 ): UseGeneralMediaInfiniteReturn => {
@@ -66,103 +68,70 @@ export const useGeneralMediaInfinite = (
     limit = 20,
   } = options;
 
+  // State for pagination
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [search, setSearch] = useState(initialSearch);
+  const [sortBy, setSortBy] = useState(initialSortBy);
+  const [sortOrder, setSortOrder] = useState(initialSortOrder);
+
+  // Upload mutations
   const [uploadGeneralImage, uploadGeneralImageResult] = useUploadGeneralImageMutation();
   const [uploadMultipleGeneralImages, uploadMultipleGeneralImagesResult] = useUploadMultipleGeneralImagesMutation();
   const [updateGeneralImage] = useUpdateGeneralImageMutation();
   const [deleteGeneralImage] = useDeleteGeneralImageMutation();
 
-  // Infinite pagination hook
-  const {
-    params,
-    setSearch,
-    setSorts,
-    reset,
-    loadMore,
-    hasNextPage,
-    nextCursor,
-    updatePaginationInfo,
-  } = useInfinitePagination<MediaImage>({
-    defaultLimit: limit,
-    defaultSearch: initialSearch,
-    defaultSorts: [{ field: initialSortBy as keyof MediaImage, order: initialSortOrder === 'ASC' ? 'ascend' : 'descend' }],
+  // RTK Query with automatic data merging
+  const { data, isLoading, refetch } = useListGeneralImagesQuery({
+    cursor: cursor || undefined,
+    limit,
+    search: search || undefined,
+    sorts: [{ field: sortBy as keyof MediaImage, order: sortOrder === 'ASC' ? 'ascend' : 'descend' }],
   });
 
-  // State management
-  const [allImages, setAllImages] = useState<MediaImage[]>([]);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  // Actions
+  const loadMore = useCallback(() => {
+    if (data?.pagination.hasNextPage && data.pagination.nextCursor) {
+      setCursor(data.pagination.nextCursor);
+    }
+  }, [data?.pagination]);
 
-  // API query
-  const { data, isLoading, refetch } = useListGeneralImagesQuery(params);
+  const refresh = useCallback(() => {
+    setCursor(null);
+    refetch();
+  }, [refetch]);
 
-  // Process data
-  const processedData = useMemo(() => {
-    if (!data?.data) return { images: [], hasNextPage: false, nextCursor: null };
-    
-    const images = data.data;
-    const hasNextPage = data.pagination.hasNextPage;
-    const nextCursor = data.pagination.nextCursor;
-
-    return { images, hasNextPage, nextCursor };
-  }, [data]);
-
-  // Update accumulated images
-  const updateAccumulatedImages = useCallback((newImages: MediaImage[], isAppend: boolean = true) => {
-    setAllImages(prev => {
-      if (isAppend && prev.length > 0) {
-        const existingIds = new Set(prev.map(img => img.id));
-        const uniqueNewImages = newImages.filter(img => !existingIds.has(img.id));
-        return [...prev, ...uniqueNewImages];
-      } else {
-        return newImages;
-      }
-    });
+  const searchImages = useCallback((query: string) => {
+    setSearch(query);
+    setCursor(null); // Reset cursor when searching
   }, []);
 
-  // Refresh function
-  const refresh = useCallback(() => {
-    setAllImages([]);
-    reset();
-    setIsInitialLoad(true);
-    refetch();
-  }, [reset, refetch]);
-
-  // Sort function
-  const sort = useCallback((newSortBy: string, newSortOrder: 'ASC' | 'DESC') => {
-    setSorts([{ field: newSortBy as keyof MediaImage, order: newSortOrder === 'ASC' ? 'ascend' : 'descend' }]);
-    setAllImages([]);
-    setIsInitialLoad(true);
-  }, [setSorts]);
-
-  // Update accumulated images when data changes
-  React.useEffect(() => {
-    if (processedData.images.length > 0) {
-      updateAccumulatedImages(processedData.images, !isInitialLoad);
-      setIsInitialLoad(false);
-    }
-  }, [processedData.images, updateAccumulatedImages, isInitialLoad]);
-
-  // Update pagination info
-  React.useEffect(() => {
-    updatePaginationInfo({
-      hasNextPage: processedData.hasNextPage,
-      nextCursor: processedData.nextCursor,
-    });
-  }, [processedData.hasNextPage, processedData.nextCursor, updatePaginationInfo]);
+  const sortImages = useCallback((newSortBy: string, newSortOrder: 'ASC' | 'DESC') => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+    setCursor(null); // Reset cursor when sorting
+  }, []);
 
   return {
-    images: allImages,
-    hasNextPage,
-    nextCursor,
-    loading: isLoading && isInitialLoad,
-    loadingMore: isLoading && !isInitialLoad,
+    // Data - RTK Query automatically merges accumulated data
+    images: data?.data || [],
+    hasNextPage: data?.pagination.hasNextPage || false,
+    nextCursor: data?.pagination.nextCursor || null,
+    
+    // Loading states
+    loading: isLoading && !cursor, // Initial load
+    loadingMore: isLoading && !!cursor, // Load more
     uploading: uploadGeneralImageResult.isLoading || uploadMultipleGeneralImagesResult.isLoading,
+    
+    // Actions
     loadMore,
     refresh,
-    search: setSearch,
-    sort,
-    uploadGeneralImage: uploadGeneralImage,
-    uploadMultipleGeneralImages: uploadMultipleGeneralImages,
-    updateGeneralImage: updateGeneralImage,
-    deleteGeneralImage: deleteGeneralImage,
+    search: searchImages,
+    sort: sortImages,
+    
+    // Upload actions
+    uploadGeneralImage,
+    uploadMultipleGeneralImages,
+    updateGeneralImage,
+    deleteGeneralImage,
   };
 };

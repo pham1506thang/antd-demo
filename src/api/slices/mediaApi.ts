@@ -58,6 +58,31 @@ export const mediaApiSlice = baseApi.injectEndpoints({
           method: 'GET',
         };
       },
+      
+      // Group queries by non-cursor params to enable data merging
+      serializeQueryArgs: ({ queryArgs }) => {
+        const { cursor, ...otherArgs } = queryArgs;
+        return otherArgs; // Group by search, sort, limit, filters
+      },
+      
+      // Merge strategy for infinite scroll
+      merge: (currentCache, newItems, { arg }) => {
+        if (arg.cursor) {
+          // Has cursor = load more → append new data
+          currentCache.data.push(...newItems.data);
+        } else {
+          // No cursor = new search/sort → replace data
+          currentCache.data = newItems.data;
+        }
+        // Update pagination info
+        currentCache.pagination = newItems.pagination;
+      },
+      
+      // Force refetch when params change
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
+      },
+      
       transformResponse: (response: InfinitePaginationResult<any>) => {
         return {
           ...response,
@@ -129,6 +154,31 @@ export const mediaApiSlice = baseApi.injectEndpoints({
           method: 'GET',
         };
       },
+      
+      // Group queries by non-cursor params to enable data merging
+      serializeQueryArgs: ({ queryArgs }) => {
+        const { cursor, ...otherArgs } = queryArgs;
+        return otherArgs; // Group by search, sort, limit, filters
+      },
+      
+      // Merge strategy for infinite scroll
+      merge: (currentCache, newItems, { arg }) => {
+        if (arg.cursor) {
+          // Has cursor = load more → append new data
+          currentCache.data.push(...newItems.data);
+        } else {
+          // No cursor = new search/sort → replace data
+          currentCache.data = newItems.data;
+        }
+        // Update pagination info
+        currentCache.pagination = newItems.pagination;
+      },
+      
+      // Force refetch when params change
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
+      },
+      
       transformResponse: (response: InfinitePaginationResult<any>) => {
         return {
           ...response,
