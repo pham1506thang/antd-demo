@@ -1,5 +1,3 @@
 // Media hooks
-export { useMediaUtils } from './useMediaUtils';
-export { useProfileMedia } from './useProfileMedia';
-export { useGeneralMedia } from './useGeneralMedia';
-export { useCrossMedia } from './useCrossMedia';
+export { useProfileMedia, useProfileMediaInfinite } from './useProfileMedia';
+export { useGeneralMedia, useGeneralMediaInfinite } from './useGeneralMedia';

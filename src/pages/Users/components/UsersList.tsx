@@ -176,9 +176,9 @@ Làm mới danh sách
         loading={isLoading || isFetching}
         pagination={{
           ...tableParams.pagination,
-          total: usersData?.meta.total,
-          current: usersData?.meta.page,
-          pageSize: usersData?.meta.limit,
+          total: usersData?.pagination.total,
+          current: usersData?.pagination.page,
+          pageSize: usersData?.pagination.limit,
           showSizeChanger: true,
           showTotal: (total) => `Tổng ${total} người dùng`,
         }}

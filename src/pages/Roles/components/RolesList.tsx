@@ -159,9 +159,9 @@ export const RolesList: React.FC<RolesListProps> = ({ filters }) => {
         rowKey="id"
         pagination={{
           ...tableParams.pagination,
-          total: data?.meta.total,
-          current: data?.meta.page,
-          pageSize: data?.meta.limit,
+          total: data?.pagination.total,
+          current: data?.pagination.page,
+          pageSize: data?.pagination.limit,
           showSizeChanger: true,
           showTotal: (total) => `Tổng ${total} vai trò`,
         }}

@@ -5,11 +5,17 @@ export const MEDIA_FILE_TYPES = {
   VIDEO: 'video',
 } as const;
 
+// Type for media file types
+export type MediaFileType = typeof MEDIA_FILE_TYPES[keyof typeof MEDIA_FILE_TYPES];
+
 // Media categories
 export const MEDIA_CATEGORIES = {
   GENERAL: 'general',
   PROFILE: 'profile',
 } as const;
+
+// Type for media categories
+export type MediaCategory = typeof MEDIA_CATEGORIES[keyof typeof MEDIA_CATEGORIES];
 
 // General image sizes (3:2 aspect ratio - landscape)
 export const IMAGE_SIZES = {
@@ -19,6 +25,9 @@ export const IMAGE_SIZES = {
   LARGE: 'large',
   ORIGINAL: 'original',
 } as const;
+
+// Type for image sizes
+export type ImageSize = typeof IMAGE_SIZES[keyof typeof IMAGE_SIZES];
 
 // General image size dimensions (3:2 aspect ratio)
 export const IMAGE_DIMENSIONS = {
@@ -30,11 +39,11 @@ export const IMAGE_DIMENSIONS = {
 
 // Profile image sizes (1:1 aspect ratio - square)
 export const PROFILE_IMAGE_SIZES = {
-  THUMBNAIL: 'thumbnail',
-  SMALL: 'small',
-  MEDIUM: 'medium',
-  LARGE: 'large',
-  ORIGINAL: 'original',
+  THUMBNAIL: IMAGE_SIZES.THUMBNAIL,
+  SMALL: IMAGE_SIZES.SMALL,
+  MEDIUM: IMAGE_SIZES.MEDIUM,
+  LARGE: IMAGE_SIZES.LARGE,
+  ORIGINAL: IMAGE_SIZES.ORIGINAL,
 } as const;
 
 // Profile image size dimensions (1:1 aspect ratio)
@@ -52,7 +61,7 @@ export const MEDIA_IMAGE_DIMENSIONS = IMAGE_DIMENSIONS;
 // Supported image MIME types
 export const SUPPORTED_IMAGE_TYPES = [
   'image/jpeg',
-  'image/jpg',
+  'image/jpg', 
   'image/png',
   'image/webp',
   'image/gif',

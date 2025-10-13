@@ -2,15 +2,8 @@ import React, { useState } from 'react';
 import { Button, Avatar, Space, message } from 'antd';
 import { UserOutlined, CameraOutlined } from '@ant-design/icons';
 import { ProfileGallery } from './Gallery';
-import type { Media, MediaResponseDto } from '@/models/media';
-import { mediaUtils } from '@/api/slices/mediaApi';
-
-// Convert Media to MediaResponseDto for mediaUtils compatibility
-const convertMediaToDto = (media: Media): MediaResponseDto => ({
-  ...media,
-  createdAt: media.createdAt.toISOString(),
-  updatedAt: media.updatedAt.toISOString(),
-});
+import type { MediaImage } from '@/models/media';
+import { getThumbnailUrl } from '@/helpers/media';
 
 interface AvatarUploadProps {
   value?: string;
@@ -20,9 +13,9 @@ interface AvatarUploadProps {
   altText?: string;
   description?: string;
   isPublic?: boolean;
-  onMediaChange?: (media: Media) => void; // Callback with full media object
+  onMediaChange?: (media: MediaImage) => void; // Callback with full media object
   // Media object for processing status
-  media?: Media;
+  media?: MediaImage;
 }
 
 export const AvatarUpload: React.FC<AvatarUploadProps> = ({
@@ -37,12 +30,12 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 }) => {
   const [galleryOpen, setGalleryOpen] = useState(false);
 
-  const handleGallerySelect = (images: Media[]) => {
+  const handleGallerySelect = (images: MediaImage[]) => {
     if (images.length > 0) {
       const selectedImage = images[0];
       
       // Get thumbnail URL from sizes array
-      const thumbnailUrl = mediaUtils.getThumbnailUrl(convertMediaToDto(selectedImage));
+      const thumbnailUrl = getThumbnailUrl(selectedImage.sizes);
       if (thumbnailUrl) {
         onChange?.(thumbnailUrl);
         message.success('Đã cập nhật avatar');

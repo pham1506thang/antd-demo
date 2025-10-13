@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import type { Media } from '@/models/media';
-import { useProfileMedia, useMediaUtils } from '@/hooks/media';
+import type { MediaImage } from '@/models/media';
+import { useProfileMediaInfinite } from '@/hooks/media/useProfileMedia';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { MEDIA_CATEGORIES } from '@/constants/media';
 import { BaseGallery } from './BaseGallery';
 
@@ -9,8 +10,8 @@ export interface ProfileGalleryProps {
   open: boolean;
   onClose: () => void;
   mode: 'single' | 'multiple';
-  onSelect: (_mediaItems: Media[]) => void;
-  selectedImages?: Media[];
+  onSelect: (mediaItems: MediaImage[]) => void;
+  selectedImages?: MediaImage[];
 }
 
 export const ProfileGallery: React.FC<ProfileGalleryProps> = ({
@@ -21,66 +22,67 @@ export const ProfileGallery: React.FC<ProfileGalleryProps> = ({
   selectedImages = [],
 }) => {
   const [searchText, setSearchText] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(20);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
 
-  // Initialize hooks
-  const profileMedia = useProfileMedia();
-  const mediaUtils = useMediaUtils();
-
-  // Load profile images
-  const { data: imagesData, isLoading: loading } = profileMedia.listProfileImages({
-    page: currentPage,
-    limit: pageSize,
-    search: searchText || undefined,
+  const {
+    images,
+    hasNextPage,
+    loading,
+    loadingMore,
+    loadMore,
+    refresh,
+    search,
+    sort,
+    uploadProfileImage,
+  } = useProfileMediaInfinite({
+    search: searchText,
     sortBy,
     sortOrder,
+    limit: 20,
   });
 
-  // Convert API response to Media format
-  const images: Media[] = imagesData?.data?.map(mediaUtils.convertToMedia) || [];
-  const totalImages = imagesData?.total || 0;
+  const { loadMoreRef } = useInfiniteScroll(
+    loadMore,
+    hasNextPage,
+    loadingMore,
+    { enabled: open }
+  );
 
-  // Event handlers
   const handleSearch = (value: string) => {
     setSearchText(value);
-    setCurrentPage(1); // Reset to first page when searching
+    search(value);
   };
 
   const handleSortChange = (value: string) => {
     const [newSortBy, newSortOrder] = value.split('_');
     setSortBy(newSortBy);
     setSortOrder(newSortOrder as 'ASC' | 'DESC');
-    setCurrentPage(1);
+    sort(newSortBy, newSortOrder as 'ASC' | 'DESC');
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleImageSelect = (_image: Media) => {
+  const handleImageSelect = (image: MediaImage) => {
     // Additional logic for profile image selection if needed
   };
 
   const handleUpload = async (file: File) => {
-    await profileMedia.uploadProfileImage({ 
-      file,
-      altText: '', // Can be enhanced to get from user input
-      description: '', // Can be enhanced to get from user input
-      isPublic: false // Default to private
-    });
-    setCurrentPage(1); // Reset to first page to show the new upload
+    try {
+      await uploadProfileImage({ 
+        file,
+        altText: '',
+        description: '',
+        isPublic: false
+      });
+      refresh();
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
   };
 
-  // UI customization for profile gallery
   const getTitle = () => 'Chọn ảnh Profile';
   const getSearchPlaceholder = () => 'Tìm kiếm ảnh profile...';
   const getUploadButtonText = () => 'Upload Profile';
-  const getInfoText = () => `Hiển thị ${images.length} / ${totalImages} ảnh profile`;
-  const getPaginationText = (total: number, range: [number, number]) => 
-    `${range[0]}-${range[1]} / ${total} ảnh profile`;
+  const getInfoText = () => `Hiển thị ${images.length} ảnh profile`;
 
   return (
     <BaseGallery
@@ -90,24 +92,23 @@ export const ProfileGallery: React.FC<ProfileGalleryProps> = ({
       onSelect={onSelect}
       selectedImages={selectedImages}
       category={MEDIA_CATEGORIES.PROFILE}
-      images={images}
+      images={images}  
       loading={loading}
-      totalImages={totalImages}
-      currentPage={currentPage}
-      pageSize={pageSize}
+      loadingMore={loadingMore}
+      hasNextPage={hasNextPage}
       searchText={searchText}
       sortBy={sortBy}
       sortOrder={sortOrder}
       onSearch={handleSearch}
       onSortChange={handleSortChange}
-      onPageChange={handlePageChange}
       onImageSelect={handleImageSelect}
       onUpload={handleUpload}
       title={getTitle()}
       searchPlaceholder={getSearchPlaceholder()}
       uploadButtonText={getUploadButtonText()}
       infoText={getInfoText()}
-      paginationText={getPaginationText}
+      useInfiniteScroll={true}
+      loadMoreRef={loadMoreRef}
     />
   );
 };

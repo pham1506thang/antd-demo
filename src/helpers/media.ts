@@ -1,80 +1,58 @@
-import type { Media, MediaResponseDto } from '@/models/media';
-import { 
-  IMAGE_SIZES, 
-  IMAGE_DIMENSIONS, 
-  PROFILE_IMAGE_SIZES, 
+import type { MediaImage, MediaSize } from '@/models/media';
+import { BASE_BACKEND_URL } from '@/constants';
+import {
+  IMAGE_SIZES,
+  IMAGE_DIMENSIONS,
+  PROFILE_IMAGE_SIZES,
   PROFILE_IMAGE_DIMENSIONS,
-  MEDIA_IMAGE_SIZES
 } from '@/constants/media';
+import { DOMAINS } from '@/models/permission';
 
-/**
- * Convert API response to frontend Media interface (Updated for new structure)
- */
-export const convertApiMediaToMedia = (apiMedia: MediaResponseDto): Media => ({
-  ...apiMedia,
-  createdAt: new Date(apiMedia.createdAt),
-  updatedAt: new Date(apiMedia.updatedAt),
-});
 
-// Legacy URL generation functions removed - use mediaUtils from API slice instead
-
-/**
- * Get available image sizes for general media
- */
 export const getAvailableImageSizes = (): string[] => {
   return Object.values(IMAGE_SIZES);
 };
 
-/**
- * Get available image sizes for profile media
- */
 export const getAvailableProfileImageSizes = (): string[] => {
   return Object.values(PROFILE_IMAGE_SIZES);
 };
 
-/**
- * Get image dimensions for a specific size and category
- */
 export const getImageDimensions = (
-  size: string, 
+  size: string,
   category: 'general' | 'profile' = 'general'
 ): { width: number; height: number } | null => {
   if (category === 'profile') {
-    return PROFILE_IMAGE_DIMENSIONS[size as keyof typeof PROFILE_IMAGE_DIMENSIONS] || null;
+    return (
+      PROFILE_IMAGE_DIMENSIONS[size as keyof typeof PROFILE_IMAGE_DIMENSIONS] ||
+      null
+    );
   }
   return IMAGE_DIMENSIONS[size as keyof typeof IMAGE_DIMENSIONS] || null;
 };
 
-/**
- * Get image dimensions for general media (legacy function)
- */
-export const getGeneralImageDimensions = (size: string): { width: number; height: number } | null => {
+export const getGeneralImageDimensions = (
+  size: string
+): { width: number; height: number } | null => {
   return getImageDimensions(size, 'general');
 };
 
-/**
- * Get image dimensions for profile media
- */
-export const getProfileImageDimensions = (size: string): { width: number; height: number } | null => {
+export const getProfileImageDimensions = (
+  size: string
+): { width: number; height: number } | null => {
   return getImageDimensions(size, 'profile');
 };
 
-/**
- * Format file size for display
- */
-export const formatFileSize = (bytes: number): string => {
+export const formatFileSize = (sizeStr: string): string => {
+  const bytes = parseInt(sizeStr);
   if (bytes === 0) return '0 Bytes';
-  
+
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
+
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-/**
- * Format file type for display
- */
 export const formatFileType = (mimeType: string): string => {
   const typeMap: Record<string, string> = {
     'image/jpeg': 'JPEG Image',
@@ -93,142 +71,100 @@ export const formatFileType = (mimeType: string): string => {
     'video/avi': 'AVI Video',
     'video/mov': 'MOV Video',
   };
-  
+
   return typeMap[mimeType] || mimeType;
 };
 
-/**
- * Get file extension from filename
- */
 export const getFileExtension = (filename: string): string => {
   return filename.split('.').pop()?.toLowerCase() || '';
 };
 
-/**
- * Check if file is an image
- */
 export const isImageFile = (mimeType: string): boolean => {
   return mimeType.startsWith('image/');
 };
 
-/**
- * Check if file is an audio
- */
 export const isAudioFile = (mimeType: string): boolean => {
   return mimeType.startsWith('audio/');
 };
 
-/**
- * Check if file is a video
- */
 export const isVideoFile = (mimeType: string): boolean => {
   return mimeType.startsWith('video/');
 };
 
-/**
- * Get media category display name
- */
-export const getMediaCategoryDisplayName = (category: 'general' | 'profile'): string => {
+export const getMediaCategoryDisplayName = (
+  category: 'general' | 'profile'
+): string => {
   const categoryMap = {
     general: 'General Media',
     profile: 'Profile Image',
   };
-  
+
   return categoryMap[category];
 };
 
-/**
- * Generate media display name
- */
-export const getMediaDisplayName = (media: Media): string => {
+export const getMediaDisplayName = (media: MediaImage): string => {
   return media.originalName || media.fileName || 'Unknown File';
 };
 
-/**
- * Check if media has dimensions (is an image) - Updated for new structure
- */
-export const hasMediaDimensions = (media: Media): boolean => {
+export const hasMediaDimensions = (media: MediaImage): boolean => {
   if (!isImageFile(media.mimeType)) return false;
-  
-  // Check if any size has dimensions
-  return media.sizes?.some(size => 
-    typeof size.width === 'number' && typeof size.height === 'number'
-  ) || false;
+
+  // Check if media has sizes with dimensions
+  return media.sizes && media.sizes.length > 0 && 
+         media.sizes.some(size => size.width > 0 && size.height > 0);
 };
 
-/**
- * Get media aspect ratio - Updated for new structure
- */
-export const getMediaAspectRatio = (media: Media): number | null => {
+export const getMediaAspectRatio = (media: MediaImage): number | null => {
   if (!hasMediaDimensions(media)) return null;
-  
-  // Get dimensions from the first available size
-  const firstSize = media.sizes?.find(size => 
-    typeof size.width === 'number' && typeof size.height === 'number'
+
+  // Get dimensions from the largest size
+  const largestSize = media.sizes.reduce((prev, current) => 
+    (current.width * current.height) > (prev.width * prev.height) ? current : prev
   );
-  
-  if (!firstSize) return null;
-  
-  return (firstSize.width / firstSize.height);
+
+  return largestSize.width / largestSize.height;
 };
 
-/**
- * Check if media is landscape
- */
-export const isMediaLandscape = (media: Media): boolean => {
+export const isMediaLandscape = (media: MediaImage): boolean => {
   const aspectRatio = getMediaAspectRatio(media);
   return aspectRatio !== null && aspectRatio > 1;
 };
 
-/**
- * Check if media is portrait
- */
-export const isMediaPortrait = (media: Media): boolean => {
+export const isMediaPortrait = (media: MediaImage): boolean => {
   const aspectRatio = getMediaAspectRatio(media);
   return aspectRatio !== null && aspectRatio < 1;
 };
 
-/**
- * Check if media is square
- */
-export const isMediaSquare = (media: Media): boolean => {
+export const isMediaSquare = (media: MediaImage): boolean => {
   const aspectRatio = getMediaAspectRatio(media);
   return aspectRatio !== null && Math.abs(aspectRatio - 1) < 0.01;
 };
 
-/**
- * Generate media metadata summary - Updated for new structure
- */
-export const getMediaMetadataSummary = (media: Media): string => {
+export const getMediaMetadataSummary = (media: MediaImage): string => {
   const parts: string[] = [];
-  
+
   // File type
   parts.push(formatFileType(media.mimeType));
-  
+
   // File size
   parts.push(formatFileSize(media.size));
-  
-  // Dimensions (for images) - get from first available size
+
+  // Dimensions (for images) - get from largest size
   if (hasMediaDimensions(media)) {
-    const firstSize = media.sizes?.find(size => 
-      typeof size.width === 'number' && typeof size.height === 'number'
+    const largestSize = media.sizes.reduce((prev, current) => 
+      (current.width * current.height) > (prev.width * prev.height) ? current : prev
     );
-    if (firstSize) {
-      parts.push(`${firstSize.width}×${firstSize.height}px`);
-    }
+    parts.push(`${largestSize.width}×${largestSize.height}px`);
   }
-  
+
   // Category
-  parts.push(getMediaCategoryDisplayName(media.category));
-  
+  parts.push(getMediaCategoryDisplayName(media.category as 'general' | 'profile'));
+
   return parts.join(' • ');
 };
 
-/**
- * Validate file before upload
- */
 export const validateFileForUpload = (
-  file: File, 
+  file: File,
   category: 'general' | 'profile',
   maxSize?: number
 ): { isValid: boolean; error?: string } => {
@@ -236,45 +172,93 @@ export const validateFileForUpload = (
   if (maxSize && file.size > maxSize) {
     return {
       isValid: false,
-      error: `File size exceeds maximum allowed size of ${formatFileSize(maxSize)}`
+      error: `File size exceeds maximum allowed size of ${formatFileSize(maxSize.toString())}`,
     };
   }
-  
+
   // Check file type based on category
   if (category === 'profile' && !isImageFile(file.type)) {
     return {
       isValid: false,
-      error: 'Only image files are allowed for profile uploads'
+      error: 'Only image files are allowed for profile uploads',
     };
   }
-  
+
   return { isValid: true };
 };
 
-/**
- * Generate media tags for display (Updated for new structure)
- */
-export const getMediaTags = (media: Media): string[] => {
+export const getMediaTags = (media: MediaImage): string[] => {
   const tags: string[] = [];
-  
+
   // Add category tag
   tags.push(media.category);
-  
+
   // Add file type tag
   tags.push(media.fileType);
-  
-  // Add tags from new tags array
-  if (media.tags && Array.isArray(media.tags)) {
-    media.tags.forEach(tag => {
-      tags.push(`${tag.tagName}:${tag.tagValue}`);
-    });
-  }
-  
-  // Add metadata tags if available (legacy - removed as metadata structure changed)
-  // Note: metadata.tags is no longer available in new structure
-  
+
+  // Note: tags array is no longer available in new structure
+  // Only basic category and file type tags are available
+
   return [...new Set(tags)]; // Remove duplicates
 };
 
-// Note: These functions are now available in mediaUtils from API slice
-// Use: import { mediaUtils } from '@/api/slices/mediaApi';
+export const getImageUrl = (
+  sizes: MediaSize[],
+  sizeName: string
+): string | null => {
+  const size = sizes.find((s) => s.sizeName === sizeName);
+  return size ? `${BASE_BACKEND_URL}/${DOMAINS.MEDIAS.value}/${size.filePath}/${size.fileName}` : null;
+};
+
+export const getThumbnailUrl = (sizes: MediaSize[]): string | null => {
+  return getImageUrl(sizes, IMAGE_SIZES.THUMBNAIL);
+};
+
+export const getDisplayUrl = (sizes: MediaSize[]): string | null => {
+  return (
+    getImageUrl(sizes, IMAGE_SIZES.LARGE) ||
+    getImageUrl(sizes, 'original') ||
+    getImageUrl(sizes, sizes[0]?.sizeName) ||
+    null
+  );
+};
+
+export const getBestSizeUrl = (
+  sizes: MediaSize[],
+  preferredSize: string = IMAGE_SIZES.MEDIUM
+): string | null => {
+  // Try preferred size first
+  let url = getImageUrl(sizes, preferredSize);
+  if (url) return url;
+
+  // Fallback order: medium -> large -> small -> original -> thumbnail
+  const fallbackOrder = [
+    IMAGE_SIZES.MEDIUM,
+    IMAGE_SIZES.LARGE,
+    IMAGE_SIZES.SMALL,
+    IMAGE_SIZES.ORIGINAL,
+    IMAGE_SIZES.THUMBNAIL,
+  ];
+  for (const size of fallbackOrder) {
+    url = getImageUrl(sizes, size);
+    if (url) return url;
+  }
+
+  return null;
+};
+
+export const getAvailableSizes = (sizes: MediaSize[]): string[] => {
+  return sizes.map((s) => s.sizeName);
+};
+
+export const hasSize = (sizes: MediaSize[], sizeName: string): boolean => {
+  return sizes.some((s) => s.sizeName === sizeName);
+};
+
+export const getSizeDimensions = (
+  sizes: MediaSize[],
+  sizeName: string
+): { width: number; height: number } | null => {
+  const size = sizes.find((s) => s.sizeName === sizeName);
+  return size ? { width: size.width, height: size.height } : null;
+};

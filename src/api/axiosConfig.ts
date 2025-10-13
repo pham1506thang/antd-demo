@@ -7,12 +7,13 @@ import type {
 } from 'axios';
 import { message } from 'antd';
 import { clearAuthState } from '@/utils/authUtils';
+import { BASE_BACKEND_URL } from '@/constants';
 
 // Extend AxiosRequestConfig to include _retry flag
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const BASE_URL = `${BASE_BACKEND_URL}/api`;
 const AXIOS_CONFIG: CreateAxiosDefaults = {
   baseURL: BASE_URL,
   timeout: 10000,

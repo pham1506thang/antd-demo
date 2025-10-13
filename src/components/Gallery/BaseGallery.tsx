@@ -12,7 +12,6 @@ import {
   Tag,
   Typography,
   Select,
-  Pagination,
 } from 'antd';
 import {
   SearchOutlined,
@@ -20,15 +19,10 @@ import {
   CloudUploadOutlined,
   FilterOutlined,
 } from '@ant-design/icons';
-import type { Media, MediaResponseDto } from '@/models/media';
+import type { MediaImage } from '@/models/media';
 import { COLORS } from '@/constants/colors';
-import { mediaUtils } from '@/api/slices/mediaApi';
-
-const convertMediaToDto = (media: Media): MediaResponseDto => ({
-  ...media,
-  createdAt: media.createdAt.toISOString(),
-  updatedAt: media.updatedAt.toISOString(),
-});
+import { getDisplayUrl, getImageUrl, getThumbnailUrl } from '@/helpers/media';
+import { IMAGE_SIZES } from '@/constants/media';
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -37,15 +31,15 @@ export interface BaseGalleryProps {
   open: boolean;
   onClose: () => void;
   mode: 'single' | 'multiple';
-  onSelect: (mediaItems: Media[]) => void;
-  selectedImages?: Media[];
+  onSelect: (mediaItems: MediaImage[]) => void;
+  selectedImages?: MediaImage[];
   category: 'general' | 'profile';
+  aspectRatio?: '1' | '3 / 2';
   // Data and loading states
-  images: Media[];
+  images: MediaImage[];
   loading: boolean;
-  totalImages: number;
-  currentPage: number;
-  pageSize: number;
+  loadingMore?: boolean;
+  hasNextPage?: boolean;
   // Search and sort states
   searchText: string;
   sortBy: string;
@@ -53,15 +47,16 @@ export interface BaseGalleryProps {
   // Event handlers
   onSearch: (value: string) => void;
   onSortChange: (value: string) => void;
-  onPageChange: (page: number) => void;
-  onImageSelect: (image: Media) => void;
+  onImageSelect: (image: MediaImage) => void;
   onUpload: (file: File) => Promise<void>;
   // UI customization
   title: string;
   searchPlaceholder: string;
   uploadButtonText: string;
   infoText: string;
-  paginationText: (total: number, range: [number, number]) => string;
+  // Infinite scroll props
+  useInfiniteScroll?: boolean;
+  loadMoreRef?: (node: HTMLElement | null) => void;
 }
 
 export const BaseGallery: React.FC<BaseGalleryProps> = ({
@@ -71,39 +66,47 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
   onSelect,
   selectedImages = [],
   images,
+  aspectRatio = '1',
   loading,
-  totalImages,
-  currentPage,
-  pageSize,
+  loadingMore = false,
+  hasNextPage = false,
   searchText,
   sortBy,
   sortOrder,
   onSearch,
   onSortChange,
-  onPageChange,
   onImageSelect,
   onUpload,
   title,
   searchPlaceholder,
   uploadButtonText,
   infoText,
-  paginationText,
+  useInfiniteScroll = false,
+  loadMoreRef,
 }) => {
-  const [selectedImageIds, setSelectedImageIds] = useState<string[]>(
-    selectedImages.map(img => img.id)
+  const [selectedImageIds, setSelectedImageIds] = useState<Set<string>>(
+    new Set(selectedImages.map(img => img.id))
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageSelect = (image: Media) => {
+  const handleImageSelect = (image: MediaImage) => {
     if (mode === 'single') {
-      setSelectedImageIds([image.id]);
+      setSelectedImageIds(prev => {
+        if (prev.has(image.id)) {
+          return new Set(); // Allow uncheck in single mode
+        } else {
+          return new Set([image.id]);
+        }
+      });
     } else {
       setSelectedImageIds(prev => {
-        if (prev.includes(image.id)) {
-          return prev.filter(id => id !== image.id);
+        const newSet = new Set(prev);
+        if (newSet.has(image.id)) {
+          newSet.delete(image.id);
         } else {
-          return [...prev, image.id];
+          newSet.add(image.id);
         }
+        return newSet;
       });
     }
     onImageSelect(image);
@@ -119,7 +122,7 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
   };
 
   const handleConfirm = () => {
-    const selectedImages = images.filter(img => selectedImageIds.includes(img.id));
+    const selectedImages = images.filter(img => selectedImageIds.has(img.id));
     onSelect(selectedImages);
     onClose();
   };
@@ -136,17 +139,16 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
     }
   };
 
-  const selectedCount = selectedImageIds.length;
+  const selectedCount = selectedImageIds.size;
   const maxSelection = mode === 'single' ? 1 : 10;
-  const totalPages = Math.ceil(totalImages / pageSize);
-  
+
   return (
     <Modal
       title={
         <Space>
           <span>{title}</span>
           {selectedCount > 0 && (
-            <Tag color="blue">Đã chọn {selectedCount} ảnh</Tag>
+            <Tag color="blue" style={{ display: 'block' }}>Đã chọn {selectedCount} ảnh</Tag>
           )}
         </Space>
       }
@@ -221,11 +223,13 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
               {infoText}
             </Text>
           </Col>
-          <Col>
-            <Text type="secondary">
-              Trang {currentPage} / {totalPages}
-            </Text>
-          </Col>
+          {!useInfiniteScroll && (
+            <Col>
+              <Text type="secondary">
+                Hiển thị {images.length} ảnh
+              </Text>
+            </Col>
+          )}
         </Row>
 
         {/* Image Grid */}
@@ -240,102 +244,147 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
               <Spin size="large" />
             </div>
           ) : (
-            <Row gutter={[8, 8]}>
-              {images.map((image) => {
-                const isSelected = selectedImageIds.includes(image.id);
-                const canSelect = mode === 'single' || selectedCount < maxSelection || isSelected;
+            <>
+              <Row gutter={[8, 8]}>
+                {images.map((image) => {
+                  const isSelected = selectedImageIds.has(image.id);
+                  const canSelect = mode === 'single' || selectedCount < maxSelection || isSelected;
 
-                return (
-                  <Col key={image.id} xs={8} sm={6} lg={4}>
-                    <div
-                      style={{
-                        position: 'relative',
-                        cursor: canSelect ? 'pointer' : 'not-allowed',
-                        opacity: canSelect ? 1 : 0.5,
-                        border: `2px solid ${isSelected ? COLORS.PRIMARY : COLORS.GRAY_3}`,
-                        borderRadius: '8px',
-                        overflow: 'hidden',
-                        width: '100%',
-                        maxWidth: '100%',
-                      }}
-                      onClick={() => canSelect && handleImageSelect(image)}
-                    >
-                      {/* Selection Overlay */}
-                      {isSelected && (
+                  return (
+                    <Col key={image.id} xs={8} sm={6} lg={4}>
+                      <div
+                        style={{
+                          position: 'relative',
+                          opacity: canSelect ? 1 : 0.5,
+                          border: `2px solid ${isSelected ? COLORS.PRIMARY : COLORS.GRAY_3}`,
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          width: '100%',
+                          maxWidth: '100%',
+                        }}
+                      >
+                        {/* Checkbox - always visible */}
                         <div
                           style={{
                             position: 'absolute',
                             top: '8px',
                             right: '8px',
                             zIndex: 2,
-                            background: COLORS.PRIMARY,
+                            background: isSelected ? COLORS.PRIMARY : COLORS.GRAY_1,
                             borderRadius: '50%',
                             width: '24px',
                             height: '24px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            border: `2px solid ${isSelected ? COLORS.PRIMARY : COLORS.GRAY_5}`,
+                            cursor: canSelect ? 'pointer' : 'not-allowed',
+                          }}
+                          onClick={() => canSelect && handleImageSelect(image)}
+                        >
+                          {isSelected && (
+                            <CheckOutlined style={{ color: 'white', fontSize: '12px' }} />
+                          )}
+                        </div>
+                        {/* Image Container with aspect ratio */}
+                        <div
+                          style={{
+                            width: '100%',
+                            aspectRatio,
+                            overflow: 'hidden',
+                            background: COLORS.GRAY_2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
                         >
-                          <CheckOutlined style={{ color: 'white', fontSize: '12px' }} />
+                          <Image
+                            src={getImageUrl(image.sizes, IMAGE_SIZES.SMALL) || ''}
+                            alt={image.originalName}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              objectPosition: 'center',
+                              display: 'block',
+                            }}
+                            wrapperStyle={{
+                              width: '100%',
+                              height: '100%',
+                            }}
+                            preview={{
+                              src: getDisplayUrl(image.sizes) || ''
+                            }}
+                          />
                         </div>
-                      )}
-                      {/* Image */}
-                      <Image
-                        src={mediaUtils.getThumbnailUrl(convertMediaToDto(image)) || ''}
-                        alt={image.altText || image.originalName}
-                        style={{
-                          width: '100%',
-                          height: '150px',
-                          objectFit: 'cover',
-                          objectPosition: 'center',
-                          display: 'block',
-                          background: COLORS.GRAY_2,
-                        }}
-                        preview={{
-                          src: mediaUtils.getDisplayUrl(convertMediaToDto(image)) || ''
-                        }}
-                      />
 
-                      {/* Image Info */}
-                      <Text
-                        style={{
-                          padding: '4px 6px',
-                          background: COLORS.GRAY_8,
-                          color: 'white',
-                          fontSize: '10px',
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {image.originalName}
-                      </Text>
+                        {/* Image Info */}
+                        <div
+                          style={{
+                            padding: '4px 6px',
+                            background: COLORS.GRAY_8,
+                            color: COLORS.GRAY_1,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: '10px',
+                              display: 'block',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              color: COLORS.GRAY_1,
+                            }}
+                          >
+                            {image.originalName}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: '8px',
+                              display: 'block',
+                              color: COLORS.GRAY_4,
+                            }}
+                          >
+                            {new Date(image.createdAt).toLocaleDateString('vi-VN')}
+                          </Text>
+                        </div>
+                      </div>
+                    </Col>
+                  );
+                })}
+              </Row>
+
+              {/* Infinite Scroll Loading Indicator */}
+              {useInfiniteScroll && (
+                <div
+                  ref={loadMoreRef}
+                  style={{ 
+                    textAlign: 'center', 
+                    padding: '20px',
+                    minHeight: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {loadingMore ? (
+                    <div>
+                      <Spin size="default" />
+                      <div style={{ marginTop: '8px', color: COLORS.GRAY_6 }}>
+                        Đang tải thêm...
+                      </div>
                     </div>
-                  </Col>
-                );
-              })}
-            </Row>
+                  ) : !hasNextPage && images.length > 0 ? (
+                    <div style={{ color: COLORS.GRAY_6 }}>
+                      Đã hiển thị tất cả ảnh
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </>
           )}
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <Row justify="center">
-            <Col>
-              <Pagination
-                current={currentPage}
-                total={totalImages}
-                pageSize={pageSize}
-                onChange={onPageChange}
-                showSizeChanger={false}
-                showQuickJumper
-                showTotal={paginationText}
-              />
-            </Col>
-          </Row>
-        )}
       </Space>
     </Modal>
   );

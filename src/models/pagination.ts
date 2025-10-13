@@ -40,7 +40,7 @@ export interface SortField<T> {
 
 export interface PaginationResult<T> {
   data: T[];
-  meta: {
+  pagination: {
     total: number;
     page: number;
     limit: number;

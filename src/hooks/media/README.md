@@ -6,8 +6,7 @@ Media hooks đã được tách thành các hooks riêng biệt để dễ quả
 
 - **useMediaUtils**: Utilities chung cho tất cả media operations
 - **useProfileMedia**: Hook chuyên dụng cho profile media
-- **useGeneralMedia**: Hook chuyên dụng cho general media  
-- **useCrossMedia**: Hook cho operations chung giữa các loại media
+- **useGeneralMedia**: Hook chuyên dụng cho general media
 
 ## 📁 Cấu trúc Files
 
@@ -16,7 +15,6 @@ src/hooks/media/
 ├── useMediaUtils.ts     # Utilities chung
 ├── useProfileMedia.ts  # Profile media operations
 ├── useGeneralMedia.ts  # General media operations
-├── useCrossMedia.ts    # Cross-category operations
 ├── index.ts           # Exports
 └── README.md         # Documentation
 ```
@@ -28,10 +26,13 @@ src/hooks/media/
 import { useMediaUtils } from '@/hooks/media';
 
 const MyComponent = () => {
-  const { generateThumbnailUrl, generateDisplayUrl, convertToMedia } = useMediaUtils();
+  const { getThumbnailUrl, getDisplayUrl, convertToMedia } = useMediaUtils();
   
-  const thumbnailUrl = generateThumbnailUrl('media-id', 'profile');
-  const displayUrl = generateDisplayUrl('media-id', 'general', 'large');
+  // Get image sizes from API
+  const { data: sizes } = useGetProfileImageSizesQuery(mediaId);
+  
+  const thumbnailUrl = getThumbnailUrl(sizes?.sizes || []);
+  const displayUrl = getDisplayUrl(sizes?.sizes || []);
   const media = convertToMedia(apiResponse);
   
   return <div>...</div>;
@@ -50,13 +51,12 @@ const ProfileComponent = () => {
   } = useProfileMedia();
   
   const { data: images, isLoading } = listProfileImages({
-    page: 1,
     limit: 20,
-    search: 'avatar'
+    cursor: undefined
   });
   
   const handleUpload = async (file: File) => {
-    await uploadProfileImage(file);
+    await uploadProfileImage({ file });
   };
   
   return <div>...</div>;
@@ -75,47 +75,32 @@ const GeneralComponent = () => {
   } = useGeneralMedia();
   
   const { data: images, isLoading } = listGeneralImages({
-    page: 1,
     limit: 20,
-    search: 'product'
+    cursor: undefined
   });
   
   const handleUpload = async (file: File) => {
-    await uploadGeneralImage(file);
+    await uploadGeneralImage({ file });
   };
   
   return <div>...</div>;
 };
 ```
 
-### Cross Media Operations
-```typescript
-import { useCrossMedia } from '@/hooks/media';
-
-const SearchComponent = () => {
-  const { searchMedia, getAllTags } = useCrossMedia();
-  
-  const { data: searchResults } = searchMedia({
-    q: 'search term',
-    category: 'general',
-    type: 'image'
-  });
-  
-  const { data: tags } = getAllTags();
-  
-  return <div>...</div>;
-};
-```
 
 ## 🔧 Hook Details
 
 ### useMediaUtils
 ```typescript
 interface MediaUtilsReturn {
-  generateFileUrl: (mediaId: string, category: 'general' | 'profile', size?: string) => string;
-  generateThumbnailUrl: (mediaId: string, category: 'general' | 'profile') => string;
-  generateDisplayUrl: (mediaId: string, category: 'general' | 'profile', size?: string) => string;
-  convertToMedia: (apiMedia: any) => Media;
+  convertToMedia: (apiMedia: MediaResponseDto) => Media;
+  getImageUrl: (sizes: MediaSizeResponseDto[], sizeName: string) => string | null;
+  getThumbnailUrl: (sizes: MediaSizeResponseDto[]) => string | null;
+  getDisplayUrl: (sizes: MediaSizeResponseDto[]) => string | null;
+  getBestSizeUrl: (sizes: MediaSizeResponseDto[], preferredSize?: string) => string | null;
+  getAvailableSizes: (sizes: MediaSizeResponseDto[]) => string[];
+  hasSize: (sizes: MediaSizeResponseDto[], sizeName: string) => boolean;
+  getSizeDimensions: (sizes: MediaSizeResponseDto[], sizeName: string) => { width: number; height: number } | null;
 }
 ```
 
@@ -123,9 +108,9 @@ interface MediaUtilsReturn {
 ```typescript
 interface ProfileMediaReturn {
   // Mutations
-  uploadProfileImage: (file: File) => Promise<any>;
+  uploadProfileImage: (params: { file: File }) => Promise<any>;
   uploadProfileImageResult: any;
-  uploadMultipleProfileImages: (files: File[]) => Promise<any>;
+  uploadMultipleProfileImages: (params: { files: File[] }) => Promise<any>;
   uploadMultipleProfileImagesResult: any;
   updateProfileImage: (params: { id: string; data: UpdateMediaDto }) => Promise<any>;
   updateProfileImageResult: any;
@@ -133,13 +118,9 @@ interface ProfileMediaReturn {
   deleteProfileImageResult: any;
   
   // Query hooks
-  listProfileImages: (params: any) => any;
+  listProfileImages: (params: { cursor?: string; limit?: number }) => any;
   getProfileImageDetails: (id: string) => any;
   getProfileImageSizes: (id: string) => any;
-  searchProfileImages: (params: any) => any;
-  filterProfileImages: (params: any) => any;
-  getProfileImagesByTag: (params: any) => any;
-  getProfileImageFileUrl: (params: any) => any;
 }
 ```
 
@@ -147,9 +128,9 @@ interface ProfileMediaReturn {
 ```typescript
 interface GeneralMediaReturn {
   // Mutations
-  uploadGeneralImage: (file: File) => Promise<any>;
+  uploadGeneralImage: (params: { file: File }) => Promise<any>;
   uploadGeneralImageResult: any;
-  uploadMultipleGeneralImages: (files: File[]) => Promise<any>;
+  uploadMultipleGeneralImages: (params: { files: File[] }) => Promise<any>;
   uploadMultipleGeneralImagesResult: any;
   updateGeneralImage: (params: { id: string; data: UpdateMediaDto }) => Promise<any>;
   updateGeneralImageResult: any;
@@ -157,26 +138,12 @@ interface GeneralMediaReturn {
   deleteGeneralImageResult: any;
   
   // Query hooks
-  listGeneralImages: (params: any) => any;
+  listGeneralImages: (params: { cursor?: string; limit?: number }) => any;
   getGeneralImageDetails: (id: string) => any;
   getGeneralImageSizes: (id: string) => any;
-  searchGeneralImages: (params: any) => any;
-  filterGeneralImages: (params: any) => any;
-  getGeneralImagesByTag: (params: any) => any;
-  getGeneralImageFileUrl: (params: any) => any;
 }
 ```
 
-### useCrossMedia
-```typescript
-interface CrossMediaReturn {
-  searchMedia: (params: any) => any;
-  filterMedia: (params: any) => any;
-  getAllTags: () => any;
-  getMediaByTag: (params: any) => any;
-  getFileUrl: (params: any) => any;
-}
-```
 
 ## 🔄 Backward Compatibility
 

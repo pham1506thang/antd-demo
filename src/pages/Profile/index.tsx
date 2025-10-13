@@ -49,7 +49,7 @@ export const ProfilePage: React.FC = () => {
       <Row gutter={[24, 24]}>
         <Col span={24}>
           <Card>
-            <Row gutter={24} align="middle">
+            <Row gutter={[24, 8]} align="middle">
               <Col>
                 <AvatarUpload avatarUrl={me.avatarUrl} />
               </Col>
