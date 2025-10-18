@@ -4,9 +4,9 @@ import type {
   MediaCategory,
   MEDIA_FILE_TYPES,
 } from '@/constants/media';
+import type { BaseModel } from './base';
 
-export interface BaseMedia {
-  id: string;
+export interface BaseMedia extends BaseModel {
   originalName: string;
   fileName: string;
   mimeType: string;
@@ -21,13 +21,9 @@ export interface BaseMedia {
   description: string | null;
   processingStatus: string;
   metadata: Record<string, any>;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
 }
 
-export interface MediaSize {
-  id: string;
+export interface MediaSize extends BaseModel {
   mediaId: string;
   sizeName: ImageSize;
   fileName: string;
@@ -36,11 +32,9 @@ export interface MediaSize {
   height: number;
   size: string;
   quality: number;
-  createdAt: string;
 }
 
-export interface MediaTag {
-  id: string;
+export interface MediaTag extends BaseModel {
   name: string;
   value?: string;
 }

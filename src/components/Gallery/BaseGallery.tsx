@@ -22,6 +22,7 @@ import {
 import type { MediaImage } from '@/models/media';
 import { COLORS } from '@/constants/colors';
 import { getDisplayUrl, getImageUrl } from '@/helpers/media';
+import { formatDateOnly } from '@/helpers/date';
 import { IMAGE_SIZES, type MediaCategory } from '@/constants/media';
 
 const { Search } = Input;
@@ -345,7 +346,7 @@ export const BaseGallery: React.FC<BaseGalleryProps> = ({
                               color: COLORS.GRAY_4,
                             }}
                           >
-                            {new Date(image.createdAt).toLocaleDateString('vi-VN')}
+                            {formatDateOnly(image.createdAt)}
                           </Text>
                         </div>
                       </div>

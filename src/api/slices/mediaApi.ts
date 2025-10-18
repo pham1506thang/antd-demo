@@ -5,7 +5,7 @@ import type {
   InfiniteParamsDto,
   InfinitePaginationResult,
 } from '@/models/infinite-pagination';
-import { buildQueryString, convertResponseTimeToDate } from '@/api/apiHelper';
+import { buildQueryString } from '@/api/apiHelper';
 import { DOMAINS } from '@/models/permission';
 import { MEDIA_CATEGORIES } from '@/constants/media';
 
@@ -83,12 +83,6 @@ export const mediaApiSlice = baseApi.injectEndpoints({
         return currentArg !== previousArg;
       },
       
-      transformResponse: (response: InfinitePaginationResult<any>) => {
-        return {
-          ...response,
-          data: response.data.map(convertResponseTimeToDate),
-        } as InfinitePaginationResult<MediaImage>;
-      },
     }),
 
     updateProfileImage: builder.mutation<
@@ -179,12 +173,6 @@ export const mediaApiSlice = baseApi.injectEndpoints({
         return currentArg !== previousArg;
       },
       
-      transformResponse: (response: InfinitePaginationResult<any>) => {
-        return {
-          ...response,
-          data: response.data.map(convertResponseTimeToDate),
-        } as InfinitePaginationResult<MediaImage>;
-      },
     }),
 
     updateGeneralImage: builder.mutation<

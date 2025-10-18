@@ -1,7 +1,7 @@
+import type { BaseModel } from './base';
 import type { Permission } from './permission';
 
-export type Role = {
-  id: string;
+export interface Role extends BaseModel {
   code: string;
   label: string;
   description?: string;
@@ -9,9 +9,7 @@ export type Role = {
   isSuperAdmin: boolean;
   isProtected: boolean;
   permissions: Permission[];
-  createdAt?: Date;
-  updatedAt?: Date;
-};
+}
 
 export type SummaryRole = Pick<
   Role,

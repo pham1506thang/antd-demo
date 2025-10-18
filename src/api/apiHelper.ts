@@ -41,16 +41,3 @@ export const buildQueryString = (params: Record<string, any>): string => {
 
   return searchParams.toString() ? `?${searchParams.toString()}` : '';
 };
-
-type DataWithTime = {
-  createdAt: string;
-  updatedAt: string;
-};
-
-export const convertResponseTimeToDate = (data: DataWithTime) => {
-  return {
-    ...data,
-    createdAt: new Date(data.createdAt),
-    updatedAt: new Date(data.updatedAt),
-  }
-};
