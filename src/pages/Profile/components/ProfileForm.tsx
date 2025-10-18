@@ -119,7 +119,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = () => {
               />
             </div>
           </Form.Item>
-          <Form.Item name="thumbnailAvatarUrl" label="Ảnh đại diện" hidden></Form.Item>
+          <Form.Item name="thumbnailAvatarUrl" label="Ảnh đại diện" hidden><div></div></Form.Item>
         </Col>
       </Row>
 

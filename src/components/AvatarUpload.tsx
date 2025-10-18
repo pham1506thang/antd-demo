@@ -27,7 +27,6 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
       
       // Call onMediaChange with full media object
       onMediaChange?.(selectedImage);
-      message.success('Đã cập nhật avatar');
     }
     setGalleryOpen(false);
   };
