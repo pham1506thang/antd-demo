@@ -1,36 +1,12 @@
 import { baseApi } from 'api/baseApi';
-import type { Permission, User } from '@/models';
+import type { AuthLoginDTO, AuthUpdateProfileDTO, AuthChangePasswordDTO, AuthResponse, LoginResponse } from '@/models';
 import { DOMAINS } from '@/models/permission';
 import axiosInstance from '@/api/axiosConfig';
 import { updateUser } from '@/store/slices/authSlice';
 
-interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-interface UpdateProfileRequest {
-  name?: string;
-  email?: string;
-}
-
-interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-export interface GetAuthResponse {
-  me: User;
-  permissions: Permission[];
-}
-
-interface LoginResponse {
-  accessToken: string;
-}
-
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    login: builder.mutation<LoginResponse, AuthLoginDTO>({
       query: (credentials) => ({
         url: '/auths/login',
         method: 'POST',
@@ -46,7 +22,7 @@ export const authApi = baseApi.injectEndpoints({
         }
       },
     }),
-    getAuth: builder.query<GetAuthResponse, void>({
+    getAuth: builder.query<AuthResponse, void>({
       query: () => ({
         url: '/auths/auth',
         method: 'GET',
@@ -68,7 +44,7 @@ export const authApi = baseApi.injectEndpoints({
         }
       },
     }),
-    updateProfile: builder.mutation<{ message: string }, UpdateProfileRequest>({
+    updateProfile: builder.mutation<{ message: string }, AuthUpdateProfileDTO>({
       query: (profileData) => ({
         url: '/auths/profile',
         method: 'PATCH',
@@ -77,6 +53,7 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: DOMAINS.USERS.value, id: 'LIST' }],
       onQueryStarted: async (profileData, { dispatch, queryFulfilled }) => {
         try {
+
           await queryFulfilled;
           // Update user info in store after successful update
           dispatch(updateUser(profileData));
@@ -85,7 +62,7 @@ export const authApi = baseApi.injectEndpoints({
         }
       },
     }),
-    changePassword: builder.mutation<{ message: string }, ChangePasswordRequest>({
+    changePassword: builder.mutation<{ message: string }, AuthChangePasswordDTO>({
       query: (passwordData) => ({
         url: '/auths/change-password',
         method: 'PATCH',
@@ -94,3 +71,8 @@ export const authApi = baseApi.injectEndpoints({
     }),
   }),
 });
+
+export const {
+  useUpdateProfileMutation,
+  useChangePasswordMutation,
+} = authApi;

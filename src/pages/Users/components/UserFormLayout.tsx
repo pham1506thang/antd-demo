@@ -6,9 +6,11 @@ import { useGetSummaryRolesQuery } from '@/api/slices/roleApi';
 import { AvatarUpload } from '@/components';
 import { RestrictedAction } from '@/components/RestrictedAction';
 import { getUserStatusText, getUserStatusColor } from '@/helpers/user';
+import { getImageUrl, getThumbnailUrl } from '@/helpers/media';
 import { USER_FORM_ACTIONS, type UserFormAction } from '../constants';
 import type { CreateUserDTO, UpdateUserDTO, ChangePasswordDTO, AssignRoleDTO } from '@/models/dto/user';
 import styled from 'styled-components';
+import { IMAGE_SIZES } from '@/constants';
 
 const { Option } = Select;
 
@@ -43,9 +45,11 @@ export function UserFormLayout(props: UserFormLayoutProps) {
     if (initialValues && isEdit) {
       const formValues = {
         username: initialValues.username,
-        name: initialValues.name,
+        firstName: initialValues.firstName,
+        lastName: initialValues.lastName,
         email: initialValues.email,
         avatarUrl: initialValues.avatarUrl,
+        thumbnailAvatarUrl: initialValues.thumbnailAvatarUrl,
         status: initialValues.status,
         roles: initialValues.roles.map((role) => role.id),
       };
@@ -56,9 +60,9 @@ export function UserFormLayout(props: UserFormLayoutProps) {
   const getFieldsForAction = (action: UserFormAction): string[] => {
     switch (action) {
       case USER_FORM_ACTIONS.CREATE:
-        return ['username', 'name', 'email', 'password', 'confirm', 'roles'];
+        return ['username', 'firstName', 'lastName', 'email', 'password', 'confirm', 'roles'];
       case USER_FORM_ACTIONS.UPDATE_INFO:
-        return ['name', 'email', 'status'];
+        return ['firstName', 'lastName', 'email', 'status'];
       case USER_FORM_ACTIONS.CHANGE_PASSWORD:
         return ['currentPassword', 'newPassword', 'confirmNewPassword'];
       case USER_FORM_ACTIONS.ASSIGN_ROLE:
@@ -108,9 +112,18 @@ export function UserFormLayout(props: UserFormLayoutProps) {
           {isEdit && (
             <Row gutter={[16, 16]}>
               <Col span={24}>
-                <Form.Item name="avatar" label="Ảnh đại diện">
+                <Form.Item name="avatarUrl" label="Ảnh đại diện">
                   <CenteredDiv>
-                    <AvatarUpload />
+                    <AvatarUpload
+                      defaultAvatar={initialValues?.thumbnailAvatarUrl}
+                      size={120}
+                      onMediaChange={(media) => {
+                        form.setFieldsValue({
+                          thumbnailAvatarUrl: getThumbnailUrl(media.sizes),
+                          avatarUrl: getImageUrl(media.sizes, IMAGE_SIZES.MEDIUM)
+                        });
+                      }}
+                    />
                   </CenteredDiv>
                 </Form.Item>
               </Col>
@@ -139,10 +152,18 @@ export function UserFormLayout(props: UserFormLayoutProps) {
             </Col>
             <Col xs={24} sm={24} md={12}>
               <Form.Item
-                name="name"
-                label="Họ và tên"
+                name="firstName"
+                label="Tên"
               >
-                <Input prefix={<UserOutlined />} placeholder="Họ và tên" />
+                <Input prefix={<UserOutlined />} placeholder="Tên" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12}>
+              <Form.Item
+                name="lastName"
+                label="Họ"
+              >
+                <Input prefix={<UserOutlined />} placeholder="Họ" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12}>

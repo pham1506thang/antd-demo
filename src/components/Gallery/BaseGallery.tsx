@@ -21,8 +21,8 @@ import {
 } from '@ant-design/icons';
 import type { MediaImage } from '@/models/media';
 import { COLORS } from '@/constants/colors';
-import { getDisplayUrl, getImageUrl, getThumbnailUrl } from '@/helpers/media';
-import { IMAGE_SIZES } from '@/constants/media';
+import { getDisplayUrl, getImageUrl } from '@/helpers/media';
+import { IMAGE_SIZES, type MediaCategory } from '@/constants/media';
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -33,7 +33,7 @@ export interface BaseGalleryProps {
   mode: 'single' | 'multiple';
   onSelect: (mediaItems: MediaImage[]) => void;
   selectedImages?: MediaImage[];
-  category: 'general' | 'profile';
+  category: MediaCategory;
   aspectRatio?: '1' | '3 / 2';
   // Data and loading states
   images: MediaImage[];

@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authApi } from '@/api/slices/authApi';
 import { useAppDispatch } from '@/store/hooks';
-import { setAuth, buildAuthState } from '@/store/slices/authSlice';
+import { setAuth } from '@/store/slices/authSlice';
 
 interface LoginForm {
   username: string;
@@ -25,8 +25,7 @@ export const Login: React.FC = () => {
       // After successful login, get auth data from server
       // This will include the new access token and user info
       const authData = await getAuth().unwrap();
-      const authState = buildAuthState(authData);
-      dispatch(setAuth(authState));
+      dispatch(setAuth(authData));
       
       // Navigate to the original route or home
       const from = (location.state as any)?.from?.pathname || '/';

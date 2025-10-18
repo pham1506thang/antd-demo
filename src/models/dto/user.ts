@@ -2,17 +2,21 @@ import type { UserStatus } from '../user';
 
 export interface CreateUserDTO {
   username: string;
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   password: string;
   roles: string[];
   avatarUrl?: string;
+  thumbnailAvatarUrl?: string;
 }
 
 export interface UpdateUserDTO {
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   avatarUrl?: string;
+  thumbnailAvatarUrl?: string;
   status?: UserStatus;
 }
 

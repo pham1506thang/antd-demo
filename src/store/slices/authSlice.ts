@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { User } from 'models/user';
-import type { Permission } from '@/models';
+import type { User } from '@/models';
+import type { AuthResponse, Permission } from '@/models';
 
 export interface AuthState {
   me: User | null;
@@ -21,10 +21,7 @@ const initialState: AuthState = {
 
 const sliceName = 'auth';
 
-export const buildAuthState = (state: {
-  me: User;
-  permissions: Permission[];
-}): AuthState => ({
+const buildAuthState = (state: AuthResponse): AuthState => ({
   ...state,
   isAdmin: state.me.roles.some((role) => role.isAdmin),
   isSuperAdmin: state.me.roles.some((role) => role.isSuperAdmin),
@@ -44,22 +41,14 @@ export const authSlice = createSlice({
         isAuthenticated: false,
       };
     },
-    setAuth: (state, action: PayloadAction<AuthState>) => {
-      return {
-        ...state,
-        ...action.payload,
-      };
+    setAuth: (_, action: PayloadAction<AuthResponse>): AuthState => {
+      return buildAuthState(action.payload);
     },
-    updateUser: (state, action: PayloadAction<Partial<User>>) => {
-      if (state.me) {
-        state.me = { ...state.me, ...action.payload };
-        // Rebuild auth state to update computed properties
-        const newState = buildAuthState({
-          me: state.me,
-          permissions: state.permissions,
-        });
-        Object.assign(state, newState);
-      }
+    updateUser: (state, action: PayloadAction<Partial<User>>): AuthState => {
+      return buildAuthState({
+        me: { ...state.me, ...action.payload as User },
+        permissions: state.permissions,
+      });
     },
   },
 });

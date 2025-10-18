@@ -61,7 +61,12 @@ export const ViewUser: React.FC = () => {
       
       <Card>
         <Flex justify="center" style={{ marginBottom: 24 }}>
-          <Avatar size={120} src={user.avatarUrl} icon={<UserOutlined />} />
+          <Avatar 
+            size={300} 
+            src={user.avatarUrl} 
+            icon={<UserOutlined />} 
+            shape="square"
+          />
         </Flex>
 
         <Descriptions
@@ -75,7 +80,7 @@ export const ViewUser: React.FC = () => {
           </Descriptions.Item>
           
           <Descriptions.Item label="Họ và tên">
-            {user.name}
+            {[user.firstName, user.lastName].filter(Boolean).join(' ') || 'Chưa cập nhật'}
           </Descriptions.Item>
           
           <Descriptions.Item label="Email">

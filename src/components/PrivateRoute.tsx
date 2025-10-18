@@ -4,11 +4,7 @@ import { Spin } from 'antd';
 import { tokenService } from '@/services/tokenService';
 import { authApi } from '@/api/slices/authApi';
 import { useAppDispatch } from '@/store/hooks';
-import {
-  buildAuthState,
-  setAuth,
-  type AuthState,
-} from '@/store/slices/authSlice';
+import { setAuth } from '@/store/slices/authSlice';
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -24,8 +20,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 
   useEffect(() => {
     if (data) {
-      const authState: AuthState = buildAuthState(data);
-      dispatch(setAuth(authState));
+      dispatch(setAuth(data));
     }
   }, [data, dispatch]);
 

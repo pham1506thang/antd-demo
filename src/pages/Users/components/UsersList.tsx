@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { Table, Space, Button, message } from 'antd';
+import { Table, Space, Button, message, Avatar } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EditOutlined, DeleteOutlined, ReloadOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, ReloadOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons';
 import type { User, UserStatus } from 'models/user';
 import type { Role } from 'models/role';
 import { userApi } from 'api/slices/userApi';
@@ -69,6 +69,18 @@ export const UsersList: React.FC<UsersListProps> = ({ filters }) => {
 
   const columns: ColumnsType<User> = [
     {
+      title: 'Avatar',
+      key: 'avatar',
+      width: 60,
+      render: (_, record: User) => (
+        <Avatar 
+          size={32} 
+          src={record.thumbnailAvatarUrl} 
+          icon={<UserOutlined />} 
+        />
+      ),
+    },
+    {
       title: 'Tên đăng nhập',
       dataIndex: 'username',
       key: 'username',
@@ -76,9 +88,12 @@ export const UsersList: React.FC<UsersListProps> = ({ filters }) => {
     },
     {
       title: 'Họ và tên',
-      dataIndex: 'name',
-      key: 'name',
+      key: 'fullName',
       sorter: true,
+      render: (_, record: User) => {
+        const fullName = [record.firstName, record.lastName].filter(Boolean).join(' ');
+        return fullName || 'Chưa cập nhật';
+      },
     },
     {
       title: 'Email',

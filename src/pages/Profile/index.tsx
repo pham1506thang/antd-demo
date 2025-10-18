@@ -7,36 +7,21 @@ import {
   Button,
   Space,
   Divider,
-  message,
   Tooltip,
+  Avatar,
+  Flex,
 } from 'antd';
-import { EditOutlined, LockOutlined } from '@ant-design/icons';
+import { CloseOutlined, EditOutlined, UserOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { ProfileForm } from './components/ProfileForm';
 import { ChangePasswordForm } from './components/ChangePasswordForm';
-import { AvatarUpload, RoleTag, TitleWithoutMargin, StatusTag } from '@/components';
+import { RoleTag, TitleWithoutMargin, StatusTag } from '@/components';
 import { meSelector } from '@/store/slices/authSlice';
 
 export const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const me = useSelector(meSelector);
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-    setIsChangingPassword(false);
-  };
-
-  const handleChangePasswordClick = () => {
-    setIsChangingPassword(true);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setIsChangingPassword(false);
-  };
 
   if (!me) {
     return null;
@@ -44,14 +29,28 @@ export const ProfilePage: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
-      <TitleWithoutMargin level={2}>Hồ sơ cá nhân</TitleWithoutMargin>
+      <Flex justify="space-between" align="center">
+        <TitleWithoutMargin level={2}>Hồ sơ cá nhân</TitleWithoutMargin>
+        <Button
+          type={isEditing ? 'default' : 'primary'}
+          icon={isEditing ? <CloseOutlined /> : <EditOutlined />}
+          onClick={() => setIsEditing((prev) => !prev)}
+        >
+          {isEditing ? 'Huỷ' : 'Chỉnh sửa'}
+        </Button>
+      </Flex>
 
-      <Row gutter={[24, 24]}>
+      {!isEditing && <Row gutter={[24, 24]}>
         <Col span={24}>
           <Card>
             <Row gutter={[24, 8]} align="middle">
               <Col>
-                <AvatarUpload avatarUrl={me.avatarUrl} />
+                <Avatar
+                  src={me.avatarUrl}
+                  icon={<UserOutlined />}
+                  size={300}
+                  shape="square"
+                />
               </Col>
               <Col flex="auto">
                 <Space
@@ -60,7 +59,8 @@ export const ProfilePage: React.FC = () => {
                   style={{ width: '100%' }}
                 >
                   <TitleWithoutMargin level={4}>
-                    {me.name || me.username}
+                    {[me.firstName, me.lastName].filter(Boolean).join(' ') ||
+                      me.username}
                   </TitleWithoutMargin>
                   <Space size={[0, 8]} wrap>
                     {me.roles.map((role) => (
@@ -70,35 +70,20 @@ export const ProfilePage: React.FC = () => {
                   <StatusTag status={me.status} />
                 </Space>
               </Col>
-              <Col>
-                <Space>
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={handleEditClick}
-                    type={isEditing ? 'primary' : 'default'}
-                  >
-                    Chỉnh sửa hồ sơ
-                  </Button>
-                  <Button
-                    icon={<LockOutlined />}
-                    onClick={handleChangePasswordClick}
-                    type={isChangingPassword ? 'primary' : 'default'}
-                  >
-                    Đổi mật khẩu
-                  </Button>
-                </Space>
-              </Col>
             </Row>
 
             <Divider />
 
-            {!isEditing && !isChangingPassword && (
+            {!isEditing && (
               <Descriptions column={2}>
                 <Descriptions.Item label="Tên đăng nhập">
                   {me.username}
                 </Descriptions.Item>
                 <Descriptions.Item label="Email">{me.email}</Descriptions.Item>
-                <Descriptions.Item label="Họ và tên">{me.name}</Descriptions.Item>
+                <Descriptions.Item label="Họ và tên">
+                  {[me.firstName, me.lastName].filter(Boolean).join(' ') ||
+                    'Chưa cập nhật'}
+                </Descriptions.Item>
                 <Descriptions.Item label="Trạng thái">
                   <StatusTag status={me.status} />
                 </Descriptions.Item>
@@ -133,30 +118,15 @@ export const ProfilePage: React.FC = () => {
                 </Descriptions.Item>
               </Descriptions>
             )}
-
-            {isEditing && (
-              <ProfileForm
-                initialValues={me}
-                onCancel={handleCancel}
-                onSuccess={() => {
-                  setIsEditing(false);
-                  message.success('Cập nhật hồ sơ thành công');
-                }}
-              />
-            )}
-
-            {isChangingPassword && (
-              <ChangePasswordForm
-                onCancel={handleCancel}
-                onSuccess={() => {
-                  setIsChangingPassword(false);
-                  message.success('Đổi mật khẩu thành công');
-                }}
-              />
-            )}
           </Card>
         </Col>
-      </Row>
+      </Row>}
+      {isEditing && (
+        <>
+          <ProfileForm />
+          <ChangePasswordForm />
+        </>
+      )}
     </Space>
   );
 };

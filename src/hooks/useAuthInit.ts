@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch } from '@/store/hooks';
 import { authApi } from '@/api/slices/authApi';
-import { setAuth, buildAuthState } from '@/store/slices/authSlice';
+import { setAuth } from '@/store/slices/authSlice';
 
 /**
  * Hook to initialize authentication state
@@ -27,8 +27,7 @@ export const useAuthInit = () => {
     getAuth()
       .unwrap()
       .then((data) => {
-        const authState = buildAuthState(data);
-        dispatch(setAuth(authState));
+        dispatch(setAuth(data));
       })
       .catch((error) => {
         // If auth fails, user will be redirected to login

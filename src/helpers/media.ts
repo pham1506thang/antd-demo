@@ -3,22 +3,20 @@ import { BASE_BACKEND_URL } from '@/constants';
 import {
   IMAGE_SIZES,
   IMAGE_DIMENSIONS,
-  PROFILE_IMAGE_SIZES,
   PROFILE_IMAGE_DIMENSIONS,
+  type ImageSize,
+  MEDIA_CATEGORIES,
+  type MediaCategory,
 } from '@/constants/media';
 import { DOMAINS } from '@/models/permission';
 
 
-export const getAvailableImageSizes = (): string[] => {
+export const getAvailableImageSizes = (): ImageSize[] => {
   return Object.values(IMAGE_SIZES);
 };
 
-export const getAvailableProfileImageSizes = (): string[] => {
-  return Object.values(PROFILE_IMAGE_SIZES);
-};
-
 export const getImageDimensions = (
-  size: string,
+  size: ImageSize,
   category: 'general' | 'profile' = 'general'
 ): { width: number; height: number } | null => {
   if (category === 'profile') {
@@ -31,15 +29,15 @@ export const getImageDimensions = (
 };
 
 export const getGeneralImageDimensions = (
-  size: string
+  size: ImageSize
 ): { width: number; height: number } | null => {
-  return getImageDimensions(size, 'general');
+  return getImageDimensions(size, MEDIA_CATEGORIES.GENERAL);
 };
 
 export const getProfileImageDimensions = (
-  size: string
+  size: ImageSize
 ): { width: number; height: number } | null => {
-  return getImageDimensions(size, 'profile');
+  return getImageDimensions(size, MEDIA_CATEGORIES.PROFILE);
 };
 
 export const formatFileSize = (sizeStr: string): string => {
@@ -92,11 +90,11 @@ export const isVideoFile = (mimeType: string): boolean => {
 };
 
 export const getMediaCategoryDisplayName = (
-  category: 'general' | 'profile'
+  category: MediaCategory
 ): string => {
   const categoryMap = {
-    general: 'General Media',
-    profile: 'Profile Image',
+    [MEDIA_CATEGORIES.GENERAL]: 'General Media',
+    [MEDIA_CATEGORIES.PROFILE]: 'Profile Image',
   };
 
   return categoryMap[category];
@@ -158,14 +156,14 @@ export const getMediaMetadataSummary = (media: MediaImage): string => {
   }
 
   // Category
-  parts.push(getMediaCategoryDisplayName(media.category as 'general' | 'profile'));
+  parts.push(getMediaCategoryDisplayName(media.category));
 
   return parts.join(' • ');
 };
 
 export const validateFileForUpload = (
   file: File,
-  category: 'general' | 'profile',
+  category: MediaCategory,
   maxSize?: number
 ): { isValid: boolean; error?: string } => {
   // Check file size
@@ -177,7 +175,7 @@ export const validateFileForUpload = (
   }
 
   // Check file type based on category
-  if (category === 'profile' && !isImageFile(file.type)) {
+  if (category === MEDIA_CATEGORIES.PROFILE && !isImageFile(file.type)) {
     return {
       isValid: false,
       error: 'Only image files are allowed for profile uploads',
@@ -204,9 +202,9 @@ export const getMediaTags = (media: MediaImage): string[] => {
 
 export const getImageUrl = (
   sizes: MediaSize[],
-  sizeName: string
+  imageSize: ImageSize
 ): string | null => {
-  const size = sizes.find((s) => s.sizeName === sizeName);
+  const size = sizes.find((s) => s.sizeName === imageSize);
   return size ? `${BASE_BACKEND_URL}/${DOMAINS.MEDIAS.value}/${size.filePath}/${size.fileName}` : null;
 };
 
@@ -217,7 +215,7 @@ export const getThumbnailUrl = (sizes: MediaSize[]): string | null => {
 export const getDisplayUrl = (sizes: MediaSize[]): string | null => {
   return (
     getImageUrl(sizes, IMAGE_SIZES.LARGE) ||
-    getImageUrl(sizes, 'original') ||
+    getImageUrl(sizes, IMAGE_SIZES.ORIGINAL) ||
     getImageUrl(sizes, sizes[0]?.sizeName) ||
     null
   );
@@ -225,7 +223,7 @@ export const getDisplayUrl = (sizes: MediaSize[]): string | null => {
 
 export const getBestSizeUrl = (
   sizes: MediaSize[],
-  preferredSize: string = IMAGE_SIZES.MEDIUM
+  preferredSize: ImageSize = IMAGE_SIZES.MEDIUM
 ): string | null => {
   // Try preferred size first
   let url = getImageUrl(sizes, preferredSize);
@@ -247,17 +245,17 @@ export const getBestSizeUrl = (
   return null;
 };
 
-export const getAvailableSizes = (sizes: MediaSize[]): string[] => {
+export const getAvailableSizes = (sizes: MediaSize[]): ImageSize[] => {
   return sizes.map((s) => s.sizeName);
 };
 
-export const hasSize = (sizes: MediaSize[], sizeName: string): boolean => {
+export const hasSize = (sizes: MediaSize[], sizeName: ImageSize): boolean => {
   return sizes.some((s) => s.sizeName === sizeName);
 };
 
 export const getSizeDimensions = (
   sizes: MediaSize[],
-  sizeName: string
+  sizeName: ImageSize
 ): { width: number; height: number } | null => {
   const size = sizes.find((s) => s.sizeName === sizeName);
   return size ? { width: size.width, height: size.height } : null;

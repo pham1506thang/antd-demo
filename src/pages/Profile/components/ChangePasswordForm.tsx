@@ -1,11 +1,10 @@
 import React from 'react';
-import { Form, Input, Button, Space } from 'antd';
-import { SaveOutlined, CloseOutlined } from '@ant-design/icons';
+import { Form, Input, Button, message, Flex } from 'antd';
+import { SaveOutlined } from '@ant-design/icons';
 import { authApi } from '@/api/slices/authApi';
+import { useApiFormErrorHandler } from '@/hooks';
 
 interface ChangePasswordFormProps {
-  onCancel: () => void;
-  onSuccess: () => void;
 }
 
 interface ChangePasswordValues {
@@ -14,12 +13,10 @@ interface ChangePasswordValues {
   confirmPassword: string;
 }
 
-export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
-  onCancel,
-  onSuccess,
-}) => {
+export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = () => {
   const [form] = Form.useForm();
   const [changePassword] = authApi.useChangePasswordMutation();
+  const { handleFormApiError } = useApiFormErrorHandler();
 
   const handleSubmit = async (values: ChangePasswordValues) => {
     try {
@@ -27,9 +24,10 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       }).unwrap();
-      onSuccess();
+      form.resetFields();
+      message.success('Đổi mật khẩu thành công');
     } catch (error) {
-      // Handle error silently or add proper error handling
+      handleFormApiError(error, form);
     }
   };
 
@@ -78,14 +76,11 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({
       </Form.Item>
 
       <Form.Item>
-        <Space>
+        <Flex justify="end">
           <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
             Đổi mật khẩu
           </Button>
-          <Button onClick={onCancel} icon={<CloseOutlined />}>
-            Hủy
-          </Button>
-        </Space>
+        </Flex>
       </Form.Item>
     </Form>
   );

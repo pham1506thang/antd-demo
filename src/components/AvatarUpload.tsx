@@ -3,30 +3,21 @@ import { Button, Avatar, Space, message } from 'antd';
 import { UserOutlined, CameraOutlined } from '@ant-design/icons';
 import { ProfileGallery } from './Gallery';
 import type { MediaImage } from '@/models/media';
-import { getThumbnailUrl } from '@/helpers/media';
 
 interface AvatarUploadProps {
-  value?: string;
-  onChange?: (value: string) => void;
+  defaultAvatar?: string;
+  draftAvatar?: string;
   size?: number;
-  // New fields for enhanced functionality
-  altText?: string;
-  description?: string;
-  isPublic?: boolean;
-  onMediaChange?: (media: MediaImage) => void; // Callback with full media object
-  // Media object for processing status
-  media?: MediaImage;
+  onMediaChange?: (media: MediaImage) => void;
+  onClear?: () => void;
 }
 
 export const AvatarUpload: React.FC<AvatarUploadProps> = ({
-  value: _value,
-  onChange,
-  size = 64,
-  altText, // Future enhancement: can be used for alt text in upload
-  description, // Future enhancement: can be used for description in upload
-  isPublic = false, // Future enhancement: can be used for privacy setting in upload
+  defaultAvatar,
+  draftAvatar,
+  size = 128,
   onMediaChange,
-  media: _media,
+  onClear,
 }) => {
   const [galleryOpen, setGalleryOpen] = useState(false);
 
@@ -34,17 +25,9 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
     if (images.length > 0) {
       const selectedImage = images[0];
       
-      // Get thumbnail URL from sizes array
-      const thumbnailUrl = getThumbnailUrl(selectedImage.sizes);
-      if (thumbnailUrl) {
-        onChange?.(thumbnailUrl);
-        message.success('Đã cập nhật avatar');
-      } else {
-        message.error('Không thể lấy URL ảnh avatar');
-      }
-      
-      // Call onMediaChange with full media object for advanced usage
+      // Call onMediaChange with full media object
       onMediaChange?.(selectedImage);
+      message.success('Đã cập nhật avatar');
     }
     setGalleryOpen(false);
   };
@@ -54,7 +37,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
       <div style={{ position: 'relative' }}>
         <Avatar
           size={size}
-          src={_value}
+          src={draftAvatar || defaultAvatar}
           icon={<UserOutlined />}
           style={{ cursor: 'pointer' }}
           onClick={() => setGalleryOpen(true)}
@@ -64,10 +47,11 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
       
       <Button
         icon={<CameraOutlined />}
-        onClick={() => setGalleryOpen(true)}
+        onClick={draftAvatar ? onClear : () => setGalleryOpen(true)}
         size="small"
+        type={draftAvatar ? 'default' : 'primary'}
       >
-        Thay đổi avatar
+        {draftAvatar ? 'Xoá' : 'Chọn avatar'}
       </Button>
       
       <ProfileGallery

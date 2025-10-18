@@ -12,9 +12,11 @@ export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
 export type User = {
   id: string;
   username: string;
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
   avatarUrl?: string;
+  thumbnailAvatarUrl?: string;
   lastLogin?: string;
   status: UserStatus;
   roles: SummaryRole[];

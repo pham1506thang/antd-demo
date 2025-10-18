@@ -37,21 +37,12 @@ export const IMAGE_DIMENSIONS = {
   [IMAGE_SIZES.LARGE]: { width: 1200, height: 800 },
 } as const;
 
-// Profile image sizes (1:1 aspect ratio - square)
-export const PROFILE_IMAGE_SIZES = {
-  THUMBNAIL: IMAGE_SIZES.THUMBNAIL,
-  SMALL: IMAGE_SIZES.SMALL,
-  MEDIUM: IMAGE_SIZES.MEDIUM,
-  LARGE: IMAGE_SIZES.LARGE,
-  ORIGINAL: IMAGE_SIZES.ORIGINAL,
-} as const;
-
 // Profile image size dimensions (1:1 aspect ratio)
 export const PROFILE_IMAGE_DIMENSIONS = {
-  [PROFILE_IMAGE_SIZES.THUMBNAIL]: { width: 150, height: 150 },
-  [PROFILE_IMAGE_SIZES.SMALL]: { width: 300, height: 300 },
-  [PROFILE_IMAGE_SIZES.MEDIUM]: { width: 600, height: 600 },
-  [PROFILE_IMAGE_SIZES.LARGE]: { width: 1200, height: 1200 },
+  [IMAGE_SIZES.THUMBNAIL]: { width: 150, height: 150 },
+  [IMAGE_SIZES.SMALL]: { width: 300, height: 300 },
+  [IMAGE_SIZES.MEDIUM]: { width: 600, height: 600 },
+  [IMAGE_SIZES.LARGE]: { width: 1200, height: 1200 },
 } as const;
 
 // Legacy constants for backward compatibility
